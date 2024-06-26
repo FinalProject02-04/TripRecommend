@@ -34,6 +34,10 @@
 		9323B9512C2A955400E751AD /* testModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9502C2A955400E751AD /* testModel.swift */; };
 		9323B9532C2A956400E751AD /* testVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9522C2A956400E751AD /* testVM.swift */; };
 		9323B9552C2A962F00E751AD /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9542C2A962F00E751AD /* ProfileView.swift */; };
+		9323B9922C2BB04900E751AD /* MainRecoModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9912C2BB04900E751AD /* MainRecoModel.swift */; };
+		9323B9942C2BB05300E751AD /* SeoulListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9932C2BB05300E751AD /* SeoulListModel.swift */; };
+		9323B9962C2BDF6100E751AD /* ProductModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9952C2BDF6100E751AD /* ProductModel.swift */; };
+		9323B9982C2C0E8400E751AD /* ChangePwView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9972C2C0E8400E751AD /* ChangePwView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,6 +69,10 @@
 		9323B9502C2A955400E751AD /* testModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testModel.swift; sourceTree = "<group>"; };
 		9323B9522C2A956400E751AD /* testVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = testVM.swift; sourceTree = "<group>"; };
 		9323B9542C2A962F00E751AD /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		9323B9912C2BB04900E751AD /* MainRecoModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainRecoModel.swift; sourceTree = "<group>"; };
+		9323B9932C2BB05300E751AD /* SeoulListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeoulListModel.swift; sourceTree = "<group>"; };
+		9323B9952C2BDF6100E751AD /* ProductModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductModel.swift; sourceTree = "<group>"; };
+		9323B9972C2C0E8400E751AD /* ChangePwView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePwView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +195,7 @@
 				9323B9322C2A942900E751AD /* JoinView.swift */,
 				9323B9342C2A943200E751AD /* LoginView.swift */,
 				9323B9362C2A944600E751AD /* FindInfoView.swift */,
+				9323B9972C2C0E8400E751AD /* ChangePwView.swift */,
 			);
 			path = JoinPage;
 			sourceTree = "<group>";
@@ -220,6 +229,9 @@
 			isa = PBXGroup;
 			children = (
 				9323B9502C2A955400E751AD /* testModel.swift */,
+				9323B9912C2BB04900E751AD /* MainRecoModel.swift */,
+				9323B9932C2BB05300E751AD /* SeoulListModel.swift */,
+				9323B9952C2BDF6100E751AD /* ProductModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -294,8 +306,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9323B9942C2BB05300E751AD /* SeoulListModel.swift in Sources */,
 				9323B92B2C2A93B800E751AD /* SeoulListDetailView.swift in Sources */,
 				9323B9372C2A944600E751AD /* FindInfoView.swift in Sources */,
+				9323B9982C2C0E8400E751AD /* ChangePwView.swift in Sources */,
 				9323B9532C2A956400E751AD /* testVM.swift in Sources */,
 				9323B92F2C2A93FE00E751AD /* ProductDetailView.swift in Sources */,
 				9323B9292C2A93AA00E751AD /* SeoulListView.swift in Sources */,
@@ -308,9 +322,11 @@
 				9323B9392C2A945500E751AD /* SplashView.swift in Sources */,
 				9323B9272C2A938500E751AD /* OurRecommendView.swift in Sources */,
 				9323B93F2C2A94AD00E751AD /* EditInfoView.swift in Sources */,
+				9323B9922C2BB04900E751AD /* MainRecoModel.swift in Sources */,
 				9323B9352C2A943200E751AD /* LoginView.swift in Sources */,
 				9323B9432C2A94DA00E751AD /* NoticeView.swift in Sources */,
 				9323B9332C2A942900E751AD /* JoinView.swift in Sources */,
+				9323B9962C2BDF6100E751AD /* ProductModel.swift in Sources */,
 				9323B9472C2A950300E751AD /* PostListView.swift in Sources */,
 				9323B93B2C2A949500E751AD /* ChatbotView.swift in Sources */,
 				9323B93D2C2A94A500E751AD /* MyPostView.swift in Sources */,

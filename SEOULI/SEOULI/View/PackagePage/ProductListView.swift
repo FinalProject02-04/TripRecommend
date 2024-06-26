@@ -8,8 +8,51 @@
 import SwiftUI
 
 struct ProductListView: View {
+    var product : [ProductModel] = [(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: "300000원")),(ProductModel(name: "야간 경복궁 투어", image: "product2", price: "150000원")),(ProductModel(name: "동대문 쇼핑센터 투어", image: "product3", price: "55000원")),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: "300000원")),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: "300000원"))]
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+            NavigationView {
+                ScrollView(showsIndicators: false) { // scrollbar 숨기기
+                    VStack(spacing: 20) {
+                        ForEach(product) { product in
+                            NavigationLink(destination: ProductDetailView(product: product)) {
+                                FullImageRow(product: product)
+                            }
+                        }
+                    }
+                    Text("")
+                        .frame(height: 30)
+                }
+            }
+        }
+}
+
+struct FullImageRow: View {
+    var product: ProductModel
+    var body: some View {
+        ZStack{
+            Image(product.image)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: 350,height: 200)
+                .cornerRadius(10)
+                .overlay(
+                    Rectangle()
+                        .foregroundStyle(.black)
+                        .cornerRadius(10)
+                        .opacity(0.2)
+                )
+            VStack(content: {
+                Text(product.name)
+                    .bold()
+                    .font(.system(.title))
+                    .foregroundStyle(.white)
+                Text(product.price)
+                    .bold()
+                    .font(.system(.title2))
+                    .foregroundStyle(.white)
+            })
+        }
     }
 }
 
