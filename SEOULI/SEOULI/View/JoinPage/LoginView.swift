@@ -34,6 +34,8 @@ struct LoginView: View {
                     Spacer()
                     
                     Image("logo")
+                        .resizable()
+                        .frame(width: 230, height: 50)
                     
                     // 간격 조절
                     Spacer().frame(height: 50)
