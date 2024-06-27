@@ -12,12 +12,12 @@ struct LoginView: View {
     @State var id = ""
     @State var password = ""
     @FocusState var isTextFieldFocused: Bool
+    @State var path = NavigationPath()
     
     var body: some View {
         
         // MARK: NavigationView
-        NavigationView(content: {
-            
+        NavigationStack(path: $path){
             // MARK: ZStack
             ZStack {
                 // MARK: VStack
@@ -103,8 +103,9 @@ struct LoginView: View {
                     
                     // MARK: ID, Password 찾기
                     HStack {
-                        NavigationLink {
-                            FindInfoView(selectedFindInfo: 0)
+                        
+                        Button {
+                            path.append("FindInfoView_Id")
                         } label: {
                             Text("아이디 찾기")
                                 .foregroundStyle(.black)
@@ -113,8 +114,8 @@ struct LoginView: View {
                         Divider()
                             .frame(height: 14)
                             .overlay(Rectangle().frame(width: 1))
-                        NavigationLink {
-                            FindInfoView(selectedFindInfo: 1)
+                        Button {
+                            path.append("FindInfoView_Pw")
                         } label: {
                             Text("비밀번호 찾기")
                                 .foregroundStyle(.black)
@@ -127,7 +128,7 @@ struct LoginView: View {
                     
                     // MARK: 로그인 버튼
                     Button{
-                        //
+                        path.append("ContentView")
                     } label: {
                         Text("로그인")
                             .padding()
@@ -185,12 +186,15 @@ struct LoginView: View {
                     HStack {
                         Text("계정이 없으세요?")
                         
-                        NavigationLink(destination: JoinView()) {
+                        Button(action: {
+                            path.append("JoinView")
+                        }, label: {
                             Text("가입하기")
                                 .bold()
                                 .underline()
                                 .foregroundColor(.black)
-                        }
+                        })
+                        
                     } // HStack
                     .padding(.top, 30)
                     
@@ -198,40 +202,26 @@ struct LoginView: View {
                     
                 }) // VStack
             } // ZStack
-        }) // NavigationView
-        
-
+            .navigationDestination(for: String.self) { value in
+                switch value {
+                case "FindInfoView_Id":
+                    FindInfoView(selectedFindInfo: 0, path: $path)
+                case "FindInfoView_Pw":
+                    FindInfoView(selectedFindInfo: 1, path: $path)
+                case "JoinView":
+                    JoinView(path: $path)
+                case "ChangePwView":
+                    ChangePwView(path: $path)
+                case "ContentView":
+                    ContentView()
+                default:
+                    Text("Unknown View")
+                }
+            }
+        } // NavigationStack
     } //body
     
 } // LoginView
-
-//struct TextFieldComponent: View {
-//    var foreground: String
-//    @Binding var data: String
-//    var body: some View {
-//        TextField("비밀번호", text: $data)
-//            // 높이 조절
-//            .frame(height: 60)
-//            // 내각 여백
-//            .padding([.horizontal], 20)
-//            // 배경색
-//            .background(Color.white)
-//            // 둥근 테두리를 추가
-//            .cornerRadius(16)
-//            // 그림자 추가
-//            .shadow(
-//                color: Color.gray.opacity(0.4),
-//                radius: 5, x: 0, y: 2
-//            )
-//            // 테두리 둥근 정도, 색상
-//            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
-//            // 외각 여백
-//            .padding([.horizontal], 24)
-//            // 폰트 사이즈
-//            .font(.system(size: 20))
-//    }
-//}
-
 
 #Preview {
     LoginView()
