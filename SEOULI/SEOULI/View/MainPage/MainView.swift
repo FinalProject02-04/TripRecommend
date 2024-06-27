@@ -28,7 +28,7 @@ struct MainView: View {
     
     // test packages
     let packages: [ProductModel] = [
-        (ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: "300000원")),(ProductModel(name: "야간 경복궁 투어", image: "product2", price: "150000원")),(ProductModel(name: "동대문 쇼핑센터 투어", image: "product3", price: "55000원")),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: "300000원")),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: "300000원"))
+        (ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: 300000)),(ProductModel(name: "야간 경복궁 투어", image: "product2", price: 150000)),(ProductModel(name: "동대문 쇼핑센터 투어", image: "product3", price: 55000)),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: 300000)),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: 300000))
     ]
     
     
