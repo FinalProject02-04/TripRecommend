@@ -2,65 +2,57 @@
 //  MainView.swift
 //  SEOULI
 //
-//  Created by 김소리 on 6/25/24.
+//  Created by 김수민 on 6/25/24.
 
 /*
- Author : Diana
+ Author : 김수민
+ 
  Date : 2024.06.26 Wednesday
- Description : 1차 UI frame 작업 (2024.06.08 Saturday 10:30)
+ Description : 1차 UI frame 작업
+ 
+ Date : 2024.06.27 Thursday
+ Description : 2차 UI frame 작업
  */
 
 import SwiftUI
 
-
-struct Location: Identifiable {
-    var id = UUID()
-    var name: String
-    var imageName: String
-}
-
-struct Packages : Identifiable {
-    var id = UUID()
-    var name: String
-    var imageName : String
-}
-
-
 struct MainView: View {
+    
     // test locations
-    let locations: [Location] = [
-        Location(name: "Location 1", imageName: "background"),
-        Location(name: "Location 2", imageName: "background2"),
-        Location(name: "Location 3", imageName: "background"),
-        Location(name: "Location 4", imageName: "background2"),
-        Location(name: "Location 5", imageName: "background")
+    let pickedlocations: [SeoulList] = [
+        SeoulList(name: "서울스카이", imageName: "seoul", description: "Very nice, very good.", address: "위례대로 6길 20", inquiries: "010-1111-1111"),
+        SeoulList(name: "청계천", imageName: "seoul2", description: "verynice, very good.",address: "위례대로 6길 20",inquiries: "010-1111-1111"),
+        SeoulList(name: "한옥마을", imageName: "seoul3", description: "very nice, very good.",address: "위례대로 6길 20",inquiries: "010-1111-1111"),
+      
     ]
     
     // test packages
-    let packages: [Packages] = [
-        Packages(name: "Package 1", imageName: "background2"),
-        Packages(name: "Package 2", imageName: "background"),
-        Packages(name: "Package 3", imageName: "background2"),
+    let packages: [ProductModel] = [
+        (ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: "300000원")),(ProductModel(name: "야간 경복궁 투어", image: "product2", price: "150000원")),(ProductModel(name: "동대문 쇼핑센터 투어", image: "product3", price: "55000원")),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: "300000원")),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: "300000원"))
     ]
+    
     
     
     var body: some View {
         NavigationStack{
             ZStack{
                 // Image (background)
-                Image("background")
+                Image("seoul")
                     .resizable()
-                    .frame(width: 395, height: 300)
-                    .padding(.bottom, 580)
+                    .frame(width: 400, height: 500)
+                    .padding(.bottom, 508)
+                
                 
                 Image("logo")
                     .resizable()
                     .frame(width: 200, height: 45)
-                    .padding(.bottom, 700)
-                // Rounded Rectangular View (
+                    .padding(.bottom, 640)
+                    .padding(.trailing)
+                
+                // Rounded Rectangular View
                 RoundedRectangle(cornerRadius: 30)
                     .fill(Color.white)
-                    .frame(width: 400, height: 760)
+                    .frame(width: 400, height: 730)
                     .padding(.top,200)
                     .shadow(radius: 10)
                     .overlay(
@@ -68,37 +60,45 @@ struct MainView: View {
                             Text("우리가 추천하는 여행지")
                                 .font(.title)
                                 .bold()
-                                .foregroundColor(.black)
+                                .foregroundColor(Color("Text Color"))
                                 .padding(.trailing, 130)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                             
                             // our recommended locations (test)
                             ScrollView(.horizontal, showsIndicators: false){
-                                HStack(){
-                                    ForEach(locations) { location in
-                                        VStack{
-                                            Image(location.imageName)
-                                                .resizable()
-                                                .frame(width: 140,height: 200)
-                                                .cornerRadius(20)
-                                                .overlay(
-                                                    Text(location.name)
-                                                        .bold()
-                                                        .foregroundColor(.white)
-                                                        .padding(.top,150)
-                                                        .padding(.trailing,10)
-                                                        .font(.title2)
-                                                )
-                                        }
-                                    }
-                                }
-                                .padding(.leading,10)
+                                HStack() {
+                                   ForEach(pickedlocations) { location in
+                                       NavigationLink(destination: SeoulListDetailView(location: location)) {
+                                           VStack {
+                                               Image(location.imageName)
+                                                   .resizable()
+                                                   .frame(width: 140, height: 200)
+                                                   .cornerRadius(20)
+                                                   .overlay(
+                                                       Rectangle()
+                                                           .foregroundStyle(.black)
+                                                           .cornerRadius(21)
+                                                           .opacity(0.21)
+                                                   )
+                                                   .overlay(
+                                                       Text(location.name)
+                                                           .bold()
+                                                           .foregroundColor(.white)
+                                                           .padding(.top, 150)
+                                                           .padding(.trailing, 10)
+                                                           .font(.title2)
+                                                   )
+                                           } // VStack
+                                       }
+                                   }
+                               }
+                               .padding(.leading, 10)
                             }
                             .padding(.bottom)
                             Text("여행 패키지")
                                 .font(.title)
                                 .bold()
-                                .foregroundColor(.black)
+                                .foregroundColor(Color("Text Color"))
                                 .padding(.trailing, 258)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                             
@@ -106,20 +106,28 @@ struct MainView: View {
                             ScrollView(.horizontal, showsIndicators: false){
                                 HStack(){
                                     ForEach(packages) { packages in
-                                        VStack{
-                                            Image(packages.imageName)
-                                                .resizable()
-                                                .frame(width: 220 ,height: 130 )
-                                                .cornerRadius(20)
-                                                .overlay(
-                                                    Text(packages.name)
-                                                        .bold()
-                                                        .foregroundColor(.white)
-                                                        .padding(.top,80)
-                                                        .padding(.trailing,80)
-                                                        .font(.title2)
-                                            )
+                                        NavigationLink(destination: ProductDetailView(product: packages)){
+                                            VStack{
+                                                Image(packages.image)
+                                                    .resizable()
+                                                    .frame(width: 230 ,height: 140 )
+                                                    .cornerRadius(20)
+                                                    .overlay(
+                                                        Rectangle()
+                                                            .foregroundStyle(.black)
+                                                            .cornerRadius(21)
+                                                            .opacity(0.21)
+                                                    )
+                                                    .overlay(
+                                                        Text(packages.name)
+                                                            .bold()
+                                                            .foregroundColor(.white)
+                                                            .padding(.top,80)
+                                                            .font(.system(size: 20))
+                                                )
+                                            } // VStack
                                         }
+                            
                                     }
                                 }
                             }
@@ -130,13 +138,13 @@ struct MainView: View {
                                     .font(.title2)
                                     .bold()
                                     .foregroundColor(.white)
-                                    .frame(width: 250, height: 50)
+                                    .frame(width: 200, height: 50)
                                     .background(Color.theme)
                                     .cornerRadius(25)
                             }
                             .padding(.top,30)
                         } // VStack
-                            .padding(.top, 35)
+                            .padding(.top, 85)
                 ) // overlay
             } // ZStack
         } // NavigationStack
