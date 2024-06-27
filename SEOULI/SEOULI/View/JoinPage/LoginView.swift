@@ -15,24 +15,29 @@ struct LoginView: View {
     
     var body: some View {
         
+        // MARK: NavigationView
         NavigationView(content: {
             
-            // 배경색 설정
+            // MARK: ZStack
             ZStack {
+                // MARK: VStack
                 VStack {
                     
                     Spacer(minLength: 300)
                     
+                    // MARK: 배경색 설정
                     LinearGradient(gradient: Gradient(colors: [Color.white, Color.theme]),
                                    startPoint: .top,
                                    endPoint: .bottom)
                     .edgesIgnoringSafeArea(.all)
                 } // VStack
                 
+                // MARK: VStack
                 VStack(content: {
                     
                     Spacer()
                     
+                    // MARK: LOGO
                     Image("logo")
                         .resizable()
                         .frame(width: 230, height: 50)
@@ -41,7 +46,7 @@ struct LoginView: View {
                     Spacer().frame(height: 50)
                     
                     
-                    // 아이디
+                    // MARK: 아이디
                     TextField("아이디", text: $id)
                         .keyboardType(.emailAddress)
                         // 높이 조절
@@ -69,7 +74,7 @@ struct LoginView: View {
                     // 간격 조절
                     Spacer().frame(height: 20)
                     
-                    // 비밀번호
+                    // MARK: 비밀번호
                     SecureField("비밀번호", text: $password)
                         // 높이 조절
                         .frame(height: 54)
@@ -96,6 +101,7 @@ struct LoginView: View {
                     // 간격 조절
                     Spacer().frame(height: 20)
                     
+                    // MARK: ID, Password 찾기
                     HStack {
                         Button(action: {
                             //
@@ -119,6 +125,7 @@ struct LoginView: View {
                     // 간격 조절
                     Spacer().frame(height: 30)
                     
+                    // MARK: 로그인 버튼
                     Button{
                         //
                     } label: {
@@ -132,30 +139,32 @@ struct LoginView: View {
                     
             //        Spacer()
                     
-                        HStack(content: {
-                            VStack{
-                                Divider()
-                                    .overlay(Rectangle().frame(height: 1))
-                                    .padding(.leading, 30)
-                            }
-                            Text("개인회원 SNS 로그인")
-                                .frame(width: 160)
-                                .bold()
-                            
-                            VStack{
-                                Divider()
-                                    .overlay(Rectangle().frame(height: 1))
-                                    .padding(.trailing, 30)
-                            }
+                    // MARK: 개인 회원 로그인
+                    HStack(content: {
+                        VStack{
+                            Divider()
+                                .overlay(Rectangle().frame(height: 1))
+                                .padding(.leading, 30)
+                        }
+                        Text("개인회원 SNS 로그인")
+                            .frame(width: 160)
+                            .bold()
+                        
+                        VStack{
+                            Divider()
+                                .overlay(Rectangle().frame(height: 1))
+                                .padding(.trailing, 30)
+                        }
 
-                        })
-                        .padding([.top, .bottom], 30)
+                    }) // HStack
+                    .padding([.top, .bottom], 30)
                     
+                    // MARK: 소셜 로그인 버튼
                     HStack(spacing: 20, content: {
                         Button(action: {
                             //
                         }, label: {
-                            Image("naver_icon")
+                            Image("google_icon")
                                 .resizable()
                                 .frame(width: 50, height: 50)
                                 .scaledToFit()
@@ -172,24 +181,24 @@ struct LoginView: View {
                         
                     }) // HStack
                     
+                    // MARK: 회원 가입
                     HStack {
                         Text("계정이 없으세요?")
+                        
                         NavigationLink(destination: JoinView()) {
                             Text("가입하기")
                                 .bold()
                                 .underline()
                                 .foregroundColor(.black)
                         }
-                    }
+                    } // HStack
                     .padding(.top, 30)
                     
                     Spacer()
                     
                 }) // VStack
-                
-                
-            }
-        })
+            } // ZStack
+        }) // NavigationView
         
 
     } //body

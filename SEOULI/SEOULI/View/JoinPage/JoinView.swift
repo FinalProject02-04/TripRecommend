@@ -19,16 +19,39 @@ struct JoinView: View {
     @State var verificationCode = ""
     
     var body: some View {
-        NavigationView(content: {
+//        NavigationView(content: {
             ZStack(content: {
-                // 배경색
+                
+                // MARK: 배경색
                 Color(red: 0.9, green: 0.9843, blue: 1.0)
                     // 가장자리까지 확장되도록 설정
-                    .edgesIgnoringSafeArea(.all)
+                    .ignoresSafeArea()
+                
+//                VStack(content: {
+//
+//                    Text("Placeholder")
+//                        .ignoresSafeArea()
+//                    
+////                    Spacer()
+//                })
+                
+                
                 
                 VStack(alignment:.leading, content: {
                     
-                    CustomNavigationBar(titleName: "회원가입", backButton: true)
+//                    HStack {
+//                        Spacer()
+//                        Text("정보 수정")
+//                          .font(.system(size: 28))
+//                          .fontWeight(.bold)
+////                          .foregroundColor(Color("Text Color"))
+////                          .padding(.bottom, 10)
+//                        Spacer()
+//                    }
+
+//                    .ignoresSafeArea()
+                    
+//                    CustomNavigationBar(titleName: "회원가입", backButton: true)
                     
                     Spacer()
                     
@@ -294,57 +317,62 @@ struct JoinView: View {
                 }) // VStack
                 .padding([.leading, .trailing], 15)
                 
+                VStack(content: {
+                    Text("이휘시치 뭐함?")
+                        .padding(.bottom, 765)
+                    
+//                    Spacer()
+                })
                 
             })
             
-            
-        })
-        .navigationBarBackButtonHidden(true)
+//        })
+//        .navigationBarBackButtonHidden(true)
     }
 }
 
-struct CustomNavigationBar: View {
-    
-    @Environment(\.dismiss) var dismiss
-    
-    @State var titleName: String
-    @State var backButton: Bool
-    
-    var body: some View {
-        ZStack(content: {
-            if backButton {
-                HStack(content: {
-                    Button(action: {
-                        dismiss.callAsFunction()
-                    }, label: {
-                        HStack(content: {
-                            Image(systemName: "arrowtriangle.backward.fill")
-                                .foregroundStyle(Color(red: 0.259, green: 0.345, blue: 0.518))
-                            
-                            Text("뒤로 가기")
-                                .foregroundStyle(Color(red: 0.259, green: 0.345, blue: 0.518))
-                                .bold()
-                        })
-                        .frame(width: UIScreen.main.bounds.width / 4, alignment: .trailing)
-                    })
-                    
-                    Text("")
-                        .frame(width: (UIScreen.main.bounds.width / 4) * 3, alignment: .leading)
-                })
-            }
-            
-            Text(titleName)
-                .font(.title)
-                .bold()
-                .foregroundStyle(Color(red: 0.259, green: 0.345, blue: 0.518))
-                .frame(width: UIScreen.main.bounds.width)
-        })
-        .ignoresSafeArea()
-        .frame(width: UIScreen.main.bounds.width, height: 50)
-
-        
-    } // body
-}
+//// MARK: CustomNavigationBar
+//struct CustomNavigationBar: View {
+//    
+//    @Environment(\.dismiss) var dismiss
+//    
+//    @State var titleName: String
+//    @State var backButton: Bool
+//    
+//    // MARK: body
+//    var body: some View {
+//        ZStack(content: {
+//            if backButton {
+//                HStack(content: {
+//                    Button(action: {
+//                        dismiss()
+//                    }, label: {
+//                        HStack(content: {
+//                            Image(systemName: "arrowtriangle.backward.fill")
+//                                .foregroundStyle(Color(red: 0.259, green: 0.345, blue: 0.518))
+//                            
+//                            Text("뒤로 가기")
+//                                .foregroundStyle(Color(red: 0.259, green: 0.345, blue: 0.518))
+//                                .bold()
+//                        })
+//                        .frame(width: UIScreen.main.bounds.width / 4, alignment: .trailing)
+//                    })
+//                    
+//                    Text("")
+//                        .frame(width: (UIScreen.main.bounds.width / 4) * 3, alignment: .leading)
+//                })
+//            }
+//            
+//            Text(titleName)
+//                .font(.title)
+//                .bold()
+//                .foregroundStyle(Color(red: 0.259, green: 0.345, blue: 0.518))
+//                .frame(width: UIScreen.main.bounds.width)
+//        })
+//        .ignoresSafeArea()
+//        .frame(width: UIScreen.main.bounds.width, height: 50)
+//    } // body
+//} // CustomNavigationBar
 
 #Preview {
     JoinView()
