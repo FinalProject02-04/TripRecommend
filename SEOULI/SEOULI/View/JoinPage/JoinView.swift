@@ -9,6 +9,7 @@ import SwiftUI
 
 struct JoinView: View {
     
+    // MARK: 변수
     @State var email = ""
     @State var password = ""
     @State var passwordCheck = ""
@@ -27,7 +28,9 @@ struct JoinView: View {
                 
                 VStack(alignment:.leading, content: {
                     
-                    CustomNavigationBar(titleName: "회원가입", backButton: false)
+                    CustomNavigationBar(titleName: "회원가입", backButton: true)
+                    
+                    Spacer()
                     
                     // MARK: 이메일
                     Text("이메일")
@@ -64,7 +67,7 @@ struct JoinView: View {
                         .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
                         .bold()
                         .padding(.leading,35)
-                    SecureField("비밀번호 입력하세요.", text: $email)
+                    SecureField("비밀번호 입력하세요.", text: $password)
                         .keyboardType(.emailAddress)
                         // 높이 조절
                         .frame(height: 40)
@@ -85,6 +88,13 @@ struct JoinView: View {
                         .padding([.horizontal], 30)
                         // 폰트 사이즈
                         .font(.system(size: 16))
+                    
+                    Text("비밀번호는 대문자와 특수문자를 포함해야 합니다.")
+                        .foregroundStyle(.red)
+                        .bold()
+                        .font(.system(size: 12))
+                        .padding(.leading, 30)
+                    
                     
                     // MARK: 비밀번호 확인
                     Text("비밀번호 확인")
@@ -92,7 +102,7 @@ struct JoinView: View {
                         .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
                         .bold()
                         .padding(.leading,35)
-                    SecureField("비밀번호 입력하세요.", text: $email)
+                    SecureField("비밀번호 입력하세요.", text: $passwordCheck)
                         .keyboardType(.emailAddress)
                         // 높이 조절
                         .frame(height: 40)
@@ -114,13 +124,19 @@ struct JoinView: View {
                         // 폰트 사이즈
                         .font(.system(size: 16))
                     
+                    Text("비밀번호가 일치합니다.")
+                        .foregroundStyle(.blue)
+                        .bold()
+                        .font(.system(size: 12))
+                        .padding(.leading, 30)
+                    
                     // MARK: 이름
                     Text("이름")
                         // 원하는 색상으로 변경
                         .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
                         .bold()
                         .padding(.leading,35)
-                    TextField("이름을 입력하세요.", text: $email)
+                    TextField("이름을 입력하세요.", text: $name)
                         .keyboardType(.emailAddress)
                         // 높이 조절
                         .frame(height: 40)
@@ -148,7 +164,7 @@ struct JoinView: View {
                         .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
                         .bold()
                         .padding(.leading,35)
-                    TextField("닉네임을 입력하세요.", text: $email)
+                    TextField("닉네임을 입력하세요.", text: $nickname)
                         .keyboardType(.emailAddress)
                         // 높이 조절
                         .frame(height: 40)
@@ -177,7 +193,7 @@ struct JoinView: View {
                         .bold()
                         .padding(.leading,35)
                     HStack {
-                        TextField("- 제외하고 번호를 입력하세요.", text: $email)
+                        TextField("- 제외하고 번호를 입력하세요.", text: $phoneNumber)
                             .keyboardType(.emailAddress)
                             // 높이 조절
                             .frame(height: 40)
@@ -215,7 +231,7 @@ struct JoinView: View {
                     }
                     .padding(.bottom, 5)
                     HStack {
-                        TextField("인증번호를 입력하세요.", text: $email)
+                        TextField("인증번호를 입력하세요.", text: $verificationCode)
                             .keyboardType(.emailAddress)
                             // 높이 조절
                             .frame(height: 40)
@@ -254,27 +270,36 @@ struct JoinView: View {
                     }
                     .padding(.bottom, 50)
                     
-                    Button{
+                    HStack {
                         
-                    }label: {
-                        Text("가입하기")
-                            .frame(width: 200)
-                            .padding()
-                            .bold()
-                            .background(.theme)
-                            .foregroundStyle(.white)
-                            .clipShape(.buttonBorder)
-                            .padding(.leading, 60)
+                        Spacer()
+                        
+                        Button{
+                            
+                        }label: {
+                            Text("가입하기")
+                                .frame(width: 200)
+                                .padding()
+                                .bold()
+                                .background(.theme)
+                                .foregroundStyle(.white)
+                                .clipShape(.buttonBorder)
                     }
-
+                        
+                        Spacer()
+                    }
                     
+                    Spacer()
 
-                })
+                }) // VStack
                 .padding([.leading, .trailing], 15)
                 
                 
             })
+            
+            
         })
+        .navigationBarBackButtonHidden(true)
     }
 }
 
