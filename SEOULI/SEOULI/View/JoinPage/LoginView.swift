@@ -103,22 +103,22 @@ struct LoginView: View {
                     
                     // MARK: ID, Password 찾기
                     HStack {
-                        Button(action: {
-                            //
-                        }, label: {
+                        NavigationLink {
+                            FindInfoView(selectedFindInfo: 0)
+                        } label: {
                             Text("아이디 찾기")
                                 .foregroundStyle(.black)
                                 .padding(.leading, 10)
-                        })
+                        }
                         Divider()
                             .frame(height: 14)
                             .overlay(Rectangle().frame(width: 1))
-                        Button(action: {
-                            //
-                        }, label: {
+                        NavigationLink {
+                            FindInfoView(selectedFindInfo: 1)
+                        } label: {
                             Text("비밀번호 찾기")
                                 .foregroundStyle(.black)
-                        })
+                        }
                     } // HStack
                     .padding(.top, 30)
                     
