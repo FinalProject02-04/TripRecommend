@@ -1,0 +1,15 @@
+{
+  "originHash" : "a5099cfadfa53a6488ccb8c8c6a5f6bc044aeb49b5c927d62fe6eaac4dc45813",
+  "pins" : [
+    {
+      "identity" : "payment-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tosspayments/payment-sdk-ios.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "cb918ca75b22d5375c1d32c05c5950510dc2710b"
+      }
+    }
+  ],
+  "version" : 3
+}

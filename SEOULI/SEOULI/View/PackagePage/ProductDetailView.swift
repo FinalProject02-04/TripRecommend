@@ -6,9 +6,33 @@
 //
 
 import SwiftUI
+import TossPayments
+
+private enum Constants {
+    static let clientKey: String = "test_ck_yL0qZ4G1VO7KnObAM5xoVoWb2MQY"
+    
+    static func createPaymentInfo(for product: ProductModel) -> PaymentInfo {
+            return DefaultPaymentInfo(
+                amount: Double(product.price)!,  // 제품 가격을 센트 단위로 사용할 수 있도록 가정
+                orderId: UUID().uuidString,  // 랜덤 UUID를 사용하여 주문 ID 생성
+                orderName: "\(product.name)",  // 제품 이름을 포함한 주문명
+                customerName: "SEOULI"  // 필요한 경우 고객명 설정
+            )
+        }
+        
+    // 예시에서 사용될 초기 테스트 결제 정보
+    static let 테스트결제정보: PaymentInfo = createPaymentInfo(for: ProductModel(name: "데이트투어&나이트투어", image: "", price: "300000"))
+}
 
 struct ProductDetailView: View {
+    
     var product : ProductModel
+    
+    @State private var showingTossPayments: Bool = false
+    @State private var showingResultAlert: Bool = false
+    @State private var resultInfo: (title: String, message: String)?
+
+    @State private var 입력한결제정보: PaymentInfo = Constants.테스트결제정보
     
     var body: some View {
         ZStack(content: {
@@ -86,7 +110,9 @@ struct ProductDetailView: View {
                     })
                     .padding(10)
                     
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
+                    Button(action: {
+                        showingTossPayments.toggle()
+                    }, label: {
                         Text("결제하기")
                             .frame(width: 200, height: 50)
                             .background(.theme)
@@ -94,6 +120,55 @@ struct ProductDetailView: View {
                             .clipShape(.capsule)
                     })
                     .padding(30)
+                    .popover(isPresented: $showingTossPayments, content: {
+                        TossPaymentsView(
+                            clientKey: Constants.clientKey,
+                            paymentMethod: .카드,
+                            paymentInfo: 입력한결제정보,
+                            isPresented: $showingTossPayments
+                        )
+                        .onSuccess { (paymentKey: String, orderId: String, amount: Int64) in
+                            print("onSuccess paymentKey \(paymentKey)")
+                            print("onSuccess orderId \(orderId)")
+                            print("onSuccess amount \(amount)")
+                            let title = "TossPayments 요청에 성공하였습니다."
+                            let message = """
+                                onSuccess
+                                paymentKey: \(paymentKey)
+                                orderId: \(orderId)
+                                amount: \(amount)
+                                """
+                            resultInfo = (title, message)
+                            showingResultAlert = true
+                        }
+                        .onFail { (errorCode: String, errorMessage: String, orderId: String) in
+                            print("onFail errorCode \(errorCode)")
+                            print("onFail errorMessage \(errorMessage)")
+                            print("onFail orderId \(orderId)")
+                            let title = "TossPayments 요청에 실패하였습니다."
+                            let message = """
+                            onFail
+                            errorCode: \(errorCode)
+                            errorMessage: \(errorMessage)
+                            orderId: \(orderId)
+                            """
+                            resultInfo = (title, message)
+                            showingResultAlert = true
+                        }
+                        .alert(isPresented: $showingResultAlert) {
+                            Alert(
+                                title: Text("\(resultInfo?.title ?? "")"),
+                                message: Text("\(resultInfo?.message ?? "")"),
+                                primaryButton: .default(Text("확인"), action: {
+                                    resultInfo = nil
+                                }),
+                                secondaryButton: .destructive(Text("클립보드에 복사하기"), action: {
+                                    UIPasteboard.general.string = resultInfo?.message
+                                    resultInfo = nil
+                                })
+                            )
+                        }
+                    })
                     
                     Text("")
                         .frame(height: 100)
@@ -107,6 +182,8 @@ struct ProductDetailView: View {
     }
 }
 
-#Preview {
-    ProductDetailView(product: ProductModel(name: "데이트투어 & 나이트투어", image: "product1", price: "300000원"))
+struct ProductDetailView_Previews: PreviewProvider {
+    static var previews: some View {
+        ProductDetailView(product: ProductModel(name: "데이트투어 & 나이트투어", image: "product1", price: "300000원"))
+    }
 }

@@ -316,12 +316,12 @@ struct JoinView: View {
 
                 }) // VStack
                 .padding([.leading, .trailing], 15)
-                
-                VStack(content: {
-                    Text("이휘시치 뭐함?")
-                        .padding(.bottom, 765)
-                    
-//                    Spacer()
+                .toolbar(content: {
+                    ToolbarItem(placement: .principal) {
+                        Text("회원가입")
+                            .bold()
+                            .font(.system(size: 24))
+                    }
                 })
                 
             })

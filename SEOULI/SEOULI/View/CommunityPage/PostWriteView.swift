@@ -1,109 +1,69 @@
-//
-//  PostWriteView.swift
-//  SEOULI
-//
-//  Created by 김소리 on 6/25/24.
-//
-
 import SwiftUI
 
 struct PostWriteView: View {
-    @Binding var posts: [PostListView.Post]
-    @State var title: String = ""
-    @State var subtitle: String = ""
-    @State var content: String = ""
-    @State var fileName: String = ""
-    @State var showAlert: Bool = false
-    @State var alertMessage: String = ""
-
+    @State private var title: String = ""
+    @State private var subtitle: String = ""
+    @State private var content: String = ""
+    
     var body: some View {
-        VStack {
-            Text("작성")
-                .font(.largeTitle)
-                .fontWeight(.bold)
-                .padding()
-
+        VStack(alignment: .center, spacing: 20) {
             TextField("장소명", text: $title)
-                .font(.system(size: 18))
                 .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
+                .background(RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.black, lineWidth: 0.5))
+                .frame(height: 44)
                 .padding(.horizontal)
-                .keyboardType(.default)
-
+                .frame(maxWidth: .infinity)
+            
             TextField("One Liner", text: $subtitle)
-                .font(.system(size: 18))
                 .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
+                .background(RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.black, lineWidth: 0.5))
+                .frame(height: 44)
                 .padding(.horizontal)
-                .keyboardType(.default)
-
-            TextEditor(text: $content)
-                .font(.system(size: 18))
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(10)
-                .padding(.horizontal)
-                .keyboardType(.default)
-
-            HStack {
-                TextField("파일명", text: $fileName)
-                    .font(.system(size: 18))
-                    .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
-                    .padding(.horizontal)
-                    .keyboardType(.default)
-                    .disabled(true)
-
-                Button(action: {
-                    // 첨부하기 버튼 동작 구현
-                }) {
-                    Text("첨부하기")
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 100, height: 50)
-                        .background(Color.blue)
-                        .cornerRadius(10)
+                .frame(maxWidth: .infinity)
+            
+            ZStack(alignment: .topLeading) {
+                if content.isEmpty {
+                    Text("내용을 입력하세요")
+                        .foregroundColor(.gray)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 10)
                 }
+                TextEditor(text: $content)
+                    .frame(minHeight: 200)
+                    .padding(.horizontal, 4)
+                    .background(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.black, lineWidth: 1)
+                    )
+                    .opacity(content.isEmpty ? 0.5 : 1.0) // 내용이 비어있을 때 투명도 조절
             }
-
-            Spacer()
-
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal)
+            
             Button(action: {
-                if title.isEmpty && subtitle.isEmpty {
-                    showAlert = true
-                    alertMessage = "장소명과 One Liner를 모두 입력해주세요"
-                } else if title.isEmpty {
-                    showAlert = true
-                    alertMessage = "장소명을 입력하지 않았습니다."
-                } else if subtitle.isEmpty {
-                    showAlert = true
-                    alertMessage = "One Liner를 입력하지 않았습니다."
-                } else {
-                    let newPost = PostListView.Post(title: title, subtitle: subtitle)
-                    posts.append(newPost)
-                }
+                // 작성 완료 버튼 동작 구현
+                print("작성 완료 버튼 클릭됨")
             }) {
-                Text("작성완료")
-                    .fontWeight(.bold)
+                Text("작성 완료")
                     .foregroundColor(.white)
                     .padding()
-                    .frame(width: 100, height: 50)
-                    .background(Color.blue)
-                    .cornerRadius(10)
+                    .frame(width: 200)
+                    .background(Color.theme)
+                    .cornerRadius(25)
             }
-            .padding(.bottom)
-            .alert(isPresented: $showAlert) {
-                Alert(title: Text("알림"), message: Text(alertMessage), dismissButton: .default(Text("확인")))
-            }
+            .padding(.horizontal)
+            
+            Spacer()
         }
         .padding()
     }
 }
 
-#Preview {
-    PostWriteView(posts: .constant([]))
+struct PostWriteView_Previews: PreviewProvider {
+    static var previews: some View {
+        PostWriteView()
+    }
 }
+
