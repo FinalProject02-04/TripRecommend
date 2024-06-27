@@ -13,15 +13,12 @@ private enum Constants {
     
     static func createPaymentInfo(for product: ProductModel) -> PaymentInfo {
         return DefaultPaymentInfo(
-            amount: Double(product.price)!,  // 제품 가격을 센트 단위로 사용할 수 있도록 가정
+            amount: Double(product.price),  // 제품 가격을 센트 단위로 사용할 수 있도록 가정
             orderId: UUID().uuidString,  // 랜덤 UUID를 사용하여 주문 ID 생성
             orderName: "\(product.name)",  // 제품 이름을 포함한 주문명
             customerName: "SEOULI"  // 필요한 경우 고객명 설정
         )
     }
-    
-    // 예시에서 사용될 초기 테스트 결제 정보
-    static let 테스트결제정보: PaymentInfo = createPaymentInfo(for: ProductModel(name: "데이트투어&나이트투어", image: "", price: "300000"))
 }
 
 struct ProductDetailView: View {
@@ -31,12 +28,17 @@ struct ProductDetailView: View {
     var product: ProductModel
     @State var issuccess : Bool = false
     
-    // 토스에 필요한
+    // 토스에 필요한 변수들
     @State private var showingTossPayments: Bool = false
     @State private var showingResultAlert: Bool = false
     @State private var resultInfo: (title: String, message: String)?
     
-    @State private var 입력한결제정보: PaymentInfo = Constants.테스트결제정보
+    @State private var 입력한결제정보: PaymentInfo
+    
+    init(product: ProductModel) {
+            self.product = product
+            self._입력한결제정보 = State(initialValue: Constants.createPaymentInfo(for: product))
+        }
     
     var body: some View {
         ZStack {
@@ -104,7 +106,7 @@ struct ProductDetailView: View {
                     
                     HStack {
                         Spacer()
-                        Text(product.price)
+                        Text("\(product.price)")
                             .bold()
                             .font(.system(size: 30))
                             .padding(.trailing, 30)
@@ -180,6 +182,6 @@ struct ProductDetailView: View {
 
 struct ProductDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        ProductDetailView(product: ProductModel(name: "데이트투어 & 나이트투어", image: "product1", price: "300000원"))
+        ProductDetailView(product: ProductModel(name: "데이트투어 & 나이트투어", image: "product1", price: 300000))
     }
 }

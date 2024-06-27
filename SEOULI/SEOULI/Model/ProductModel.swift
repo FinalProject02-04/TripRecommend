@@ -11,5 +11,5 @@ struct ProductModel : Identifiable{
     var id = UUID()
     var name: String
     var image: String
-    var price : String
+    var price : Int
 }
