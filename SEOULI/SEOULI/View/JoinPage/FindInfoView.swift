@@ -18,6 +18,8 @@ struct FindInfoView: View {
     @State var pwSendAlert = false
     @State var pwCheckAlert = false
     @State var resultIdAlert = false
+    @Environment(\.dismiss) var dismiss
+    @Binding var path: NavigationPath
     
     var body: some View {
         
@@ -151,6 +153,7 @@ struct FindInfoView: View {
                         }
                         .alert("아이디 확인", isPresented: $resultIdAlert, actions: {
                             Button("OK", role: .none, action: {
+                                path.removeLast()
                                 print("성공")
                             })
                         },
@@ -259,9 +262,9 @@ struct FindInfoView: View {
                         
                         // MARK: 비밀번호 찾기 버튼
                         
-                        NavigationLink {
-//                            ChangePwView()
-                        } label: {
+                        Button(action: {
+                            path.append("ChangePwView")
+                        }, label: {
                             Text("비밀번호 찾기")
                                 .padding()
                                 .frame(width: 200)
@@ -269,7 +272,8 @@ struct FindInfoView: View {
                                 .background(.theme)
                                 .foregroundStyle(.white)
                                 .clipShape(.buttonBorder)
-                        }
+                        })
+                        
                     }
                     Spacer()
                 } // VStack
@@ -286,5 +290,5 @@ struct FindInfoView: View {
 } // FindInfoView
 
 #Preview {
-    FindInfoView(selectedFindInfo: 0)
+    FindInfoView(selectedFindInfo: 0, path:LoginView().$path)
 }
