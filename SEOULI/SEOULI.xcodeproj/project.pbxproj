@@ -37,7 +37,9 @@
 		9323B9552C2A962F00E751AD /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9542C2A962F00E751AD /* ProfileView.swift */; };
 		9323B9942C2BB05300E751AD /* SeoulListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9932C2BB05300E751AD /* SeoulListModel.swift */; };
 		9323B9962C2BDF6100E751AD /* ProductModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9952C2BDF6100E751AD /* ProductModel.swift */; };
-		9323B9982C2C0E8400E751AD /* ChangePwView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9972C2C0E8400E751AD /* ChangePwView.swift */; };
+		9397594E2C2D32AA00DC0700 /* TossPayments in Frameworks */ = {isa = PBXBuildFile; productRef = 9397594D2C2D32AA00DC0700 /* TossPayments */; };
+		939759502C2D33D600DC0700 /* test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9397594F2C2D33D600DC0700 /* test.swift */; };
+		939759522C2D3CE200DC0700 /* ChangePwView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939759512C2D3CE200DC0700 /* ChangePwView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,7 +74,8 @@
 		9323B9542C2A962F00E751AD /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		9323B9932C2BB05300E751AD /* SeoulListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeoulListModel.swift; sourceTree = "<group>"; };
 		9323B9952C2BDF6100E751AD /* ProductModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductModel.swift; sourceTree = "<group>"; };
-		9323B9972C2C0E8400E751AD /* ChangePwView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePwView.swift; sourceTree = "<group>"; };
+		9397594F2C2D33D600DC0700 /* test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = test.swift; sourceTree = "<group>"; };
+		939759512C2D3CE200DC0700 /* ChangePwView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePwView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9397594E2C2D32AA00DC0700 /* TossPayments in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,6 +158,7 @@
 				9323B92C2C2A93F000E751AD /* ProductListView.swift */,
 				9323B92E2C2A93FE00E751AD /* ProductDetailView.swift */,
 				9323B9302C2A941000E751AD /* CheckoutView.swift */,
+				9397594F2C2D33D600DC0700 /* test.swift */,
 			);
 			path = PackagePage;
 			sourceTree = "<group>";
@@ -195,7 +200,7 @@
 				9323B9322C2A942900E751AD /* JoinView.swift */,
 				9323B9342C2A943200E751AD /* LoginView.swift */,
 				9323B9362C2A944600E751AD /* FindInfoView.swift */,
-				9323B9972C2C0E8400E751AD /* ChangePwView.swift */,
+				939759512C2D3CE200DC0700 /* ChangePwView.swift */,
 			);
 			path = JoinPage;
 			sourceTree = "<group>";
@@ -252,6 +257,9 @@
 			dependencies = (
 			);
 			name = SEOULI;
+			packageProductDependencies = (
+				9397594D2C2D32AA00DC0700 /* TossPayments */,
+			);
 			productName = SEOULI;
 			productReference = 9323B9082C2A899900E751AD /* SEOULI.app */;
 			productType = "com.apple.product-type.application";
@@ -280,6 +288,9 @@
 				Base,
 			);
 			mainGroup = 9323B8FF2C2A899900E751AD;
+			packageReferences = (
+				9397594C2C2D32AA00DC0700 /* XCRemoteSwiftPackageReference "payment-sdk-ios" */,
+			);
 			productRefGroup = 9323B9092C2A899900E751AD /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -309,7 +320,6 @@
 				9323B9942C2BB05300E751AD /* SeoulListModel.swift in Sources */,
 				9323B92B2C2A93B800E751AD /* SeoulListDetailView.swift in Sources */,
 				9323B9372C2A944600E751AD /* FindInfoView.swift in Sources */,
-				9323B9982C2C0E8400E751AD /* ChangePwView.swift in Sources */,
 				9323B9532C2A956400E751AD /* testVM.swift in Sources */,
 				9323B92F2C2A93FE00E751AD /* ProductDetailView.swift in Sources */,
 				9323B9292C2A93AA00E751AD /* SeoulListView.swift in Sources */,
@@ -319,6 +329,8 @@
 				9323B90E2C2A899900E751AD /* ContentView.swift in Sources */,
 				9323B9252C2A937800E751AD /* MainView.swift in Sources */,
 				931EDF502C2CF8830097B7F8 /* PostModel.swift in Sources */,
+				939759502C2D33D600DC0700 /* test.swift in Sources */,
+				939759522C2D3CE200DC0700 /* ChangePwView.swift in Sources */,
 				9323B90C2C2A899900E751AD /* SEOULIApp.swift in Sources */,
 				9323B9392C2A945500E751AD /* SplashView.swift in Sources */,
 				9323B9272C2A938500E751AD /* OurRecommendView.swift in Sources */,
@@ -546,6 +558,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9397594C2C2D32AA00DC0700 /* XCRemoteSwiftPackageReference "payment-sdk-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tosspayments/payment-sdk-ios.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9397594D2C2D32AA00DC0700 /* TossPayments */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9397594C2C2D32AA00DC0700 /* XCRemoteSwiftPackageReference "payment-sdk-ios" */;
+			productName = TossPayments;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9323B9002C2A899900E751AD /* Project object */;
 }
