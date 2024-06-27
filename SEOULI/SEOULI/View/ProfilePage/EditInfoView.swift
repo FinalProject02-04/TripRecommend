@@ -57,7 +57,12 @@ struct EditInfoView: View {
                             .padding([.horizontal], 30)
                             // 폰트 사이즈
                             .font(.system(size: 16))
-                            .padding(.bottom, 20)
+                        Text("비밀번호는 대문자와 특수문자를 포함해야 합니다.")
+                            .foregroundStyle(.red)
+                            .bold()
+                            .font(.system(size: 12))
+                            .padding(.trailing,88)
+
                     }
 
                     // Password Check
@@ -86,8 +91,15 @@ struct EditInfoView: View {
                             .padding([.horizontal], 30)
                             // 폰트 사이즈
                             .font(.system(size: 16))
-                            .padding(.bottom, 20)
+                        Text("비밀번호가 일치합니다.")
+                            .foregroundStyle(.blue)
+                            .bold()
+                            .font(.system(size: 12))
+                            .padding(.trailing, 210)
                     }
+                    
+                   
+                    
 
                     // Nickname
                     VStack {
