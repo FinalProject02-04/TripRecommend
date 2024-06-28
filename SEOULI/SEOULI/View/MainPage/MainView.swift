@@ -12,6 +12,9 @@
  
  Date : 2024.06.27 Thursday
  Description : 2차 UI frame 작업
+ 
+ Date : 2024.06.28 Friday
+ Description : HWIBOT view 추가
  */
 
 import SwiftUI
@@ -146,6 +149,10 @@ struct MainView: View {
                         } // VStack
                             .padding(.top, 85)
                 ) // overlay
+  
+                // HWIBOT VIEW
+                ChatbotView()
+    
             } // ZStack
         } // NavigationStack
         .navigationBarBackButtonHidden(true)
