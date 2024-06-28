@@ -23,7 +23,7 @@ struct MyPostView: View {
     ]
     
     var body: some View {
-        NavigationStack {
+        
             ZStack(alignment: .top) {
                 Color("Background Color")
                     .edgesIgnoringSafeArea(.all)
@@ -52,9 +52,6 @@ struct MyPostView: View {
                 })
             } // ZStack
             .edgesIgnoringSafeArea(.all)
-        } // NavigationView
-        .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden)
     } // body
 }
 
