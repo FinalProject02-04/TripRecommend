@@ -1,18 +1,18 @@
 //
-//  RecommendView.swift
+//  RecommendResultView.swift
 //  SEOULI
 //
-//  Created by 김소리 on 6/25/24.
+//  Created by 김소리 on 6/28/24.
 //
 
 import SwiftUI
 
-struct RecommendView: View {
+struct RecommendResultView: View {
     var body: some View {
         Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
     }
 }
 
 #Preview {
-    RecommendView()
+    RecommendResultView()
 }
