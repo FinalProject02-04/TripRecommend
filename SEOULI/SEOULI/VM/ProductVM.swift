@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct ProductVM{
     func selectProduct() async throws -> [ProductModel] {
