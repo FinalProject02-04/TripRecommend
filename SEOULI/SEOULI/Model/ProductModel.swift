@@ -16,6 +16,7 @@ struct ProductModel : Decodable{
     var trans : String
     var tourlist : String
     var stay : String
+    var image : String
 }
 
 extension ProductModel: Hashable {
