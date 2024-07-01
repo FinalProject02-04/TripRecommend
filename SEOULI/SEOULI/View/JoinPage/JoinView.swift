@@ -17,6 +17,8 @@ struct JoinView: View {
     @State var nickname = ""
     @State var phoneNumber = ""
     @State var verificationCode = ""
+    @State var joinAlert = false
+    @Binding var path: NavigationPath
     
     var body: some View {
 //        NavigationView(content: {
@@ -25,33 +27,9 @@ struct JoinView: View {
                 // MARK: 배경색
                 Color(red: 0.9, green: 0.9843, blue: 1.0)
                     // 가장자리까지 확장되도록 설정
-                    .ignoresSafeArea()
-                
-//                VStack(content: {
-//
-//                    Text("Placeholder")
-//                        .ignoresSafeArea()
-//                    
-////                    Spacer()
-//                })
-                
-                
+                    .edgesIgnoringSafeArea(.all)
                 
                 VStack(alignment:.leading, content: {
-                    
-//                    HStack {
-//                        Spacer()
-//                        Text("정보 수정")
-//                          .font(.system(size: 28))
-//                          .fontWeight(.bold)
-////                          .foregroundColor(Color("Text Color"))
-////                          .padding(.bottom, 10)
-//                        Spacer()
-//                    }
-
-//                    .ignoresSafeArea()
-                    
-//                    CustomNavigationBar(titleName: "회원가입", backButton: true)
                     
                     Spacer()
                     
@@ -298,6 +276,7 @@ struct JoinView: View {
                         Spacer()
                         
                         Button{
+                            joinAlert = true
                             
                         }label: {
                             Text("가입하기")
@@ -307,7 +286,16 @@ struct JoinView: View {
                                 .background(.theme)
                                 .foregroundStyle(.white)
                                 .clipShape(.buttonBorder)
-                    }
+                        }
+                        .alert("가입완료", isPresented: $joinAlert, actions: {
+                            Button("OK", role: .none, action: {
+                                path.removeLast()
+                                print("성공")
+                            })
+                        },
+                        message: {
+                            Text("가입이 완료되었습니다.")
+                        })
                         
                         Spacer()
                     }
@@ -375,5 +363,5 @@ struct JoinView: View {
 //} // CustomNavigationBar
 
 #Preview {
-    JoinView()
+    JoinView(path:LoginView().$path)
 }
