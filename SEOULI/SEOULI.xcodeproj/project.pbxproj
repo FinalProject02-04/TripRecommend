@@ -11,6 +11,11 @@
 		931810D22C2E63DF004401EB /* RecommendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810D12C2E63DF004401EB /* RecommendView.swift */; };
 		931810D42C2E6B73004401EB /* RecommendResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810D32C2E6B73004401EB /* RecommendResultView.swift */; };
 		931810D62C324AB2004401EB /* ProductVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810D52C324AB2004401EB /* ProductVM.swift */; };
+		931810D92C326E0C004401EB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 931810D82C326E0C004401EB /* FirebaseAuth */; };
+		931810DC2C326E7A004401EB /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 931810DB2C326E7A004401EB /* GoogleSignIn */; };
+		931810DE2C326E7A004401EB /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 931810DD2C326E7A004401EB /* GoogleSignInSwift */; };
+		931810E02C326E8E004401EB /* SeoulListVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810DF2C326E8E004401EB /* SeoulListVM.swift */; };
+		931810E22C326F63004401EB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 931810E12C326F63004401EB /* GoogleService-Info.plist */; };
 		931EDF502C2CF8830097B7F8 /* PostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931EDF4F2C2CF8830097B7F8 /* PostModel.swift */; };
 		9323B90C2C2A899900E751AD /* SEOULIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B90B2C2A899900E751AD /* SEOULIApp.swift */; };
 		9323B90E2C2A899900E751AD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B90D2C2A899900E751AD /* ContentView.swift */; };
@@ -48,6 +53,9 @@
 		931810D12C2E63DF004401EB /* RecommendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendView.swift; sourceTree = "<group>"; };
 		931810D32C2E6B73004401EB /* RecommendResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendResultView.swift; sourceTree = "<group>"; };
 		931810D52C324AB2004401EB /* ProductVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductVM.swift; sourceTree = "<group>"; };
+		931810DF2C326E8E004401EB /* SeoulListVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeoulListVM.swift; sourceTree = "<group>"; };
+		931810E12C326F63004401EB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		931810E32C326F7F004401EB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		931EDF4F2C2CF8830097B7F8 /* PostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostModel.swift; sourceTree = "<group>"; };
 		9323B9082C2A899900E751AD /* SEOULI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SEOULI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9323B90B2C2A899900E751AD /* SEOULIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SEOULIApp.swift; sourceTree = "<group>"; };
@@ -86,6 +94,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				9397594E2C2D32AA00DC0700 /* TossPayments in Frameworks */,
+				931810D92C326E0C004401EB /* FirebaseAuth in Frameworks */,
+				931810DC2C326E7A004401EB /* GoogleSignIn in Frameworks */,
+				931810DE2C326E7A004401EB /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,6 +131,8 @@
 		9323B90A2C2A899900E751AD /* SEOULI */ = {
 			isa = PBXGroup;
 			children = (
+				931810E32C326F7F004401EB /* Info.plist */,
+				931810E12C326F63004401EB /* GoogleService-Info.plist */,
 				9323B94D2C2A952C00E751AD /* Model */,
 				9323B94C2C2A952700E751AD /* VM */,
 				9323B9192C2A922300E751AD /* View */,
@@ -237,6 +250,7 @@
 			children = (
 				9323B9522C2A956400E751AD /* testVM.swift */,
 				931810D52C324AB2004401EB /* ProductVM.swift */,
+				931810DF2C326E8E004401EB /* SeoulListVM.swift */,
 			);
 			path = VM;
 			sourceTree = "<group>";
@@ -270,6 +284,9 @@
 			name = SEOULI;
 			packageProductDependencies = (
 				9397594D2C2D32AA00DC0700 /* TossPayments */,
+				931810D82C326E0C004401EB /* FirebaseAuth */,
+				931810DB2C326E7A004401EB /* GoogleSignIn */,
+				931810DD2C326E7A004401EB /* GoogleSignInSwift */,
 			);
 			productName = SEOULI;
 			productReference = 9323B9082C2A899900E751AD /* SEOULI.app */;
@@ -301,6 +318,8 @@
 			mainGroup = 9323B8FF2C2A899900E751AD;
 			packageReferences = (
 				9397594C2C2D32AA00DC0700 /* XCRemoteSwiftPackageReference "payment-sdk-ios" */,
+				931810D72C326E0C004401EB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				931810DA2C326E7A004401EB /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			productRefGroup = 9323B9092C2A899900E751AD /* Products */;
 			projectDirPath = "";
@@ -318,6 +337,7 @@
 			files = (
 				9323B9132C2A899B00E751AD /* Preview Assets.xcassets in Resources */,
 				9323B9102C2A899B00E751AD /* Assets.xcassets in Resources */,
+				931810E22C326F63004401EB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -347,6 +367,7 @@
 				939759522C2D3CE200DC0700 /* ChangePwView.swift in Sources */,
 				9323B90C2C2A899900E751AD /* SEOULIApp.swift in Sources */,
 				9323B9392C2A945500E751AD /* SplashView.swift in Sources */,
+				931810E02C326E8E004401EB /* SeoulListVM.swift in Sources */,
 				9323B93F2C2A94AD00E751AD /* EditInfoView.swift in Sources */,
 				9323B9352C2A943200E751AD /* LoginView.swift in Sources */,
 				9323B9432C2A94DA00E751AD /* NoticeView.swift in Sources */,
@@ -494,6 +515,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"SEOULI/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SEOULI/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -526,6 +548,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"SEOULI/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SEOULI/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -572,6 +595,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		931810D72C326E0C004401EB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 10.28.1;
+			};
+		};
+		931810DA2C326E7A004401EB /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.1.0;
+			};
+		};
 		9397594C2C2D32AA00DC0700 /* XCRemoteSwiftPackageReference "payment-sdk-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/tosspayments/payment-sdk-ios.git";
@@ -583,6 +622,21 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		931810D82C326E0C004401EB /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 931810D72C326E0C004401EB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		931810DB2C326E7A004401EB /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 931810DA2C326E7A004401EB /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		931810DD2C326E7A004401EB /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 931810DA2C326E7A004401EB /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
 		9397594D2C2D32AA00DC0700 /* TossPayments */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9397594C2C2D32AA00DC0700 /* XCRemoteSwiftPackageReference "payment-sdk-ios" */;
