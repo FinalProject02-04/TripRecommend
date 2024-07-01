@@ -11,7 +11,10 @@ import SwiftUI
 struct FindInfoView: View {
     
     @State var selectedFindInfo: Int
-    @State var phoneNumber = ""
+    @State var idPhoneNumber = ""
+    @State var idCheckNumber = ""
+    @State var pwPhoneNumber = ""
+    @State var pwCheckNumber = ""
     @State var verificationCode = ""
     @State var idSendAlert = false
     @State var idCheckAlert = false
@@ -23,7 +26,6 @@ struct FindInfoView: View {
     
     var body: some View {
         
-            // MARK: ZStack
             ZStack(content: {
                 
                 // MARK: 배경색
@@ -39,11 +41,11 @@ struct FindInfoView: View {
                     .pickerStyle(SegmentedPickerStyle())
                     .padding()
                     
-                    // MARK: tag 별
                     if selectedFindInfo == 0{
+                        
                         HStack {
                             // MARK: 휴대폰 번호 입력
-                            TextField("- 제외하고 번호를 입력하세요.", text: $phoneNumber)
+                            TextField("- 제외하고 번호를 입력하세요.", text: $idPhoneNumber)
                                 .keyboardType(.emailAddress)
                                 // 높이 조절
                                 .frame(height: 40)
@@ -91,7 +93,7 @@ struct FindInfoView: View {
                         
                         // MARK: 인증번호 입력
                         HStack {
-                            TextField("- 제외하고 번호를 입력하세요.", text: $phoneNumber)
+                            TextField("인증번호를 입력하세요.", text: $idCheckNumber)
                                 .keyboardType(.emailAddress)
                                 // 높이 조절
                                 .frame(height: 40)
@@ -164,7 +166,7 @@ struct FindInfoView: View {
                     } else{
                         // MARK: 휴대폰 번호 입력
                         HStack {
-                            TextField("- 제외하고 번호를 입력하세요.", text: $phoneNumber)
+                            TextField("- 제외하고 번호를 입력하세요.", text: $pwPhoneNumber)
                                 .keyboardType(.emailAddress)
                                 // 높이 조절
                                 .frame(height: 40)
@@ -212,7 +214,7 @@ struct FindInfoView: View {
                         
                         // MARK: 인증번호 입력
                         HStack {
-                            TextField("인증번호를 입력하세요.", text: $phoneNumber)
+                            TextField("인증번호를 입력하세요.", text: $pwCheckNumber)
                                 .keyboardType(.emailAddress)
                                 // 높이 조절
                                 .frame(height: 40)
