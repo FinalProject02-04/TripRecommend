@@ -42,7 +42,7 @@ struct ProductDetailView: View {
     
     var body: some View {
         ZStack {
-            Image(product.image)
+            Image("seoul")
                 .resizable()
                 .ignoresSafeArea()
             
@@ -60,7 +60,7 @@ struct ProductDetailView: View {
                     .foregroundColor(.white)
                 
                 ScrollView {
-                    Image(product.image)
+                    Image("seoul")
                         .resizable()
                         .frame(width: 300, height: 200)
                         .padding(30)
@@ -71,7 +71,9 @@ struct ProductDetailView: View {
                     
                     HStack {
                         Text(" • 날짜 ")
-                        Text("24.06.20 ~ 24.06.22")
+                        Text(product.startdate)
+                        Text(" ~ ")
+                        Text(product.enddate)
                     }
                     .padding(8)
                     
@@ -82,19 +84,19 @@ struct ProductDetailView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(20)
                         
-                        Text("숙소 : 롯데 호텔")
+                        Text("숙소 : \(product.stay)")
                             .bold()
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
                             .padding(.bottom, 10)
                         
-                        Text("이동수단 : 버스")
+                        Text("이동수단 : \(product.trans)")
                             .bold()
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
                             .padding(.bottom, 10)
                         
-                        Text("관광 : 롯데월드, 롯더타워, 석촌호수")
+                        Text("관광 : \(product.tourlist)")
                             .bold()
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
@@ -182,6 +184,6 @@ struct ProductDetailView: View {
 
 struct ProductDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        ProductDetailView(product: ProductModel(name: "데이트투어 & 나이트투어", image: "product1", price: 300000))
+        ProductDetailView(product: ProductModel(id: 1, name: "나이트투어", price: 300000, startdate: "2024-06-28", enddate: "2024-06-30", trans: "고속버스", tourlist: "서울역,김포공항", stay: "신라호텔"))
     }
 }

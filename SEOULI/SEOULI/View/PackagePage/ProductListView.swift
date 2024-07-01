@@ -8,13 +8,17 @@
 import SwiftUI
 
 struct ProductListView: View {
-    var product : [ProductModel] = [(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: 300000)),(ProductModel(name: "야간 경복궁 투어", image: "product2", price: 150000)),(ProductModel(name: "동대문 쇼핑센터 투어", image: "product3", price: 55000)),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: 300000)),(ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: 300000))]
+    @State var product : [ProductModel] = []
+    @State var isLoading : Bool = true
     
     var body: some View {
-            NavigationView {
+        NavigationView {
+            if isLoading{
+                ProgressView()
+            }else{
                 ScrollView(showsIndicators: false) { // scrollbar 숨기기
                     VStack(spacing: 20) {
-                        ForEach(product) { product in
+                        ForEach(product,id: \.id) { product in
                             NavigationLink(destination: ProductDetailView(product: product)) {
                                 FullImageRow(product: product)
                             }
@@ -25,13 +29,26 @@ struct ProductListView: View {
                 }
             }
         }
+            .onAppear(perform: {
+                loadProduct()
+            })
+        }
+    
+    func loadProduct(){
+        let api = ProductVM()
+        Task{
+            product = try await api.selectProduct()
+            isLoading = false
+        }
+    }
 }
+
 
 struct FullImageRow: View {
     var product: ProductModel
     var body: some View {
         ZStack{
-            Image(product.image)
+            Image("seoul")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 350,height: 200)
