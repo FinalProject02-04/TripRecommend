@@ -184,6 +184,6 @@ struct ProductDetailView: View {
 
 struct ProductDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        ProductDetailView(product: ProductModel(id: 1, name: "나이트투어", price: 300000, startdate: "2024-06-28", enddate: "2024-06-30", trans: "고속버스", tourlist: "서울역,김포공항", stay: "신라호텔"))
+        ProductDetailView(product: ProductModel(id: 1, name: "나이트투어", price: 300000, startdate: "2024-06-28", enddate: "2024-06-30", trans: "고속버스", tourlist: "서울역,김포공항", stay: "신라호텔", image: "seoul"))
     }
 }

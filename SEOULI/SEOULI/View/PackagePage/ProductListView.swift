@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProductListView: View {
     @State var product : [ProductModel] = []
+    @State var productImage : Image?
     @State var isLoading : Bool = true
     
     var body: some View {
@@ -29,10 +30,10 @@ struct ProductListView: View {
                 }
             }
         }
-            .onAppear(perform: {
-                loadProduct()
-            })
-        }
+        .onAppear(perform: {
+            loadProduct()
+        })
+    }
     
     func loadProduct(){
         let api = ProductVM()
@@ -48,17 +49,26 @@ struct FullImageRow: View {
     var product: ProductModel
     var body: some View {
         ZStack{
-            Image("seoul")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 350,height: 200)
-                .cornerRadius(10)
-                .overlay(
-                    Rectangle()
-                        .foregroundStyle(.black)
-                        .cornerRadius(10)
-                        .opacity(0.2)
-                )
+            if let imageData = Data(base64Encoded: product.image), let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height: 200)
+                    .cornerRadius(10)
+                
+            }else{
+                Image("seoul")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 350,height: 200)
+                    .cornerRadius(10)
+                    .overlay(
+                        Rectangle()
+                            .foregroundStyle(.black)
+                            .cornerRadius(10)
+                            .opacity(0.2)
+                    )
+            }
             VStack(content: {
                 Text(product.name)
                     .bold()
