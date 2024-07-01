@@ -90,7 +90,7 @@ struct MotivationSelect: View {
 struct ConpanionsSelect: View {
     @State private var navigateToNextView = false
     @State private var selectedOption: String? = nil
-    let options = ["혼자", "동반1인", "동반2인", "동반3인"]
+    let options = ["혼자", "동반 1인", "동반 2인", "동반 3인"]
     
     var body: some View {
         VStack {
