@@ -49,15 +49,8 @@ struct FullImageRow: View {
     var product: ProductModel
     var body: some View {
         ZStack{
-            if let imageData = Data(base64Encoded: product.image), let uiImage = UIImage(data: imageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(height: 200)
-                    .cornerRadius(10)
-                
-            }else{
-                Image("seoul")
+            AsyncImage(url: URL(string: "http://192.168.50.83:8000/package/image?img_name=\(product.image)"), content: { Image in
+                Image
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 350,height: 200)
@@ -68,7 +61,11 @@ struct FullImageRow: View {
                             .cornerRadius(10)
                             .opacity(0.2)
                     )
+            }) {
+                Image("seoul")
             }
+                
+            
             VStack(content: {
                 Text(product.name)
                     .bold()

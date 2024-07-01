@@ -42,9 +42,13 @@ struct ProductDetailView: View {
     
     var body: some View {
         ZStack {
-            Image("seoul")
-                .resizable()
-                .ignoresSafeArea()
+            AsyncImage(url: URL(string: "http://192.168.50.83:8000/package/image?img_name=\(product.image)"), content: { Image in
+                Image
+                    .resizable()
+                    .ignoresSafeArea()
+            }) {
+                Image("seoul")
+            }
             
             Text(product.name)
                 .foregroundColor(.black)
@@ -60,11 +64,15 @@ struct ProductDetailView: View {
                     .foregroundColor(.white)
                 
                 ScrollView {
-                    Image("seoul")
-                        .resizable()
-                        .frame(width: 300, height: 200)
-                        .padding(30)
-                    
+                    AsyncImage(url: URL(string: "http://192.168.50.83:8000/package/image?img_name=\(product.image)"), content: { Image in
+                        Image
+                            .resizable()
+                            .frame(width: 300, height: 200)
+                            .padding(30)
+                    }) {
+                        Image("seoul")
+                    }
+                        
                     Text(product.name)
                         .bold()
                         .font(.title)
@@ -184,6 +192,6 @@ struct ProductDetailView: View {
 
 struct ProductDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        ProductDetailView(product: ProductModel(id: 1, name: "나이트투어", price: 300000, startdate: "2024-06-28", enddate: "2024-06-30", trans: "고속버스", tourlist: "서울역,김포공항", stay: "신라호텔", image: "seoul"))
+        ProductDetailView(product: ProductModel(id: 1, name: "나이트투어", price: 300000, startdate: "2024-06-28", enddate: "2024-06-30", trans: "고속버스", tourlist: "서울역,김포공항", stay: "신라호텔", image: "w10.jpg"))
     }
 }
