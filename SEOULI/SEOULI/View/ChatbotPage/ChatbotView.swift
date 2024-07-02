@@ -11,30 +11,25 @@
  Date : 2024.06.28 Friday
  Description : 1차 UI 작업, R&D 시작
  
+ Date : 2024.07.01 Monday
+ Description : 2차 UI 및 R&D 작업
+ 
+ Date : 2024.07.02 Tuesady
+ Description : R&D 작업
+ 
 */
-
 
 import SwiftUI
 
 struct ChatbotView: View {
     @State private var isAnimating = false
     @State private var isSheetPresented = false
+    @State private var isLoading = false
+    
     
     var body: some View {
         ZStack {
-//            Color(.theme)
-//                .edgesIgnoringSafeArea(.all)
-//            
-//            VStack {
-//                Image(systemName: "globe")
-//                    .imageScale(.large)
-//                    .foregroundStyle(.tint)
-//                
-//                Text("HWIBOT TEST")
-//            }
-//            .padding()
-            
-
+            // HWIBOT Floating Button
             Button(action: {
                 withAnimation(.spring()) {
                     isSheetPresented.toggle()
@@ -47,31 +42,43 @@ struct ChatbotView: View {
                     .padding()
                     .background(Color.white)
                     .clipShape(Circle())
-                    .shadow(radius: 11)
             }
             .offset(x: 0, y: isAnimating ? -20 : 0)
             .position(x: UIScreen.main.bounds.width - 50, y: UIScreen.main.bounds.height - 60)
             .onAppear {
-                withAnimation(Animation.easeInOut(duration: 1).repeatForever()) {
-                    isAnimating.toggle()
+                startAnimation()
+            }
+            .onChange(of: isSheetPresented) {
+                if !isSheetPresented {
+                    startAnimation()
                 }
             }
             
-       
+            // Chat Screen
             if isSheetPresented {
-                ChatBubble(isPresented: $isSheetPresented)
+                ChatBubble(isPresented: $isSheetPresented, isLoading: $isLoading)
                     .transition(.move(edge: .bottom))
-                    .zIndex(1) // Ensure it's above other views
+                    .zIndex(1)
             }
+        }
+    }
+    
+    // ANIMATION FOR HWIBOT BUTTON
+    private func startAnimation() {
+        isAnimating = true
+        withAnimation(Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)) {
+            isAnimating.toggle()
         }
     }
 }
 
-// ChatBubble view
+// CHAT BUBBLE VIEW
 struct ChatBubble: View {
     @Binding var isPresented: Bool
-    @State private var message: String = "" // State to hold user input message
-    @State private var messages: [String] = [] // Array to store chat messages
+    @Binding var isLoading: Bool
+    @State private var message: String = "" // user input message
+    @State private var messages: [ChatMessage] = [] // Array to store messages
+    @FocusState private var isInputActive: Bool
     
     var body: some View {
         VStack {
@@ -81,6 +88,7 @@ struct ChatBubble: View {
                     withAnimation(.spring()) {
                         isPresented = false
                     }
+                    isInputActive = false // Hide keyboard
                 }) {
                     Image(systemName: "xmark")
                         .padding()
@@ -89,58 +97,35 @@ struct ChatBubble: View {
                 .padding()
             }
             
-        
             ScrollView {
                 VStack(spacing: 10) {
-                    // Iterate through messages and display each in a chat bubble
-                    ForEach(messages, id: \.self) { msg in
-                        HStack {
-                            // Conditional styling based on whether message is from user or bot
-                            if msg == message {
-                                Spacer()
-                                Text(msg)
-                                    .padding(10)
-                                    .background(Color.blue)
-                                    .foregroundColor(.white)
-                                    .clipShape(ChatBubbleShape(isFromCurrentUser: true))
-                                    .overlay(
-                                        ChatBubbleShape(isFromCurrentUser: true)
-                                            .stroke(Color.blue, lineWidth: 1)
-                                    )
-                            } else {
-                                Spacer()
-                                Text(msg)
-                                    .padding(10)
-                                    .background(Color.theme.opacity(0.3))
-                                    .foregroundColor(.black)
-                                    .clipShape(ChatBubbleShape(isFromCurrentUser: false))
-                                    .overlay(
-                                        ChatBubbleShape(isFromCurrentUser: false)
-                                            .stroke(Color.theme.opacity(0.7), lineWidth: 1))
-                            }
+                    ForEach(messages, id: \.id) { msg in
+                        if msg.isFromCurrentUser {
+                            ChatBubbleRow(text: msg.text, isFromCurrentUser: true)
+                        } else {
+                            ChatBubbleRow(text: msg.text, isFromCurrentUser: false)
                         }
-                        .padding(.horizontal)
+                    }
+                    if isLoading {
+                        LoadingBubbleView()
                     }
                 }
                 .padding(.vertical)
             }
             
-          
             HStack {
-                TextField("Type your message here!", text: $message)
+                TextField("키워드를 입력하세요!", text: $message)
                     .padding(10)
                     .background(Color.white)
                     .cornerRadius(36)
-                    .overlay(RoundedRectangle(cornerRadius: 36).stroke(Color.gray).opacity(0.6))
+                    .overlay(RoundedRectangle(cornerRadius: 36).stroke(Color.gray.opacity(0.6), lineWidth: 1))
                     .frame(height: 50)
+                    .focused($isInputActive)
                 
-                // Send button
                 Button(action: {
                     if !message.isEmpty {
-                        withAnimation {
-                            messages.append(message)
-                            message = "" // Clear input field
-                        }
+                        sendMessage()
+                        message = ""
                     }
                 }) {
                     Image(systemName: "paperplane.fill")
@@ -155,51 +140,125 @@ struct ChatBubble: View {
             .padding()
         }
         .background(Color.white)
-        .cornerRadius(36)
-        .shadow(radius: 20)
+        .cornerRadius(20)
+        .shadow(radius: 10)
         .padding(.horizontal)
-        .frame(maxHeight: 670)
+        .frame(maxHeight: 500)
         .offset(y: isPresented ? 0 : UIScreen.main.bounds.height)
         .animation(.spring(), value: isPresented)
     }
+    
+    // SENDING MESSAGE FUNCTION
+    private func sendMessage() {
+        // user's input
+        let userMessage = ChatMessage(text: message, isFromCurrentUser: true)
+        messages.append(userMessage)
+
+        // Clear input field and dismiss keyboard
+        message = ""
+        isInputActive = false
+
+        // Show loading indicator
+        isLoading = true
+        
+        // Simulate response delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            let responseText = generateResponse(for: userMessage.text)
+            let responseMessage = ChatMessage(text: responseText, isFromCurrentUser: false)
+            withAnimation {
+                messages.append(responseMessage)
+            }
+            isLoading = false
+        }
+    }
+    
+    // TEST RESPONSE ( IMPLEMENT DEEP LEARNING MODEL HERE )
+    private func generateResponse(for message: String) -> String {
+        // Make the responses case-insensitive
+        let normalizedMessage = message.lowercased()
+        switch normalizedMessage {
+        case "hello":
+            return "Hello there!"
+        case "how are you?":
+            return "I'm fine, thank you!"
+        case "bye":
+            return "Goodbye!"
+        default:
+            return "I don't understand."
+        }
+    }
+    
+    struct ChatBubbleRow: View {
+        let text: String
+        let isFromCurrentUser: Bool
+        
+        var body: some View {
+            HStack {
+                if isFromCurrentUser {
+                    Spacer()
+                    Text(text)
+                        .padding(10)
+                        .background(Color.blue.opacity(0.9))
+                        .foregroundColor(.white)
+                        .clipShape(Capsule())
+                } else {
+                    Text(text)
+                        .padding(10)
+                        .background(Color.gray.opacity(0.3))
+                        .foregroundColor(.black)
+                        .clipShape(Capsule())
+                    Spacer()
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+// MESSAGE MODEL
+struct ChatMessage: Identifiable {
+    let id = UUID()
+    let text: String
+    let isFromCurrentUser: Bool
+}
+    
 }
 
+// "..." ANIMATION
+struct LoadingBubbleView: View {
+    @State private var dot1Scale: CGFloat = 1.0
+    @State private var dot2Scale: CGFloat = 1.0
+    @State private var dot3Scale: CGFloat = 1.0
 
-struct ChatBubbleShape: Shape {
-    var isFromCurrentUser: Bool
-    
-    func path(in rect: CGRect) -> Path {
-        let cornerRadius: CGFloat = 16
-        var path = Path() // Initialize path
-        
-        if isFromCurrentUser {
-            // Draw chat bubble for messages sent by the current user
-            path.move(to: CGPoint(x: rect.minX + cornerRadius, y: rect.minY))
-            path.addLine(to: CGPoint(x: rect.maxX - cornerRadius, y: rect.minY))
-            path.addArc(center: CGPoint(x: rect.maxX - cornerRadius, y: rect.minY + cornerRadius), radius: cornerRadius, startAngle: Angle(degrees: -90), endAngle: Angle(degrees: 0), clockwise: false)
-            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + cornerRadius))
-            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - cornerRadius))
-            path.addArc(center: CGPoint(x: rect.maxX - cornerRadius, y: rect.maxY - cornerRadius), radius: cornerRadius, startAngle: Angle(degrees: 0), endAngle: Angle(degrees: 90), clockwise: false)
-            path.addLine(to: CGPoint(x: rect.minX + cornerRadius, y: rect.maxY))
-            path.addArc(center: CGPoint(x: rect.minX + cornerRadius, y: rect.maxY - cornerRadius), radius: cornerRadius, startAngle: Angle(degrees: 90), endAngle: Angle(degrees: 180), clockwise: false)
-            path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + cornerRadius))
-            path.addArc(center: CGPoint(x: rect.minX + cornerRadius, y: rect.minY + cornerRadius), radius: cornerRadius, startAngle: Angle(degrees: 180), endAngle: Angle(degrees: 270), clockwise: false)
-        } else {
-            // Chat bubble for messages received from others (not implemented yet)
-            path.move(to: CGPoint(x: rect.minX + cornerRadius, y: rect.minY))
-            path.addLine(to: CGPoint(x: rect.maxX - cornerRadius, y: rect.minY))
-            path.addArc(center: CGPoint(x: rect.maxX - cornerRadius, y: rect.minY + cornerRadius), radius: cornerRadius, startAngle: Angle(degrees: -90), endAngle: Angle(degrees: 0), clockwise: false)
-            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + cornerRadius))
-            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY - cornerRadius))
-            path.addArc(center: CGPoint(x: rect.maxX - cornerRadius, y: rect.maxY - cornerRadius), radius: cornerRadius, startAngle: Angle(degrees: 0), endAngle: Angle(degrees: 90), clockwise: false)
-            path.addLine(to: CGPoint(x: rect.minX + cornerRadius, y: rect.maxY))
-            path.addArc(center: CGPoint(x: rect.minX + cornerRadius, y: rect.maxY - cornerRadius), radius: cornerRadius, startAngle: Angle(degrees: 90), endAngle: Angle(degrees: 180), clockwise: false)
-            path.addLine(to: CGPoint(x: rect.minX, y: rect.minY + cornerRadius))
-            path.addArc(center: CGPoint(x: rect.minX + cornerRadius, y: rect.minY + cornerRadius), radius: cornerRadius, startAngle: Angle(degrees: 180), endAngle: Angle(degrees: 270), clockwise: false)
-
+    var body: some View {
+        HStack {
+            HStack(spacing: 5) {
+                Circle()
+                    .fill(Color.gray.opacity(0.8))
+                    .frame(width: 9, height: 9)
+                    .scaleEffect(dot1Scale)
+                    .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true), value: dot1Scale)
+                Circle()
+                    .fill(Color.gray.opacity(0.8))
+                    .frame(width: 9, height: 9)
+                    .scaleEffect(dot2Scale)
+                    .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.2), value: dot2Scale)
+                Circle()
+                    .fill(Color.gray.opacity(0.8))
+                    .frame(width: 9, height: 9)
+                    .scaleEffect(dot3Scale)
+                    .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.4), value: dot3Scale)
+            }
+            .padding(15)
+            .background(Color.gray.opacity(0.3))
+            .cornerRadius(20)
+            Spacer()
         }
-        
-        return path
+        .onAppear {
+            dot1Scale = 1.3
+            dot2Scale = 1.3
+            dot3Scale = 1.3
+        }
+        .padding(.horizontal)
     }
 }
 
