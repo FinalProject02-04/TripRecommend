@@ -16,11 +16,10 @@ struct LoginView: View {
     
     var body: some View {
         
-        // MARK: NavigationStack
         NavigationStack(path: $path){
-            // MARK: ZStack
+            
             ZStack {
-                // MARK: VStack
+                
                 VStack {
                     
                     Spacer(minLength: 300)
@@ -30,9 +29,9 @@ struct LoginView: View {
                                    startPoint: .top,
                                    endPoint: .bottom)
                     .edgesIgnoringSafeArea(.all)
-                } // VStack
+                    
+                } // VStack(배경색)
                 
-                // MARK: VStack
                 VStack(content: {
                     
                     Spacer()
@@ -45,57 +44,14 @@ struct LoginView: View {
                     // 간격 조절
                     Spacer().frame(height: 50)
                     
-                    
                     // MARK: 아이디
-                    TextField("아이디", text: $id)
-                        .keyboardType(.emailAddress)
-                        // 높이 조절
-                        .frame(height: 54)
-                        // 내각 여백
-                        .padding([.horizontal], 20)
-                        // 배경색
-                        .background(Color.white)
-                        // 둥근 테두리를 추가
-                        .cornerRadius(16)
-                        // 그림자 추가
-                        .shadow(
-                            color: Color.gray.opacity(0.4),
-                            radius: 5, x: 0, y: 2
-                        )
-                        // 테두리 둥근 정도, 색상
-                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
-                        // 외각 여백
-                        .padding([.horizontal], 30)
-                        // 폰트 사이즈
-                        .font(.system(size: 20))
-                        .focused($isTextFieldFocused)
-                    
+                    CustomTextField(text: $id, placeholder: "아이디")
                     
                     // 간격 조절
                     Spacer().frame(height: 20)
                     
                     // MARK: 비밀번호
-                    SecureField("비밀번호", text: $password)
-                        // 높이 조절
-                        .frame(height: 54)
-                        // 내각 여백
-                        .padding([.horizontal], 20)
-                        // 배경색
-                        .background(Color.white)
-                        // 둥근 테두리를 추가
-                        .cornerRadius(16)
-                        // 그림자 추가
-                        .shadow(
-                            color: Color.gray.opacity(0.4),
-                            radius: 5, x: 0, y: 2
-                        )
-                        // 테두리 둥근 정도, 색상
-                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
-                        // 외각 여백
-                        .padding([.horizontal], 30)
-                        // 폰트 사이즈
-                        .font(.system(size: 20))
-                        .focused($isTextFieldFocused)
+                    CustomTextField(text: $password, placeholder: "비밀번호", isSecure: true)
                     
                     
                     // 간격 조절
@@ -127,8 +83,9 @@ struct LoginView: View {
                     Spacer().frame(height: 30)
                     
                     // MARK: 로그인 버튼
-                    Button{
-                        path.append("ContentView")
+                    
+                    NavigationLink {
+                        ContentView()
                     } label: {
                         Text("로그인")
                             .padding()
@@ -137,6 +94,16 @@ struct LoginView: View {
                             .foregroundStyle(.white)
                             .clipShape(.buttonBorder)
                     }
+//                    Button{
+//                        path.append("ContentView")
+//                    } label: {
+//                        Text("로그인")
+//                            .padding()
+//                            .frame(width: 200)
+//                            .background(.theme)
+//                            .foregroundStyle(.white)
+//                            .clipShape(.buttonBorder)
+//                    }
                     
             //        Spacer()
                     
@@ -161,26 +128,14 @@ struct LoginView: View {
                     .padding([.top, .bottom], 30)
                     
                     // MARK: 소셜 로그인 버튼
-                    HStack(spacing: 20, content: {
-                        Button(action: {
-                            //
-                        }, label: {
-                            Image("google_icon")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .scaledToFit()
-                        })
-                        
-                        Button(action: {
-                            //
-                        }, label: {
-                            Image("apple_icon")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .scaledToFit()
-                        })
-                        
-                    }) // HStack
+                    Button(action: {
+//                        Authentication.googleOauth()
+                    }, label: {
+                        Image("google_icon")
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .scaledToFit()
+                    })
                     
                     // MARK: 회원 가입
                     HStack {
@@ -222,6 +177,28 @@ struct LoginView: View {
     } //body
     
 } // LoginView
+
+// MARK: 공통 TextField
+struct CustomTextField: View {
+    
+    // Property
+    @Binding var text: String
+    var placeholder: String
+    var isSecure: Bool = false
+    
+    // MARK: View
+    var body: some View {
+        SecureField(placeholder, text: $text)
+            .frame(height: 54)
+            .padding([.horizontal], 20)
+            .background(Color.white)
+            .cornerRadius(16)
+            .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
+            .padding([.horizontal], 30)
+            .font(.system(size: 20))
+    } // body
+} // CustomTextField
 
 #Preview {
     LoginView()
