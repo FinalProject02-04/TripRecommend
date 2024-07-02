@@ -18,11 +18,7 @@ import SwiftUI
 struct MyResoView: View {
     
     var product: [ProductModel] = [
-        ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: 300000),
-        ProductModel(name: "야간 경복궁 투어", image: "product2", price: 150000),
-        ProductModel(name: "동대문 쇼핑센터 투어", image: "product3", price: 55000),
-        ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: 300000),
-        ProductModel(name: "데이트 투어 & 나이트 투어", image: "product1", price: 300000)
+        ProductModel(id: 1, name: "나이트투어", price: 300000, startdate: "2024-06-28", enddate: "2024-06-30", trans: "고속버스", tourlist: "서울역,김포공항", stay: "신라호텔", image: "seoul")
     ]
     
     var body: some View {
@@ -34,7 +30,7 @@ struct MyResoView: View {
                 VStack(spacing: 0) {                    
                     ScrollView(showsIndicators: false) { // scrollbar 숨기기
                         VStack(spacing: 20) {
-                            ForEach(product) { product in
+                            ForEach(product,id: \.id) { product in
                                 CardView(product: product)
                             }
                         }
@@ -61,7 +57,7 @@ struct CardView: View {
     
     var body: some View {
         HStack {
-            Image(product.image)
+            Image("seoul")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 90, height: 90) 

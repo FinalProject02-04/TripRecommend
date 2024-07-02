@@ -7,9 +7,20 @@
 
 import Foundation
 
-struct ProductModel : Identifiable{
-    var id = UUID()
+struct ProductModel : Decodable{
+    var id : Int
     var name: String
-    var image: String
-    var price : Int
+    var price: Int
+    var startdate : String
+    var enddate : String
+    var trans : String
+    var tourlist : String
+    var stay : String
+    var image : String
+}
+
+extension ProductModel: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }

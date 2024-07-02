@@ -16,7 +16,7 @@ struct LoginView: View {
     
     var body: some View {
         
-        // MARK: NavigationView
+        // MARK: NavigationStack
         NavigationStack(path: $path){
             // MARK: ZStack
             ZStack {
