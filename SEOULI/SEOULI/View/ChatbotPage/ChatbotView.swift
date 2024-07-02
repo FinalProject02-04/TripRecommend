@@ -148,46 +148,55 @@ struct ChatBubble: View {
         .animation(.spring(), value: isPresented)
     }
     
-    // SENDING MESSAGE FUNCTION
-    private func sendMessage() {
-        // user's input
-        let userMessage = ChatMessage(text: message, isFromCurrentUser: true)
-        messages.append(userMessage)
+        // SENDING MESSAGE FUNCTION
+        private func sendMessage() {
+            // user's input
+            let userMessage = ChatMessage(text: message, isFromCurrentUser: true)
+            messages.append(userMessage)
 
-        // Clear input field and dismiss keyboard
-        message = ""
-        isInputActive = false
+            // Clear input field and dismiss keyboard
+            message = ""
+            isInputActive = false
 
-        // Show loading indicator
-        isLoading = true
-        
-        // Simulate response delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            let responseText = generateResponse(for: userMessage.text)
-            let responseMessage = ChatMessage(text: responseText, isFromCurrentUser: false)
-            withAnimation {
-                messages.append(responseMessage)
+            // Delay the start of the loading indicator
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                // Show loading indicator
+                isLoading = true
+                
+                // Simulate response delay
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+                    let responseText = generateResponse(for: userMessage.text)
+                    let responseMessage = ChatMessage(text: responseText, isFromCurrentUser: false)
+                    withAnimation {
+                        messages.append(responseMessage)
+                    }
+                    isLoading = false
+                }
             }
-            isLoading = false
         }
-    }
+        
+        // TEST RESPONSE ( IMPLEMENT DEEP LEARNING MODEL HERE )
     
-    // TEST RESPONSE ( IMPLEMENT DEEP LEARNING MODEL HERE )
-    private func generateResponse(for message: String) -> String {
-        // Make the responses case-insensitive
-        let normalizedMessage = message.lowercased()
-        switch normalizedMessage {
-        case "hello":
-            return "Hello there!"
-        case "how are you?":
-            return "I'm fine, thank you!"
-        case "bye":
-            return "Goodbye!"
-        default:
-            return "I don't understand."
+        private func generateResponse(for message: String) -> String {
+            
+            // case-insensitive
+            let normalizedMessage = message.lowercased()
+            switch normalizedMessage {
+            case "hello":
+                return "Hello there!"
+            case "how are you?":
+                return "I'm fine, thank you!"
+            case "bye":
+                return "Goodbye!"
+            case "tell me a joke":
+                return "휘 is a 바보"
+            default:
+                return "I don't understand."
+            }
+            
         }
-    }
     
+    // Chat Bubble view (send.reply)
     struct ChatBubbleRow: View {
         let text: String
         let isFromCurrentUser: Bool
