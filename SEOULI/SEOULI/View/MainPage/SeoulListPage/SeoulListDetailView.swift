@@ -83,8 +83,21 @@ struct SeoulListDetailView: View {
                                 
                                 // Map (MAPKIT)
                                 Map(coordinateRegion: $mapRegion, annotationItems: [location]) { location in
-                                    MapMarker(coordinate: CLLocationCoordinate2D(latitude: mapRegion.center.latitude, longitude: mapRegion.center.longitude), tint: .red)
-                                    
+                                    MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: mapRegion.center.latitude, longitude: mapRegion.center.longitude)) {
+                                        VStack {
+                                            Image(systemName: "mappin.circle.fill")
+                                                .foregroundColor(.pink)
+                                                .font(.system(size: 32))
+                                            Text(location.name)
+                                                .foregroundColor(.black)
+                                                .font(.caption)
+                                                .bold()
+                                                .padding(4)
+                                                .background(Color.white)
+                                                .cornerRadius(8)
+                                                .padding(4)
+                                        }
+                                    }
                                 }
                                 .frame(width: 350, height: 350, alignment: .center)
                                 .onAppear {
@@ -97,7 +110,6 @@ struct SeoulListDetailView: View {
                                         mapRegion = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
                                     }
                                 }
-                                
                                 
                                 Spacer(minLength: 40)
                                 
