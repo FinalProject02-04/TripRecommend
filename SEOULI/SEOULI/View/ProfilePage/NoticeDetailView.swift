@@ -18,7 +18,7 @@
 import SwiftUI
 
 struct NoticeDetailView: View {
-    var post : Post
+    var post : PostModel
     var body: some View {
     ScrollView {
         
@@ -56,5 +56,5 @@ struct NoticeDetailView: View {
 }
 
 #Preview {
-    NoticeDetailView(post: Post(title: "Seouli Update", username: "Seouli Team", subtitle: "새롭게 업데이트된 서울리!", date: "2024/06/32"))
+    NoticeDetailView(post: PostModel(title: "Seouli Update", username: "Seouli Team", subtitle: "새롭게 업데이트된 서울리!", content: "" ,date: "2024/06/32", image: ""))
 }

@@ -6,3 +6,13 @@
 //
 
 import Foundation
+
+struct PostModel: Identifiable {
+    var id = UUID()
+    var title: String
+    var username: String
+    var subtitle: String
+    var content: String
+    var date: String
+    var image : String
+}

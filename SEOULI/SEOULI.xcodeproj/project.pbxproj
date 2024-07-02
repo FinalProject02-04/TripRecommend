@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5D034C252C338842002ABC7A /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 5D034C242C338842002ABC7A /* GoogleService-Info.plist */; };
 		931810C12C2D585E004401EB /* NoticeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810C02C2D585E004401EB /* NoticeDetailView.swift */; };
 		931810D22C2E63DF004401EB /* RecommendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810D12C2E63DF004401EB /* RecommendView.swift */; };
 		931810D42C2E6B73004401EB /* RecommendResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810D32C2E6B73004401EB /* RecommendResultView.swift */; };
@@ -51,6 +52,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5D034C242C338842002ABC7A /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		931810C02C2D585E004401EB /* NoticeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeDetailView.swift; sourceTree = "<group>"; };
 		931810D12C2E63DF004401EB /* RecommendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendView.swift; sourceTree = "<group>"; };
 		931810D32C2E6B73004401EB /* RecommendResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendResultView.swift; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 			children = (
 				931810E32C326F7F004401EB /* Info.plist */,
 				931810E12C326F63004401EB /* GoogleService-Info.plist */,
+				5D034C242C338842002ABC7A /* GoogleService-Info.plist */,
 				9323B94D2C2A952C00E751AD /* Model */,
 				9323B94C2C2A952700E751AD /* VM */,
 				9323B9192C2A922300E751AD /* View */,
@@ -342,6 +345,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9323B9132C2A899B00E751AD /* Preview Assets.xcassets in Resources */,
+				5D034C252C338842002ABC7A /* GoogleService-Info.plist in Resources */,
 				9323B9102C2A899B00E751AD /* Assets.xcassets in Resources */,
 				931810E22C326F63004401EB /* GoogleService-Info.plist in Resources */,
 			);
