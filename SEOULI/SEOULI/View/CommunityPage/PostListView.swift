@@ -1,32 +1,22 @@
 import SwiftUI
+import PhotosUI
 
-// Model for Post
-struct Post: Identifiable {
-    let id = UUID()
-    let title: String
-    let username: String
-    let subtitle: String
-    let date: String
+// ObservableObject를 사용하여 데이터 관리
+class PostData: ObservableObject {
+    @Published var communities: [PostModel] = []
 }
 
 struct PostListView: View {
-    let posts: [Post] = [
-        Post(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-25"),
-        Post(title: "동대문문화원", username: "이천영", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-25"),
-        Post(title: "동대문문화원", username: "리턴영", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-24"),
-        Post(title: "동대문문화원", username: "그린플럼", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-21"),
-        Post(title: "동대문문화원", username: "이휘의남자원도현", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-19"),
-        Post(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-18")
-    ]
+    @StateObject var postData = PostData() // 데이터 객체 초기화
     
     var body: some View {
         NavigationView {
             ZStack {
                 VStack {
                     ScrollView {
-                        ForEach(posts) { post in
-                            NavigationLink(destination: PostDetailView(post: post)) {
-                                PostCardView(post: post)
+                        ForEach(postData.communities) { post in
+                            NavigationLink(destination: PostDetailView(community: post)) {
+                                PostCardView(community: post)
                                     .padding(.horizontal)
                             }
                         }
@@ -39,20 +29,17 @@ struct PostListView: View {
                 
                 VStack {
                     Spacer()
-                    HStack {
-                        Spacer()
-                        NavigationLink(destination: PostWriteView()) {
-                            Text("작성하기")
-                                .font(.system(size: 14))
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(width: 100)
-                                .frame(height: 50)
-                                .background(Color.theme)
-                                .cornerRadius(20)
-                        }
-                        .padding()
+                    NavigationLink(destination: PostWriteView().environmentObject(postData)) { // 환경 객체로 전달
+                        Text("작성하기")
+                            .font(.system(size: 14))
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(width: 100)
+                            .frame(height: 50)
+                            .background(Color.blue)
+                            .cornerRadius(20)
                     }
+                    .padding()
                 }
             }
         }
@@ -60,27 +47,27 @@ struct PostListView: View {
 }
 
 struct PostCardView: View {
-    let post: Post
+    let community: PostModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(post.title)
+            Text(community.title)
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
             
-            Text("작성자: \(post.username)")
+            Text("작성자: \(community.username)")
                 .font(.subheadline)
                 .fontWeight(.bold)
                 .foregroundColor(.gray)
             
-            Text(post.subtitle)
+            Text(community.subtitle)
                 .font(.body)
                 .foregroundColor(.primary)
             
             HStack {
                 Spacer()
-                Text(post.date)
+                Text(community.date)
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -103,4 +90,3 @@ struct PostListView_Previews: PreviewProvider {
         PostListView()
     }
 }
-

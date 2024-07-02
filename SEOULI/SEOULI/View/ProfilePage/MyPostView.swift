@@ -16,10 +16,10 @@ import SwiftUI
 
 struct MyPostView: View {
     
-    let posts: [Post] = [
-        Post(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-25"),
-        Post(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-25"),
-        Post(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-25"),
+    let posts: [PostModel] = [
+        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: ""),
+        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: ""),
+        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: ""),
     ]
     
     var body: some View {
@@ -32,7 +32,7 @@ struct MyPostView: View {
                     ScrollView(showsIndicators: false) { // scrollbar 숨기기
                         VStack(spacing: 20) {
                             ForEach(posts) { post in
-                                NavigationLink(destination: PostDetailView(post: post)) {
+                                NavigationLink(destination: PostDetailView(community: post)) {
                                     MyPostCard(post: post)
                                 }
                             }
@@ -56,7 +56,7 @@ struct MyPostView: View {
 }
 
 struct MyPostCard: View {
-    var post: Post
+    var post: PostModel
     
     var body: some View {
         HStack {
