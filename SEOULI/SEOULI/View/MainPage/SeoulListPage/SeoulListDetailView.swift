@@ -11,7 +11,7 @@
  Description : 1차 UI frame 작업
  
  Date : 2024.07.02 Tuesday
- Description : DB 연결, MapKit
+ Description : DB 연결, MapKit이용해 Map생성
  */
 
 import SwiftUI
@@ -28,6 +28,12 @@ struct SeoulListDetailView: View {
     
     // Geocoder instance to convert address to coordinates
     let geocoder = CLGeocoder()
+    
+    // Coordinates for the location
+    @State private var locationCoordinate = CLLocationCoordinate2D(latitude: 37.5665, longitude: 126.9780)
+    
+    // State to track if the annotation is selected
+    @State private var isAnnotationSelected = false
     
     var body: some View {
         ZStack {
@@ -83,19 +89,35 @@ struct SeoulListDetailView: View {
                                 
                                 // Map (MAPKIT)
                                 Map(coordinateRegion: $mapRegion, annotationItems: [location]) { location in
-                                    MapAnnotation(coordinate: CLLocationCoordinate2D(latitude: mapRegion.center.latitude, longitude: mapRegion.center.longitude)) {
-                                        VStack {
-                                            Image(systemName: "mappin.circle.fill")
-                                                .foregroundColor(.pink)
-                                                .font(.system(size: 32))
-                                            Text(location.name)
-                                                .foregroundColor(.black)
-                                                .font(.caption)
-                                                .bold()
-                                                .padding(4)
-                                                .background(Color.white)
-                                                .cornerRadius(8)
-                                                .padding(4)
+                                    MapAnnotation(coordinate: locationCoordinate) {
+                                        Button(action: {
+                                            isAnnotationSelected.toggle()
+                                        }) {
+                                            VStack {
+                                                Image(systemName: "mappin.circle.fill")
+                                                    .foregroundColor(.pink)
+                                                    .font(.system(size: 32))
+                                                Text(location.name)
+                                                    .foregroundColor(.black)
+                                                    .font(.caption)
+                                                    .bold()
+                                                    .padding(4)
+                                                    .background(Color.white)
+                                                    .cornerRadius(8)
+                                                    .padding(4)
+                                            }
+                                        }
+                                        if isAnnotationSelected {
+                                            VStack {
+                                                Text(location.address)
+                                                    .foregroundColor(.black)
+                                                    .font(.caption)
+                                                    .padding(4)
+                                                    .background(Color.white)
+                                                    .cornerRadius(8)
+                                                    .padding(.top, 87)
+                                                    .bold()
+                                            }
                                         }
                                     }
                                 }
@@ -107,6 +129,7 @@ struct SeoulListDetailView: View {
                                             print("Error geocoding address")
                                             return
                                         }
+                                        locationCoordinate = location.coordinate
                                         mapRegion = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
                                     }
                                 }
