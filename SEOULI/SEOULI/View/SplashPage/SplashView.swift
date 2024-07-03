@@ -5,11 +5,18 @@ struct SplashView: View {
     @State private var imageScale: CGFloat = 1.0
     @State private var imageOpacity: Double = 0.0
     
+    @State var isLogin: Bool = false
+    
     var body: some View {
         ZStack {
             if showMainView{
-                // 여기서 유저 정보 있는지 없는지 판단하면 됨
-                LoginView()
+                // 로그인 Ckeck
+                if isLogin {
+                    ContentView(isLogin: $isLogin)
+                }
+                else {
+                    LoginView(isLogin: $isLogin)
+                }
             } else {
                 SplashContentView(imageScale: $imageScale, imageOpacity: $imageOpacity)
                     .onAppear {
