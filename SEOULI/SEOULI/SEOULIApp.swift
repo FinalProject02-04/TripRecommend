@@ -17,10 +17,7 @@ struct SEOULIApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var body: some Scene {
         WindowGroup {
-            LoginView().onOpenURL { url in
-                //Handle Google Oauth URL
-                GIDSignIn.sharedInstance.handle(url)
-            }
+            SplashView()
         }
     }
 }

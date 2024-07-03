@@ -123,9 +123,9 @@ struct ChangePwView: View {
                             }, message: {
                                 Text("비밀번호가 성공적으로 변경되었습니다.")
                             })
-                            .navigationDestination(isPresented: $shouldNavigate) {
-                                LoginView()
-                        }
+//                            .navigationDestination(isPresented: $shouldNavigate) {
+//                                LoginView(isLogin: <#Binding<Bool>#>)
+//                        }
                     }
                             
                     Spacer()
@@ -146,6 +146,6 @@ struct ChangePwView: View {
     }
 }
 
-#Preview {
-    ChangePwView(path:LoginView().$path)
-}
+//#Preview {
+//    ChangePwView(path:LoginView().$path)
+//}
