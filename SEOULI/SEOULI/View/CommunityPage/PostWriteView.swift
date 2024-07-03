@@ -1,3 +1,11 @@
+/*
+ Author : 이 서
+ 
+ Date : 2024.06.27 Thursday
+ Description : 1차 UI frame 작업
+ 
+ */
+
 import SwiftUI
 import PhotosUI
 
@@ -28,6 +36,7 @@ struct PostWriteView: View {
                 
                 Spacer()
                 
+                // 장소명 TextField
                 TextField("장소명", text: $title)
                     .padding()
                     .background(RoundedRectangle(cornerRadius: 8)
@@ -37,6 +46,7 @@ struct PostWriteView: View {
                     .frame(maxWidth: .infinity)
                     .focused($isTextFieldFocused)
                 
+                // One Liner TextField
                 TextField("One Liner", text: $subtitle)
                     .padding()
                     .background(RoundedRectangle(cornerRadius: 8)
@@ -46,7 +56,9 @@ struct PostWriteView: View {
                     .frame(maxWidth: .infinity)
                     .focused($isTextFieldFocused)
                 
+                
                 ZStack(alignment: .topLeading) {
+                    // Content TextEditor
                     if content.isEmpty {
                         Text("내용을 입력하세요")
                             .foregroundColor(.gray)
@@ -62,11 +74,12 @@ struct PostWriteView: View {
                         )
                         .focused($isTextFieldFocused)
                         .opacity(content.isEmpty ? 0.5 : 1.0)
-                }
+                } // ZStack
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal)
                 
                 HStack(spacing: 10) {
+                    // 첨부파일 TextField
                     TextField("첨부파일", text: $selectedFileNameForAttachment)
                         .disabled(true)
                         .padding()
@@ -77,6 +90,7 @@ struct PostWriteView: View {
                         .frame(maxWidth: .infinity)
                         .focused($isTextFieldFocused)
                     
+                    // 첨부파일 button
                     Button(action: {
                         self.showImagePicker.toggle()
                     }) {
@@ -88,7 +102,7 @@ struct PostWriteView: View {
                             .cornerRadius(8)
                     }
                     .padding(.horizontal)
-                }
+                } //HStack
                 
                 Button(action: {
                     if validateFields() {
@@ -99,7 +113,8 @@ struct PostWriteView: View {
                                 subtitle: subtitle,
                                 content: content,
                                 date: getCurrentDate(),
-                                image: savedImagePath
+                                image: savedImagePath, 
+                                views: 0
                             )
                             postData.communities.append(newPost)
                             showAlert = true
@@ -117,7 +132,7 @@ struct PostWriteView: View {
                         .foregroundColor(.white)
                         .padding()
                         .frame(width: 200)
-                        .background(Color.blue)
+                        .background(Color.theme)
                         .cornerRadius(20)
                 }
                 .padding(.horizontal)
@@ -133,14 +148,14 @@ struct PostWriteView: View {
                 }
                 
                 Spacer()
-            }
+            } // VStack
             .padding()
             .navigationBarTitle("")
             .sheet(isPresented: $showImagePicker) {
                 ImagePicker(selectedImage: $selectedImage, selectedFileName: $selectedFileNameForAttachment)
-            }
-        }
-    }
+            } //sheet
+        } //navigationview
+    } //body
     
     func validateFields() -> Bool {
         return !title.isEmpty && !subtitle.isEmpty
@@ -209,4 +224,5 @@ struct ImagePicker: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
 }
+
 

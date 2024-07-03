@@ -17,9 +17,9 @@ import SwiftUI
 struct MyPostView: View {
     
     let posts: [PostModel] = [
-        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: ""),
-        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: ""),
-        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: ""),
+        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: "", views: 0),
+        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: "", views: 0),
+        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: "", views: 0),
     ]
     
     var body: some View {

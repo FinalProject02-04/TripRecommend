@@ -56,5 +56,5 @@ struct NoticeDetailView: View {
 }
 
 #Preview {
-    NoticeDetailView(post: PostModel(title: "Seouli Update", username: "Seouli Team", subtitle: "새롭게 업데이트된 서울리!", content: "" ,date: "2024/06/32", image: ""))
+    NoticeDetailView(post: PostModel(title: "Seouli Update", username: "Seouli Team", subtitle: "새롭게 업데이트된 서울리!", content: "" ,date: "2024/06/32", image: "", views: 0))
 }
