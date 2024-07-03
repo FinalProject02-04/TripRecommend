@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State var selectpage = 0
+    @Binding var isLogin: Bool
     
     var body: some View {
         VStack(content: {
@@ -39,7 +40,7 @@ struct ContentView: View {
                             Text("Community")
                         }
                         .tag(3)
-                    ProfileView()
+                    ProfileView(isLogin: $isLogin)
                         .tabItem {
                             Image(systemName: "person.fill")
                             Text("Profile")
@@ -56,5 +57,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    ContentView(isLogin: .constant(true))
 }
