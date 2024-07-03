@@ -188,5 +188,5 @@ struct ProfileView: View {
   }
 
 #Preview {
-    ProfileView()
+    ProfileView(isLogin: .constant(true))
 }
