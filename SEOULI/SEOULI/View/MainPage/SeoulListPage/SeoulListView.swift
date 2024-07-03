@@ -15,6 +15,10 @@
  
  Date : 2024.07.02 Tuesday
  Description : DB 연결
+ 
+ Date : 2024.07.03 Wednesday
+ Description : List 마무리작업 + lazy loading추가 
+ 
  */
 
 import SwiftUI
@@ -22,6 +26,10 @@ import SwiftUI
 struct SeoulListView: View {
     @ObservedObject var seoulListVM = SeoulListVM()
     @State private var searchText = ""
+    @State private var displayedLocations = [SeoulList]()
+    @State private var isLoading = false
+    @State private var currentPage = 0
+    let pageSize = 10
 
     var body: some View {
         NavigationView {
@@ -32,16 +40,34 @@ struct SeoulListView: View {
                 VStack {
                     HStack {
                         Image(systemName: "magnifyingglass")
-                        TextField("검색하기", text: $searchText)
+                        TextField("검색하기", text: $searchText, onCommit: {
+                            // Reset the displayed locations when search text changes
+                            currentPage = 0
+                            displayedLocations = []
+                            loadMoreLocations()
+                        })
                     }
                     .padding()
 
                     ScrollView {
-                        ForEach(seoulListVM.locations.filter {
-                            searchText.isEmpty ? true : $0.name.localizedStandardContains(searchText)
-                        }) { location in
-                            NavigationLink(destination: SeoulListDetailView(location: location)) {
-                                LocationRow(location: location)
+                        LazyVStack {
+                            ForEach(displayedLocations.filter {
+                                searchText.isEmpty ? true : $0.name.localizedStandardContains(searchText)
+                            }) { location in
+                                NavigationLink(destination: SeoulListDetailView(location: location)) {
+                                    LocationRow(location: location)
+                                }
+                            }
+
+                            if isLoading {
+                                ProgressView()
+                                    .padding()
+                            } else {
+                                Color.clear
+                                    .frame(height: 1)
+                                    .onAppear {
+                                        loadMoreLocations()
+                                    }
                             }
                         }
                     }
@@ -50,9 +76,22 @@ struct SeoulListView: View {
             }
             .onAppear {
                 seoulListVM.fetchDataFromAPI()
+                loadMoreLocations()
             }
         }
-    }		
+    }
+
+    private func loadMoreLocations() {
+        guard !isLoading else { return }
+        isLoading = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { // network delay
+            let newLocations = Array(seoulListVM.locations.prefix((currentPage + 1) * pageSize))
+            displayedLocations = newLocations
+            isLoading = false
+            currentPage += 1
+        }
+    }
 }
 
 struct LocationRow: View {
@@ -61,26 +100,26 @@ struct LocationRow: View {
     var body: some View {
         HStack {
             AsyncImage(url: URL(string: location.imageName)) { phase in
-            switch phase {
-            case .success(let image):
-                image
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 80, height: 80)
-                    .cornerRadius(10)
-            case .failure:
-                Image(systemName: "photo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 80, height: 80)
-                    .cornerRadius(10)
-            case .empty:
-                ProgressView()
-                    .frame(width: 80, height: 80)
-            @unknown default:
-                EmptyView()
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(10)
+                case .failure:
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(10)
+                case .empty:
+                    ProgressView()
+                        .frame(width: 80, height: 80)
+                @unknown default:
+                    EmptyView()
+                }
             }
-        }
 
             VStack(alignment: .leading) {
                 Text(location.name)
@@ -109,9 +148,6 @@ struct SeoulListView_Previews: PreviewProvider {
             .environmentObject(SeoulListVM())
     }
 }
-
-
-
 
 #Preview {
     SeoulListView()
