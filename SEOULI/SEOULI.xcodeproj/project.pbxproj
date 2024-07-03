@@ -22,6 +22,7 @@
 		931811342C34DE50004401EB /* RegularExpressionVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931811332C34DE50004401EB /* RegularExpressionVM.swift */; };
 		931811362C34EA53004401EB /* RecommandVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931811352C34EA53004401EB /* RecommandVM.swift */; };
 		931811382C34F663004401EB /* PostVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931811372C34F663004401EB /* PostVM.swift */; };
+		9318113A2C35043A004401EB /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 931811392C35043A004401EB /* FirebaseStorage */; };
 		931EDF502C2CF8830097B7F8 /* PostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931EDF4F2C2CF8830097B7F8 /* PostModel.swift */; };
 		9323B90C2C2A899900E751AD /* SEOULIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B90B2C2A899900E751AD /* SEOULIApp.swift */; };
 		9323B90E2C2A899900E751AD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B90D2C2A899900E751AD /* ContentView.swift */; };
@@ -106,6 +107,7 @@
 				9397594E2C2D32AA00DC0700 /* TossPayments in Frameworks */,
 				931810D92C326E0C004401EB /* FirebaseAuth in Frameworks */,
 				931810DC2C326E7A004401EB /* GoogleSignIn in Frameworks */,
+				9318113A2C35043A004401EB /* FirebaseStorage in Frameworks */,
 				931810DE2C326E7A004401EB /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -302,6 +304,7 @@
 				931810D82C326E0C004401EB /* FirebaseAuth */,
 				931810DB2C326E7A004401EB /* GoogleSignIn */,
 				931810DD2C326E7A004401EB /* GoogleSignInSwift */,
+				931811392C35043A004401EB /* FirebaseStorage */,
 			);
 			productName = SEOULI;
 			productReference = 9323B9082C2A899900E751AD /* SEOULI.app */;
@@ -656,6 +659,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 931810DA2C326E7A004401EB /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		931811392C35043A004401EB /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 931810D72C326E0C004401EB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 		9397594D2C2D32AA00DC0700 /* TossPayments */ = {
 			isa = XCSwiftPackageProductDependency;
