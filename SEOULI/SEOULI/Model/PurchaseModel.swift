@@ -7,7 +7,14 @@
 
 import Foundation
 
-struct PurchaseModel{
+struct PurchaseModel : Decodable{
     var package_info : ProductModel
     var purchase_date : String
+    var pur_id : Int
+}
+
+extension PurchaseModel: Hashable {
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(pur_id)
+    }
 }
