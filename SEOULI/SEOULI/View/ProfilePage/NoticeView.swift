@@ -17,9 +17,9 @@ import SwiftUI
 struct NoticeView: View {
     
     let notice: [PostModel] = [
-        PostModel(title: "국내여행 후기 이벤트 종료!", username: "Seouli", subtitle: "안녕하세요! 서울리입니다.", content: "", date: "2024-06-25", image: ""),
-        PostModel(title: "서울리 2.0 버젼으로 리뉴얼 되었습니다!", username: "Seouli", subtitle: "안녕하세요! 서울리입니다.", content: "", date: "2024-06-25", image: ""),
-        PostModel(title: "서울리 1.7 버젼으로 리뉴얼 되었습니다!", username: "Seouli", subtitle: "안녕하세요! 서울리입니다.", content: "", date: "2024-06-24", image: ""),
+        PostModel(title: "국내여행 후기 이벤트 종료!", username: "Seouli", subtitle: "안녕하세요! 서울리입니다.", content: "", date: "2024-06-25", image: "", views: 0),
+        PostModel(title: "서울리 2.0 버젼으로 리뉴얼 되었습니다!", username: "Seouli", subtitle: "안녕하세요! 서울리입니다.", content: "", date: "2024-06-25", image: "", views: 0),
+        PostModel(title: "서울리 1.7 버젼으로 리뉴얼 되었습니다!", username: "Seouli", subtitle: "안녕하세요! 서울리입니다.", content: "", date: "2024-06-24", image: "", views: 0),
     ]
     
     var body: some View {
