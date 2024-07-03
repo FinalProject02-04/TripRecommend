@@ -12,8 +12,13 @@ struct LoginView: View {
     @State var password = ""
     @FocusState var isTextFieldFocused: Bool
     @State var path = NavigationPath()
+    @State private var showAlert = false // Alert 표시 여부를 관리하는 상태 변수
+    @State private var errorMessage: String = "" // Alert창의 메세지를 저장할 상태 변수
     
     @Binding var isLogin: Bool
+    
+    // Firebase Query Request가 완료 됬는지 확인하는 상태 변수
+    @State var result: Bool = false
     
     var body: some View {
         
@@ -100,12 +105,35 @@ struct LoginView: View {
                     // 간격 조절
                     Spacer().frame(height: 30)
                     
+                    // MARK: 로그인 버튼
                     Button(action: {
                         
-                        UserDefaults.standard.set(email, forKey: "userEmail")
-                        withAnimation {
-                            isLogin.toggle()
-                        }
+                        // 로그인 로직
+                        Task{
+                            let userQuery = UserInfo(result: $result)
+                            let userInfo = try await userQuery.fetchUserInfo(userid: email, userpw: password)
+
+                            if result {
+                                print("로그인성공")
+                                
+                                print(userInfo.documentId)
+                                // firebase request 성공
+                                if userInfo.documentId.isEmpty{
+                                    // id, pw 잘못 입력
+                                    self.showAlert = true
+                                    self.errorMessage = "Please Check your ID or password"
+                                }else{
+                                    // id, pw 제대로 입력
+                                    self.isLogin = true
+                                    UserDefaults.standard.set(email, forKey: "userEmail")
+                                }
+                            }else{
+                                // firebase request 실패
+                                self.showAlert = true
+                                self.errorMessage = "Failed to connect to the server"
+                            }
+                            
+                        } // Task
                         
                     }, label: {
                         Text("로그인")
@@ -115,7 +143,7 @@ struct LoginView: View {
                             .foregroundStyle(.white)
                             .clipShape(.buttonBorder)
                     })
-                    // MARK: 로그인 버튼
+                    
 //                    NavigationLink {
 //                        ContentView()
 //                    } label: {
@@ -204,7 +232,7 @@ struct LoginView: View {
     }
     
 } // LoginView
-
+//
 //#Preview {
-//    LoginView()
+//    LoginView(isLogin: .constant(false))
 //}
