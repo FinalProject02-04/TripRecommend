@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+struct UserModel: Decodable{
+    var email: String
+    var password: String
+    
+}

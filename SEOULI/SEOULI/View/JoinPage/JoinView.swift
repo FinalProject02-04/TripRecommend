@@ -362,6 +362,6 @@ struct JoinView: View {
 //    } // body
 //} // CustomNavigationBar
 
-#Preview {
-    JoinView(path:LoginView().$path)
-}
+//#Preview {
+//    JoinView(path:LoginView().$path)
+//}
