@@ -20,6 +20,7 @@
 		9318112E2C33B9E5004401EB /* UserModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9318112D2C33B9E5004401EB /* UserModel.swift */; };
 		931811322C33D33F004401EB /* EditPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931811312C33D33F004401EB /* EditPostView.swift */; };
 		931811342C34DE50004401EB /* RegularExpressionVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931811332C34DE50004401EB /* RegularExpressionVM.swift */; };
+		931811362C34EA53004401EB /* RecommandVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931811352C34EA53004401EB /* RecommandVM.swift */; };
 		931EDF502C2CF8830097B7F8 /* PostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931EDF4F2C2CF8830097B7F8 /* PostModel.swift */; };
 		9323B90C2C2A899900E751AD /* SEOULIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B90B2C2A899900E751AD /* SEOULIApp.swift */; };
 		9323B90E2C2A899900E751AD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B90D2C2A899900E751AD /* ContentView.swift */; };
@@ -64,6 +65,7 @@
 		9318112D2C33B9E5004401EB /* UserModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserModel.swift; sourceTree = "<group>"; };
 		931811312C33D33F004401EB /* EditPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPostView.swift; sourceTree = "<group>"; };
 		931811332C34DE50004401EB /* RegularExpressionVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegularExpressionVM.swift; sourceTree = "<group>"; };
+		931811352C34EA53004401EB /* RecommandVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommandVM.swift; sourceTree = "<group>"; };
 		931EDF4F2C2CF8830097B7F8 /* PostModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostModel.swift; sourceTree = "<group>"; };
 		9323B9082C2A899900E751AD /* SEOULI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SEOULI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9323B90B2C2A899900E751AD /* SEOULIApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SEOULIApp.swift; sourceTree = "<group>"; };
@@ -262,6 +264,7 @@
 				931810DF2C326E8E004401EB /* SeoulListVM.swift */,
 				931810E42C327826004401EB /* AuthenticationVM.swift */,
 				931811332C34DE50004401EB /* RegularExpressionVM.swift */,
+				931811352C34EA53004401EB /* RecommandVM.swift */,
 			);
 			path = VM;
 			sourceTree = "<group>";
@@ -372,6 +375,7 @@
 				9323B9512C2A955400E751AD /* testModel.swift in Sources */,
 				9323B92D2C2A93F000E751AD /* ProductListView.swift in Sources */,
 				931810E52C327826004401EB /* AuthenticationVM.swift in Sources */,
+				931811362C34EA53004401EB /* RecommandVM.swift in Sources */,
 				931811322C33D33F004401EB /* EditPostView.swift in Sources */,
 				931810D42C2E6B73004401EB /* RecommendResultView.swift in Sources */,
 				9323B9552C2A962F00E751AD /* ProfileView.swift in Sources */,

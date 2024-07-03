@@ -188,6 +188,9 @@ struct ProductDetailView: View {
             .offset(y: 100)
         }
     }
+    func insertpayinfo(){
+        
+    }
 }
 
 struct ProductDetailView_Previews: PreviewProvider {
