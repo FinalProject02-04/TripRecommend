@@ -2,6 +2,7 @@ from fastapi import FastAPI
 import pymysql
 from seouli_package import router as package_router
 from seouli_purchase import router as purchase_router
+from seouli_placelist import router as place_router
 
 app = FastAPI()
 
@@ -22,6 +23,7 @@ def connect() :
 # package table router
 app.include_router(package_router, prefix="/package", tags=['package'])
 app.include_router(purchase_router, prefix="/purchase", tags=['purchase'])
+app.include_router(place_router, prefix="/place", tags=["place"])
 
 
 if __name__ == "__main__" :

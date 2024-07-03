@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 import pymysql
+from datetime import datetime
+
 """
 작성자 : 원도현
 날짜 : 24.06.28 (금)
@@ -30,6 +32,7 @@ async def pur_select():
     curs = conn.cursor()
 
     sql = "SELECT * FROM purchase"
+
     curs.execute(sql)
     rows = curs.fetchall()
     conn.close()
@@ -45,6 +48,33 @@ async def pur_select():
             }
         )
     return dict_list
+
+# 192.168.50.83:8000/purchase/select/user?user_id=
+@router.get("/select/user")
+async def pur_user_select(user_id: str) :
+    try :
+        conn = connect()
+        curs = conn.cursor()
+        
+        sql = "select pack.*, pur.pur_date, pur.pur_id from purchase as pur, package as pack where user_id = %s and pur_status = 1 and pur.pack_id = pack.pack_id"
+        curs.execute(sql, user_id)
+        rows = curs.fetchall()
+        conn.close()
+
+        result = []
+
+        for data in rows :
+            temp_dict = {
+                "package_info" : make_dict(data),
+                "purchase_date" : datetime.strftime(data[9], "%Y-%m-%d"),
+                "pur_id" : data[10]
+            }
+            result.append(temp_dict)
+
+        return result
+    except :
+        print("Error")
+        return "Error"
 
 # 192.168.50.83:8000/purchase/insert?pack_id=&user_id=
 @router.get("/insert")
@@ -83,3 +113,33 @@ async def pur_status_update(pur_id: int, status: int):
         conn.close()
         print("Error :", ex)
         return "Error"
+
+
+def make_dict(arr) :
+    return {
+        # pack_id
+        "id" : arr[0],
+
+        # pack_name
+        "name" : arr[1],
+
+        # pack_price
+        "price" : arr[2],
+
+        # pack_startdate,
+        "startdate" : arr[3].strftime("%Y-%m-%d"),
+
+        # pack_enddate
+        "enddate" : arr[4].strftime("%Y-%m-%d"),
+
+        # pack_trans
+        "trans" : arr[5],
+
+        # pack_tourlist
+        "tourlist" : arr[6],
+
+        # pack_stay
+        "stay" : arr[7],
+
+        "image" : arr[8]
+    }

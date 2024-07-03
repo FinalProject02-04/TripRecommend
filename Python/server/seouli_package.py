@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 import pymysql
 from datetime import datetime
+import base64
 
 # Server Host IP
 host_ip = '192.168.50.83'
@@ -42,10 +43,10 @@ async def packageTableSelect() :
             "price" : data[2],
 
             # pack_startdate,
-            "startdate" : data[3].strftime("%Y-%m-%d %H:%M:%S"),
+            "startdate" : data[3].strftime("%Y-%m-%d"),
 
             # pack_enddate
-            "enddate" : data[4].strftime("%Y-%m-%d %H:%M:%S"),
+            "enddate" : data[4].strftime("%Y-%m-%d"),
 
             # pack_trans
             "trans" : data[5],
@@ -54,7 +55,9 @@ async def packageTableSelect() :
             "tourlist" : data[6],
 
             # pack_stay
-            "stay" : data[7]
+            "stay" : data[7],
+
+            "image" : data[8]
         }
         result.append(temp_dict)
 
@@ -86,3 +89,74 @@ async def packageTableSelect() :
     ]
     """
     return result
+
+@router.get("/select/detail")
+async def packageDetailSelect(pack_id: int) :
+    try :
+        conn = connect()
+        curs = conn.cursor()
+
+        sql = "select * from package where pack_id = %s"
+        
+        curs.execute(sql, pack_id)
+        rows = curs.fetchall()
+
+        curs.close()
+
+        print(rows)
+
+        """
+        [
+            [   2, 
+                "데이트&나이트 투어",
+                250000, 
+                "2024-07-01",
+                "2024-07-16",
+                "비행기, 고속버스",
+                "제주공항, 감귤농장",
+                "제주호텔",
+                "w9.jpg"
+            ]
+        ]
+        """
+
+        return make_dict(rows[0])
+    except :
+        return "error"
+
+@router.get("/image")
+async def packageImage(img_name: str) :
+    from fastapi import File
+    from fastapi.responses import FileResponse
+
+    return FileResponse(f'./images/{img_name}')
+
+
+def make_dict(arr) :
+    return {
+        # pack_id
+        "id" : arr[0],
+
+        # pack_name
+        "name" : arr[1],
+
+        # pack_price
+        "price" : arr[2],
+
+        # pack_startdate,
+        "startdate" : arr[3].strftime("%Y-%m-%d"),
+
+        # pack_enddate
+        "enddate" : arr[4].strftime("%Y-%m-%d"),
+
+        # pack_trans
+        "trans" : arr[5],
+
+        # pack_tourlist
+        "tourlist" : arr[6],
+
+        # pack_stay
+        "stay" : arr[7],
+
+        "image" : arr[8]
+    }
