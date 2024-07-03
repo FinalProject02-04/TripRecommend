@@ -17,16 +17,30 @@
  Date : 2024.07.02 Tuesady
  Description : R&D 작업
  
+ Date : 2024.07.03 Wednesday
+ Description : 모델사용해서 추천해주기(영어 가능)
+ 
 */
 
 import SwiftUI
+
+// MESSAGE MODEL
+struct ChatMessage: Identifiable {
+    let id = UUID()
+    let text: String
+    let isFromCurrentUser: Bool
+}
 
 struct ChatbotView: View {
     @State private var isAnimating = false
     @State private var isSheetPresented = false
     @State private var isLoading = false
-    
-    
+    @State private var message = ""
+    @State private var messages: [ChatMessage] = []
+    @StateObject private var networkManager = NetworkManager()
+    @FocusState private var isInputActive: Bool
+    @State private var isFirstTimePresented = true
+
     var body: some View {
         ZStack {
             // HWIBOT Floating Button
@@ -56,12 +70,31 @@ struct ChatbotView: View {
             
             // Chat Screen
             if isSheetPresented {
-                ChatBubble(isPresented: $isSheetPresented, isLoading: $isLoading)
-                    .transition(.move(edge: .bottom))
-                    .zIndex(1)
+                ChatBubble(
+                    isPresented: $isSheetPresented,
+                    isLoading: $isLoading,
+                    message: $message,
+                    messages: $messages,
+                    networkManager: networkManager
+//                    isInputActive: $isInputActive
+                )
+                .transition(.move(edge: .bottom))
+                .zIndex(1)
+                .onAppear {
+                    if isFirstTimePresented {
+                        sendInitialMessage()
+                        isFirstTimePresented = false
+                    }
+                }
             }
         }
     }
+    private func sendInitialMessage() {
+           let initialMessage = "추천받고 싶은 장소에 대한 키워드를 입력해주세요!😊"
+           let botMessage = ChatMessage(text: initialMessage, isFromCurrentUser: false)
+           messages.append(botMessage)
+       }
+   
     
     // ANIMATION FOR HWIBOT BUTTON
     private func startAnimation() {
@@ -76,8 +109,9 @@ struct ChatbotView: View {
 struct ChatBubble: View {
     @Binding var isPresented: Bool
     @Binding var isLoading: Bool
-    @State private var message: String = "" // user input message
-    @State private var messages: [ChatMessage] = [] // Array to store messages
+    @Binding var message: String
+    @Binding var messages: [ChatMessage]
+    @ObservedObject var networkManager: NetworkManager
     @FocusState private var isInputActive: Bool
     
     var body: some View {
@@ -150,53 +184,34 @@ struct ChatBubble: View {
     
         // SENDING MESSAGE FUNCTION
         private func sendMessage() {
-            // user's input
             let userMessage = ChatMessage(text: message, isFromCurrentUser: true)
             messages.append(userMessage)
 
-            // Clear input field and dismiss keyboard
-            message = ""
-            isInputActive = false
-
-            // Delay the start of the loading indicator
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
-                // Show loading indicator
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 isLoading = true
-                
-                // Simulate response delay
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                    let responseText = generateResponse(for: userMessage.text)
-                    let responseMessage = ChatMessage(text: responseText, isFromCurrentUser: false)
-                    withAnimation {
-                        messages.append(responseMessage)
+
+                networkManager.fetchRecommendations(for: userMessage.text) { result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let recommendations):
+                            let responseText = recommendations.joined(separator: "\n")
+                            let responseMessage = ChatMessage(text: responseText, isFromCurrentUser: false)
+                            messages.append(responseMessage)
+                        case .failure(let error):
+                            let errorMessage = ChatMessage(text: "Error: \(error.localizedDescription)", isFromCurrentUser: false)
+                            messages.append(errorMessage)
+                        }
+                        isLoading = false
                     }
-                    isLoading = false
                 }
             }
+            message = "" // Clear the text field
+            isInputActive = false // Hide keyboard
         }
-        
-        // TEST RESPONSE ( IMPLEMENT DEEP LEARNING MODEL HERE )
+    }
     
-        private func generateResponse(for message: String) -> String {
-            
-            // case-insensitive
-            let normalizedMessage = message.lowercased()
-            switch normalizedMessage {
-            case "hello":
-                return "Hello there!"
-            case "how are you?":
-                return "I'm fine, thank you!"
-            case "bye":
-                return "Goodbye!"
-            case "tell me a joke":
-                return "휘 is a 바보"
-            default:
-                return "I don't understand."
-            }
-            
-        }
     
-    // Chat Bubble view (send.reply)
+    // CHAT BUBBLE ROW VIEW
     struct ChatBubbleRow: View {
         let text: String
         let isFromCurrentUser: Bool
@@ -209,67 +224,59 @@ struct ChatBubble: View {
                         .padding(10)
                         .background(Color.blue.opacity(0.9))
                         .foregroundColor(.white)
-                        .clipShape(Capsule())
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                 } else {
                     Text(text)
                         .padding(10)
                         .background(Color.gray.opacity(0.3))
                         .foregroundColor(.black)
-                        .clipShape(Capsule())
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                     Spacer()
                 }
             }
             .padding(.horizontal)
         }
     }
-
-// MESSAGE MODEL
-struct ChatMessage: Identifiable {
-    let id = UUID()
-    let text: String
-    let isFromCurrentUser: Bool
-}
     
-}
 
-// "..." ANIMATION
-struct LoadingBubbleView: View {
-    @State private var dot1Scale: CGFloat = 1.0
-    @State private var dot2Scale: CGFloat = 1.0
-    @State private var dot3Scale: CGFloat = 1.0
-
-    var body: some View {
-        HStack {
-            HStack(spacing: 5) {
-                Circle()
-                    .fill(Color.gray.opacity(0.8))
-                    .frame(width: 9, height: 9)
-                    .scaleEffect(dot1Scale)
-                    .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true), value: dot1Scale)
-                Circle()
-                    .fill(Color.gray.opacity(0.8))
-                    .frame(width: 9, height: 9)
-                    .scaleEffect(dot2Scale)
-                    .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.2), value: dot2Scale)
-                Circle()
-                    .fill(Color.gray.opacity(0.8))
-                    .frame(width: 9, height: 9)
-                    .scaleEffect(dot3Scale)
-                    .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.4), value: dot3Scale)
+    // LOADING BUBBLE VIEW
+    struct LoadingBubbleView: View {
+        @State private var dot1Scale: CGFloat = 1.0
+        @State private var dot2Scale: CGFloat = 1.0
+        @State private var dot3Scale: CGFloat = 1.0
+        
+        var body: some View {
+            HStack {
+                HStack(spacing: 5) {
+                    Circle()
+                        .fill(Color.gray.opacity(0.8))
+                        .frame(width: 9, height: 9)
+                        .scaleEffect(dot1Scale)
+                        .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true), value: dot1Scale)
+                    Circle()
+                        .fill(Color.gray.opacity(0.8))
+                        .frame(width: 9, height: 9)
+                        .scaleEffect(dot2Scale)
+                        .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.2), value: dot2Scale)
+                    Circle()
+                        .fill(Color.gray.opacity(0.8))
+                        .frame(width: 9, height: 9)
+                        .scaleEffect(dot3Scale)
+                        .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.4), value: dot3Scale)
+                }
+                .padding(15)
+                .background(Color.gray.opacity(0.3))
+                .cornerRadius(20)
+                Spacer()
             }
-            .padding(15)
-            .background(Color.gray.opacity(0.3))
-            .cornerRadius(20)
-            Spacer()
+            .onAppear {
+                dot1Scale = 1.3
+                dot2Scale = 1.3
+                dot3Scale = 1.3
+            }
+            .padding(.horizontal)
         }
-        .onAppear {
-            dot1Scale = 1.3
-            dot2Scale = 1.3
-            dot3Scale = 1.3
-        }
-        .padding(.horizontal)
     }
-}
 
 #Preview {
     ChatbotView()
