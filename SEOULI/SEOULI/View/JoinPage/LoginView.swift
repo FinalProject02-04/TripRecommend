@@ -4,15 +4,16 @@
 //
 //  Created by 김소리 on 6/25/24.
 //
-
 import SwiftUI
 
 struct LoginView: View {
     
-    @State var id = ""
+    @State var email = ""
     @State var password = ""
     @FocusState var isTextFieldFocused: Bool
     @State var path = NavigationPath()
+    
+    @Binding var isLogin: Bool
     
     var body: some View {
         
@@ -45,14 +46,31 @@ struct LoginView: View {
                     Spacer().frame(height: 50)
                     
                     // MARK: 아이디
-                    CustomTextField(text: $id, placeholder: "아이디")
+                    TextField("이메일을 입력하세요.", text: $email)
+                        .frame(height: 54)
+                        .padding([.horizontal], 20)
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
+                        .padding([.horizontal], 30)
+                        .font(.system(size: 20))
+                 
                     
                     // 간격 조절
                     Spacer().frame(height: 20)
                     
                     // MARK: 비밀번호
-                    CustomTextField(text: $password, placeholder: "비밀번호", isSecure: true)
-                    
+                    SecureField("비밀번호를 입력하세요.", text: $password)
+                        .focused($isTextFieldFocused)
+                        .frame(height: 54)
+                        .padding([.horizontal], 20)
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
+                        .padding([.horizontal], 30)
+                        .font(.system(size: 20))
                     
                     // 간격 조절
                     Spacer().frame(height: 20)
@@ -82,20 +100,24 @@ struct LoginView: View {
                     // 간격 조절
                     Spacer().frame(height: 30)
                     
-                    // MARK: 로그인 버튼
-                    
-                    NavigationLink {
-                        ContentView()
-                    } label: {
+                    Button(action: {
+                        
+                        UserDefaults.standard.set(email, forKey: "userEmail")
+                        withAnimation {
+                            isLogin.toggle()
+                        }
+                        
+                    }, label: {
                         Text("로그인")
                             .padding()
                             .frame(width: 200)
                             .background(.theme)
                             .foregroundStyle(.white)
                             .clipShape(.buttonBorder)
-                    }
-//                    Button{
-//                        path.append("ContentView")
+                    })
+                    // MARK: 로그인 버튼
+//                    NavigationLink {
+//                        ContentView()
 //                    } label: {
 //                        Text("로그인")
 //                            .padding()
@@ -105,7 +127,6 @@ struct LoginView: View {
 //                            .clipShape(.buttonBorder)
 //                    }
                     
-            //        Spacer()
                     
                     // MARK: 개인 회원 로그인
                     HStack(content: {
@@ -168,7 +189,7 @@ struct LoginView: View {
                 case "ChangePwView":
                     ChangePwView(path: $path)
                 case "ContentView":
-                    ContentView()
+                    ContentView(isLogin: $isLogin)
                 default:
                     Text("Unknown View")
                 }
@@ -176,30 +197,14 @@ struct LoginView: View {
         } // NavigationStack
     } //body
     
+    // 이메일 저장 함수
+    private func saveEmail() {
+        UserDefaults.standard.set($email, forKey: "userEmail")
+        print("이메일 저장됨: \($email)")
+    }
+    
 } // LoginView
 
-// MARK: 공통 TextField
-struct CustomTextField: View {
-    
-    // Property
-    @Binding var text: String
-    var placeholder: String
-    var isSecure: Bool = false
-    
-    // MARK: View
-    var body: some View {
-        SecureField(placeholder, text: $text)
-            .frame(height: 54)
-            .padding([.horizontal], 20)
-            .background(Color.white)
-            .cornerRadius(16)
-            .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
-            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
-            .padding([.horizontal], 30)
-            .font(.system(size: 20))
-    } // body
-} // CustomTextField
-
-#Preview {
-    LoginView()
-}
+//#Preview {
+//    LoginView()
+//}
