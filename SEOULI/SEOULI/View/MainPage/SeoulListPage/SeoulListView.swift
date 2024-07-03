@@ -12,73 +12,142 @@
  
  Date : 2024.06.27 Thursday
  Description : 2차 UI frame 작업
+ 
+ Date : 2024.07.02 Tuesday
+ Description : DB 연결
+ 
+ Date : 2024.07.03 Wednesday
+ Description : List 마무리작업 + lazy loading추가 
+ 
  */
 
 import SwiftUI
 
-
-// Test data
-let testLocations: [SeoulList] = [
-    SeoulList(name: "서울스카이", imageName: "seoul", description: "동대문문화원은 서울 동대문구에 위치한 주요 문화 기관입니다. 이 기관은 지역 문화와 유산을 보존하고 홍보하는 중심지 역할을 합니다. 동대문문화원은 전통 한국 예술, 공예, 음악, 춤 등을 선보이는 다양한 문화 행사, 교육 프로그램, 전시회를 개최합니다. 또한 지역 주민과 방문객들에게 문화적 정체성과 공동체 의식을 함양할 수 있는 자원과 공간을 제공합니다. Very nice, very good.", address: "위례대로 6길 20", inquiries: "010-1111-1111"),
-    SeoulList(name: "한옥마을", imageName: "seoul3", description: "동대문문화원은 서울 동대문구에 위치한 주요 문화 기관입니다. 이 기관은 지역 문화와 유산을 보존하고 홍보하는 중심지 역할을 합니다. 동대문문화원은 전통 한국 예술, 공예, 음악, 춤 등을 선보이는 다양한 문화 행사, 교육 프로그램, 전시회를 개최합니다. 또한 지역 주민과 방문객들에게 문화적 정체성과 공동체 의식을 함양할 수 있는 자원과 공간을 제공합니다. ",address: "위례대로 6길 20",inquiries: "010-1111-1111"),
-  
-]
-
 struct SeoulListView: View {
-    @State var searchText = ""
+    @ObservedObject var seoulListVM = SeoulListVM()
+    @State private var searchText = ""
+    @State private var displayedLocations = [SeoulList]()
+    @State private var isLoading = false
+    @State private var currentPage = 0
+    let pageSize = 10
+
     var body: some View {
         NavigationView {
             ZStack {
-                // Background Color
-                    Color("Background Color")
-                        .edgesIgnoringSafeArea(.all)
-            
-                VStack{
-                    HStack{
+                Color("Background Color")
+                    .edgesIgnoringSafeArea(.all)
+
+                VStack {
+                    HStack {
                         Image(systemName: "magnifyingglass")
-                        TextField("검색하기", text: $searchText)
+                        TextField("검색하기", text: $searchText, onCommit: {
+                            // Reset the displayed locations when search text changes
+                            currentPage = 0
+                            displayedLocations = []
+                            loadMoreLocations()
+                        })
                     }
                     .padding()
+
                     ScrollView {
-                        ForEach(testLocations.filter{
-                            searchText.isEmpty ? true : $0.name.localizedStandardContains(searchText)
-                        }){ location in
-                            NavigationLink(destination: SeoulListDetailView(location : location)){
-                                HStack{
-                                    Image(location.imageName)
-                                        .resizable()
-                                        .frame(width: 80, height: 80)
-                                        .cornerRadius(10)
-                                        .padding(.trailing, 15)
-                                    VStack(alignment: .leading) {
-                                        Text(location.name)
-                                            .font(.title3)
-                                            .bold()
-                                            .foregroundColor(Color("Text Color"))
-                                        Text("위례대로 6길 20")
-                                          .font(.subheadline)
-                                          .foregroundColor(.gray)
+                        LazyVStack {
+                            ForEach(displayedLocations.filter {
+                                searchText.isEmpty ? true : $0.name.localizedStandardContains(searchText)
+                            }) { location in
+                                NavigationLink(destination: SeoulListDetailView(location: location)) {
+                                    LocationRow(location: location)
+                                }
+                            }
+
+                            if isLoading {
+                                ProgressView()
+                                    .padding()
+                            } else {
+                                Color.clear
+                                    .frame(height: 1)
+                                    .onAppear {
+                                        loadMoreLocations()
                                     }
-                                    Spacer()
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(.gray)
-                                        .padding(.trailing, 30)
-                                } // HStack
-                                .padding(.leading, 10)
                             }
                         }
-                    } // Scroll View
-                    
+                    }
+                    .padding(.horizontal)
                 }
-            } // VStack
-         
-        } // Navigation view
-//        .navigationTitle("서울 목록 리스트")
-        .background(Color("Background Color").edgesIgnoringSafeArea(.all))
+            }
+            .onAppear {
+                seoulListVM.fetchDataFromAPI()
+                loadMoreLocations()
+            }
+        }
+    }
+
+    private func loadMoreLocations() {
+        guard !isLoading else { return }
+        isLoading = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) { // network delay
+            let newLocations = Array(seoulListVM.locations.prefix((currentPage + 1) * pageSize))
+            displayedLocations = newLocations
+            isLoading = false
+            currentPage += 1
+        }
     }
 }
 
+struct LocationRow: View {
+    let location: SeoulList
 
+    var body: some View {
+        HStack {
+            AsyncImage(url: URL(string: location.imageName)) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(10)
+                case .failure:
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(10)
+                case .empty:
+                    ProgressView()
+                        .frame(width: 80, height: 80)
+                @unknown default:
+                    EmptyView()
+                }
+            }
+
+            VStack(alignment: .leading) {
+                Text(location.name)
+                    .font(.title3)
+                    .bold()
+                    .foregroundColor(Color("Text Color"))
+                Text(location.address)
+                    .font(.system(size: 13))
+                    .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            Image(systemName: "chevron.right")
+                .foregroundColor(.gray)
+                .padding(.trailing, 10)
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 10)
+    }
+}
+
+struct SeoulListView_Previews: PreviewProvider {
+    static var previews: some View {
+        SeoulListView()
+            .environmentObject(SeoulListVM())
+    }
+}
 
 #Preview {
     SeoulListView()

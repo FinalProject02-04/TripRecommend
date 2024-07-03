@@ -4,23 +4,28 @@
 //
 //  Created by 김소리 on 6/25/24.
 //
-
 import SwiftUI
 
 struct LoginView: View {
     
-    @State var id = ""
+    @State var email = ""
     @State var password = ""
     @FocusState var isTextFieldFocused: Bool
     @State var path = NavigationPath()
+    @State private var showAlert = false // Alert 표시 여부를 관리하는 상태 변수
+    @State private var errorMessage: String = "" // Alert창의 메세지를 저장할 상태 변수
+    
+    @Binding var isLogin: Bool
+    
+    // Firebase Query Request가 완료 됬는지 확인하는 상태 변수
+    @State var result: Bool = false
     
     var body: some View {
         
-        // MARK: NavigationStack
         NavigationStack(path: $path){
-            // MARK: ZStack
+            
             ZStack {
-                // MARK: VStack
+                
                 VStack {
                     
                     Spacer(minLength: 300)
@@ -30,9 +35,9 @@ struct LoginView: View {
                                    startPoint: .top,
                                    endPoint: .bottom)
                     .edgesIgnoringSafeArea(.all)
-                } // VStack
+                    
+                } // VStack(배경색)
                 
-                // MARK: VStack
                 VStack(content: {
                     
                     Spacer()
@@ -45,58 +50,32 @@ struct LoginView: View {
                     // 간격 조절
                     Spacer().frame(height: 50)
                     
-                    
                     // MARK: 아이디
-                    TextField("아이디", text: $id)
-                        .keyboardType(.emailAddress)
-                        // 높이 조절
+                    TextField("이메일을 입력하세요.", text: $email)
                         .frame(height: 54)
-                        // 내각 여백
                         .padding([.horizontal], 20)
-                        // 배경색
                         .background(Color.white)
-                        // 둥근 테두리를 추가
                         .cornerRadius(16)
-                        // 그림자 추가
-                        .shadow(
-                            color: Color.gray.opacity(0.4),
-                            radius: 5, x: 0, y: 2
-                        )
-                        // 테두리 둥근 정도, 색상
+                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
-                        // 외각 여백
                         .padding([.horizontal], 30)
-                        // 폰트 사이즈
                         .font(.system(size: 20))
-                        .focused($isTextFieldFocused)
-                    
+                 
                     
                     // 간격 조절
                     Spacer().frame(height: 20)
                     
                     // MARK: 비밀번호
-                    SecureField("비밀번호", text: $password)
-                        // 높이 조절
-                        .frame(height: 54)
-                        // 내각 여백
-                        .padding([.horizontal], 20)
-                        // 배경색
-                        .background(Color.white)
-                        // 둥근 테두리를 추가
-                        .cornerRadius(16)
-                        // 그림자 추가
-                        .shadow(
-                            color: Color.gray.opacity(0.4),
-                            radius: 5, x: 0, y: 2
-                        )
-                        // 테두리 둥근 정도, 색상
-                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
-                        // 외각 여백
-                        .padding([.horizontal], 30)
-                        // 폰트 사이즈
-                        .font(.system(size: 20))
+                    SecureField("비밀번호를 입력하세요.", text: $password)
                         .focused($isTextFieldFocused)
-                    
+                        .frame(height: 54)
+                        .padding([.horizontal], 20)
+                        .background(Color.white)
+                        .cornerRadius(16)
+                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
+                        .padding([.horizontal], 30)
+                        .font(.system(size: 20))
                     
                     // 간격 조절
                     Spacer().frame(height: 20)
@@ -127,18 +106,55 @@ struct LoginView: View {
                     Spacer().frame(height: 30)
                     
                     // MARK: 로그인 버튼
-                    Button{
-                        path.append("ContentView")
-                    } label: {
+                    Button(action: {
+                        
+                        // 로그인 로직
+                        Task{
+                            let userQuery = UserInfo(result: $result)
+                            let userInfo = try await userQuery.fetchUserInfo(userid: email, userpw: password)
+
+                            if result {
+                                print("로그인성공")
+                                
+                                print(userInfo.documentId)
+                                // firebase request 성공
+                                if userInfo.documentId.isEmpty{
+                                    // id, pw 잘못 입력
+                                    self.showAlert = true
+                                    self.errorMessage = "Please Check your ID or password"
+                                }else{
+                                    // id, pw 제대로 입력
+                                    self.isLogin = true
+                                    UserDefaults.standard.set(email, forKey: "userEmail")
+                                }
+                            }else{
+                                // firebase request 실패
+                                self.showAlert = true
+                                self.errorMessage = "Failed to connect to the server"
+                            }
+                            
+                        } // Task
+                        
+                    }, label: {
                         Text("로그인")
                             .padding()
                             .frame(width: 200)
                             .background(.theme)
                             .foregroundStyle(.white)
                             .clipShape(.buttonBorder)
-                    }
+                    })
                     
-            //        Spacer()
+//                    NavigationLink {
+//                        ContentView()
+//                    } label: {
+//                        Text("로그인")
+//                            .padding()
+//                            .frame(width: 200)
+//                            .background(.theme)
+//                            .foregroundStyle(.white)
+//                            .clipShape(.buttonBorder)
+//                    }
+                    
                     
                     // MARK: 개인 회원 로그인
                     HStack(content: {
@@ -161,26 +177,14 @@ struct LoginView: View {
                     .padding([.top, .bottom], 30)
                     
                     // MARK: 소셜 로그인 버튼
-                    HStack(spacing: 20, content: {
-                        Button(action: {
-                            //
-                        }, label: {
-                            Image("google_icon")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .scaledToFit()
-                        })
-                        
-                        Button(action: {
-                            //
-                        }, label: {
-                            Image("apple_icon")
-                                .resizable()
-                                .frame(width: 50, height: 50)
-                                .scaledToFit()
-                        })
-                        
-                    }) // HStack
+                    Button(action: {
+//                        Authentication.googleOauth()
+                    }, label: {
+                        Image("google_icon")
+                            .resizable()
+                            .frame(width: 50, height: 50)
+                            .scaledToFit()
+                    })
                     
                     // MARK: 회원 가입
                     HStack {
@@ -213,7 +217,7 @@ struct LoginView: View {
                 case "ChangePwView":
                     ChangePwView(path: $path)
                 case "ContentView":
-                    ContentView()
+                    ContentView(isLogin: $isLogin)
                 default:
                     Text("Unknown View")
                 }
@@ -221,8 +225,14 @@ struct LoginView: View {
         } // NavigationStack
     } //body
     
+    // 이메일 저장 함수
+    private func saveEmail() {
+        UserDefaults.standard.set($email, forKey: "userEmail")
+        print("이메일 저장됨: \($email)")
+    }
+    
 } // LoginView
-
-#Preview {
-    LoginView()
-}
+//
+//#Preview {
+//    LoginView(isLogin: .constant(false))
+//}

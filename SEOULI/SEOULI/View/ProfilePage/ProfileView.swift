@@ -15,6 +15,7 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @Binding var isLogin: Bool
     var body: some View {
         NavigationView {
             ZStack {
@@ -141,9 +142,10 @@ struct ProfileView: View {
                               .bold()
                       }) {
                           Button(action: {
-                              
-                             // 로그아웃 action
-                              
+                              // 로그아웃 action
+                              withAnimation {
+                                isLogin.toggle()
+                              }
                               
                           }) {
                               Text("로그아웃")
@@ -186,5 +188,5 @@ struct ProfileView: View {
   }
 
 #Preview {
-    ProfileView()
+    ProfileView(isLogin: .constant(true))
 }

@@ -291,6 +291,6 @@ struct FindInfoView: View {
     }
 } // FindInfoView
 
-#Preview {
-    FindInfoView(selectedFindInfo: 0, path:LoginView().$path)
-}
+//#Preview {
+//    FindInfoView(selectedFindInfo: 0, path:LoginView().$path)
+//}

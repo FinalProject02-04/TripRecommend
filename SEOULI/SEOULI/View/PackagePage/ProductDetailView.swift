@@ -35,6 +35,8 @@ struct ProductDetailView: View {
     
     @State private var 입력한결제정보: PaymentInfo
     
+    @State private var userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "none"
+    
     init(product: ProductModel) {
             self.product = product
             self._입력한결제정보 = State(initialValue: Constants.createPaymentInfo(for: product))
@@ -165,6 +167,7 @@ struct ProductDetailView: View {
                             resultInfo = (title, message)
                             issuccess = true
                             showingResultAlert = true
+                            insertpayinfo(pack_id: String(product.id), user_id: userEmail)
                         }
                         .onFail { (errorCode: String, errorMessage: String, orderId: String) in
                             let title = "TossPayments 요청에 실패하였습니다."
@@ -186,6 +189,12 @@ struct ProductDetailView: View {
                 .frame(height: 650)
             }
             .offset(y: 100)
+        }
+    }
+    func insertpayinfo(pack_id:String,user_id:String){
+        let api = PurchaseVM()
+        Task {
+            try await api.insertPurchase(pack_id:pack_id,user_id:user_id)
         }
     }
 }

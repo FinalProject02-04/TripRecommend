@@ -1,89 +1,121 @@
-import SwiftUI
+/*
+ Author : 이 서
+ 
+ Date : 2024.06.27 Thursday
+ Description : 1차 UI frame 작업
+ 
+ */
 
-// Model for Post
-struct Post: Identifiable {
-    let id = UUID()
-    let title: String
-    let username: String
-    let subtitle: String
-    let date: String
+
+import SwiftUI
+import PhotosUI
+
+
+// MARK: - PostData
+
+// ObservableObject를 사용하여 데이터 관리
+class PostData: ObservableObject {
+    @Published var communities: [PostModel] = []
 }
 
+// MARK: - PostListView
+
 struct PostListView: View {
-    let posts: [Post] = [
-        Post(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-25"),
-        Post(title: "동대문문화원", username: "이천영", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-25"),
-        Post(title: "동대문문화원", username: "리턴영", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-24"),
-        Post(title: "동대문문화원", username: "그린플럼", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-21"),
-        Post(title: "동대문문화원", username: "이휘의남자원도현", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-19"),
-        Post(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", date: "2024-06-18")
-    ]
+    // 데이터 객체 초기화
+    @StateObject var postData = PostData()
     
     var body: some View {
         NavigationView {
             ZStack {
                 VStack {
                     ScrollView {
-                        ForEach(posts) { post in
-                            NavigationLink(destination: PostDetailView(post: post)) {
-                                PostCardView(post: post)
+                        ForEach(postData.communities) { post in
+                            NavigationLink(destination: PostDetailView(community: post).environmentObject(postData)) {
+                                PostCardView(community: post)
                                     .padding(.horizontal)
+                                    .onAppear {
+                                        increaseViews(for: post)
+                                    }
                             }
                         }
-                    }
+                    } // ScrollView
                     
                     Spacer()
-                }
+                } // VStack
                 .padding()
+                // 내비게이션 바 타이틀 설정
                 .navigationBarTitle("커뮤니티", displayMode: .inline)
                 
                 VStack {
+                    
                     Spacer()
+                    
                     HStack {
+                        
                         Spacer()
-                        NavigationLink(destination: PostWriteView()) {
-                            Text("작성하기")
-                                .font(.system(size: 14))
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(width: 100)
-                                .frame(height: 50)
-                                .background(Color.theme)
-                                .cornerRadius(20)
-                        }
-                        .padding()
+                                        
+                        NavigationLink(destination: PostWriteView().environmentObject(postData)) {
+                                Image(systemName: "pencil")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(Color.theme)
+                                    .cornerRadius(25)
+                                    .shadow(color: Color.gray.opacity(0.4), radius: 4, x: 0, y: 2)
+                                        }
+                                        .padding()
+                                    }
+                                } // VStack
+                            } // ZStack
+                        } // NavigationView
                     }
-                }
-            }
+    
+    // 게시물의 조회수를 증가시키는 함수
+    func increaseViews(for post: PostModel) {
+        if let index = postData.communities.firstIndex(where: { $0.id == post.id }) {
+            postData.communities[index].views += 1
         }
     }
 }
 
+// MARK: - PostCardView
+
 struct PostCardView: View {
-    let post: Post
+    let community: PostModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(post.title)
+            // 게시물 제목
+            Text(community.title)
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
             
-            Text("작성자: \(post.username)")
+            // 작성자 정보
+            Text("작성자: \(community.username)")
                 .font(.subheadline)
                 .fontWeight(.bold)
                 .foregroundColor(.gray)
             
-            Text(post.subtitle)
+            // 게시물 부제목
+            Text(community.subtitle)
                 .font(.body)
                 .foregroundColor(.primary)
             
             HStack {
                 Spacer()
-                Text(post.date)
+                // 게시물 날짜
+                Text(community.date)
                     .font(.caption)
                     .foregroundColor(.gray)
-            }
+            } //HStack
+            
+            HStack {
+                Spacer()
+                Text("조회수: \(community.views)")
+                    .font(.caption)
+                    .foregroundColor(.gray)
+            } //HStack
         }
         .padding()
         .background(Color.white)
@@ -98,9 +130,6 @@ struct PostCardView: View {
     }
 }
 
-struct PostListView_Previews: PreviewProvider {
-    static var previews: some View {
-        PostListView()
-    }
+#Preview {
+    PostListView()
 }
-

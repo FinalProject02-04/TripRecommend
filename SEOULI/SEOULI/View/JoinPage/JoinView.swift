@@ -1,25 +1,46 @@
-//
-//  JoinView.swift
-//  SEOULI
-//
-//  Created by 김소리 on 6/25/24.
-//
+/*
+ Author : 이 휘
+ Date : 2024.07.03 Thursday
+ Description : 1차 UI frame 작업
+ JoinView.swift
+ */
 
 import SwiftUI
 
 struct JoinView: View {
     
     // MARK: 변수
-    @State var email = ""
-    @State var password = ""
-    @State var passwordCheck = ""
-    @State var name = ""
-    @State var nickname = ""
-    @State var phoneNumber = ""
     @State var verificationCode = ""
     @State var joinAlert = false
+    @State var isAlert = false
     @Binding var path: NavigationPath
     
+    @State private var email = ""
+    @State private var password = ""
+    @State private var passwordcheck = ""
+    @State private var name = ""
+    @State private var nickname = ""
+    @State private var phoneNumber = ""
+    
+    // Firebase Query Request가 완료 됬는지 확인하는 상태 변수
+    @State private var result: Bool = true
+
+    // 정규식
+    @State private var isValidEmail = true // 이메일
+    @State private var isValidPw = true // 비밀번호
+    @State private var isCheckPw = true // 일치 여부
+    
+    // 키보드를 내릴때 필요한 상태 변수
+    @FocusState private var isFocused: Bool
+    // 완료 버튼 후 뒤로가기
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var isPasswordValid = true // 비밀번호 유효성 상태 변수
+    
+    
+    // RegularExpression 구조체 인스턴스 생성
+    private let regexValidator = RegularExpression()
+        
     var body: some View {
 //        NavigationView(content: {
             ZStack(content: {
@@ -41,6 +62,9 @@ struct JoinView: View {
                         .padding(.leading,35)
 
                     TextField("이메일을 입력하세요.", text: $email)
+                        .focused($isFocused)
+                        // 자동 대문자 비활성화
+                        .textInputAutocapitalization(.never)
                         .keyboardType(.emailAddress)
                         // 높이 조절
                         .frame(height: 40)
@@ -61,6 +85,7 @@ struct JoinView: View {
                         .padding([.horizontal], 30)
                         // 폰트 사이즈
                         .font(.system(size: 16))
+
                     
                     // MARK: 비밀번호
                     Text("비밀번호")
@@ -89,13 +114,15 @@ struct JoinView: View {
                         .padding([.horizontal], 30)
                         // 폰트 사이즈
                         .font(.system(size: 16))
+
                     
-                    Text("비밀번호는 대문자와 특수문자를 포함해야 합니다.")
-                        .foregroundStyle(.red)
-                        .bold()
-                        .font(.system(size: 12))
-                        .padding(.leading, 30)
-                    
+//                    // 유효성 검사 결과에 따른 안내 메시지 표시
+//                    if !isPasswordValid {
+//                        Text("비밀번호는 알파벳과 숫자가 모두 포함된 최소 8자 이상이어야 합니다.")
+//                            .foregroundColor(.red)
+//                            .font(.system(size: 12))
+//                            .padding(.leading, 30)
+//                    }
                     
                     // MARK: 비밀번호 확인
                     Text("비밀번호 확인")
@@ -103,7 +130,7 @@ struct JoinView: View {
                         .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
                         .bold()
                         .padding(.leading,35)
-                    SecureField("비밀번호 입력하세요.", text: $passwordCheck)
+                    SecureField("비밀번호 입력하세요.", text: $passwordcheck)
                         .keyboardType(.emailAddress)
                         // 높이 조절
                         .frame(height: 40)
@@ -125,11 +152,11 @@ struct JoinView: View {
                         // 폰트 사이즈
                         .font(.system(size: 16))
                     
-                    Text("비밀번호가 일치합니다.")
-                        .foregroundStyle(.blue)
-                        .bold()
-                        .font(.system(size: 12))
-                        .padding(.leading, 30)
+//                    Text("비밀번호가 일치합니다.")
+//                        .foregroundStyle(.blue)
+//                        .bold()
+//                        .font(.system(size: 12))
+//                        .padding(.leading, 30)
                     
                     // MARK: 이름
                     Text("이름")
@@ -193,6 +220,7 @@ struct JoinView: View {
                         .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
                         .bold()
                         .padding(.leading,35)
+                    
                     HStack {
                         TextField("- 제외하고 번호를 입력하세요.", text: $phoneNumber)
                             .keyboardType(.emailAddress)
@@ -215,6 +243,7 @@ struct JoinView: View {
                             .padding(.leading, 30)
                             // 폰트 사이즈
                         .font(.system(size: 16))
+                        .keyboardType(.numberPad) // 전화번호 입력에 적합한 키보드 타입
                         
                         Button{
                             
@@ -255,8 +284,9 @@ struct JoinView: View {
                         .font(.system(size: 16))
                         
                         Button{
-                            
-                        } label: {
+                            //
+                        }
+                    label: {
                             Text("확인")
                                 .padding(10)
                                 .bold()
@@ -267,16 +297,29 @@ struct JoinView: View {
                                 .clipShape(.buttonBorder)
                                 .padding(.trailing, 30)
                         }
+//                    .alert("입력 되었습니다.", isPresented: $isAlert, actions: {
+//                        Button("네, 알겠습니다", action: {
+//                            path.removeLast()
+//                        })
+//                    })
  
                     }
                     .padding(.bottom, 50)
                     
+                    
+                    // MARK: 가입버튼
                     HStack {
                         
                         Spacer()
                         
                         Button{
-                            joinAlert = true
+                            Task{
+                                var userInsert = UserInfo(result: $result)
+                                let result = try await userInsert.insertUser(email: email, password: password, name: name, nickname: nickname)
+                                print(result)
+                                joinAlert = true
+                            }
+
                             
                         }label: {
                             Text("가입하기")
@@ -319,49 +362,6 @@ struct JoinView: View {
     }
 }
 
-//// MARK: CustomNavigationBar
-//struct CustomNavigationBar: View {
-//    
-//    @Environment(\.dismiss) var dismiss
-//    
-//    @State var titleName: String
-//    @State var backButton: Bool
-//    
-//    // MARK: body
-//    var body: some View {
-//        ZStack(content: {
-//            if backButton {
-//                HStack(content: {
-//                    Button(action: {
-//                        dismiss()
-//                    }, label: {
-//                        HStack(content: {
-//                            Image(systemName: "arrowtriangle.backward.fill")
-//                                .foregroundStyle(Color(red: 0.259, green: 0.345, blue: 0.518))
-//                            
-//                            Text("뒤로 가기")
-//                                .foregroundStyle(Color(red: 0.259, green: 0.345, blue: 0.518))
-//                                .bold()
-//                        })
-//                        .frame(width: UIScreen.main.bounds.width / 4, alignment: .trailing)
-//                    })
-//                    
-//                    Text("")
-//                        .frame(width: (UIScreen.main.bounds.width / 4) * 3, alignment: .leading)
-//                })
-//            }
-//            
-//            Text(titleName)
-//                .font(.title)
-//                .bold()
-//                .foregroundStyle(Color(red: 0.259, green: 0.345, blue: 0.518))
-//                .frame(width: UIScreen.main.bounds.width)
-//        })
-//        .ignoresSafeArea()
-//        .frame(width: UIScreen.main.bounds.width, height: 50)
-//    } // body
-//} // CustomNavigationBar
-
-#Preview {
-    JoinView(path:LoginView().$path)
-}
+//#Preview {
+//    JoinView(path:LoginView().$path)
+//}
