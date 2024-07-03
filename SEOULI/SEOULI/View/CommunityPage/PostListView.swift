@@ -47,22 +47,28 @@ struct PostListView: View {
                 .navigationBarTitle("커뮤니티", displayMode: .inline)
                 
                 VStack {
+                    
                     Spacer()
-                    NavigationLink(destination: PostWriteView().environmentObject(postData)) {
-                        Text("작성하기")
-                            .font(.system(size: 14))
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(width: 100)
-                            .frame(height: 50)
-                            .background(Color.blue)
-                            .cornerRadius(20)
+                    
+                    HStack {
+                        
+                        Spacer()
+                                        
+                        NavigationLink(destination: PostWriteView().environmentObject(postData)) {
+                                Image(systemName: "pencil")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(Color.theme)
+                                    .cornerRadius(25)
+                                    .shadow(color: Color.gray.opacity(0.4), radius: 4, x: 0, y: 2)
+                                        }
+                                        .padding()
+                                    }
+                                } // VStack
+                            } // ZStack
+                        } // NavigationView
                     }
-                    .padding()
-                } //VStack
-            }
-        }
-    }
     
     // 게시물의 조회수를 증가시키는 함수
     func increaseViews(for post: PostModel) {
