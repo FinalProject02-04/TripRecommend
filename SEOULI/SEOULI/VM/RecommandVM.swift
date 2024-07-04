@@ -7,8 +7,11 @@
 
 import SwiftUI
 
+import SwiftUI
+
 class NetworkManager: ObservableObject {
     @Published var recommendations: [SeoulList] = []
+    @Published var norecmessage: String = ""
     
     func fetchRecommendations(for input: String, completion: @escaping (Result<[SeoulList], Error>) -> Void) {
         guard let encodedInput = input.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
@@ -33,9 +36,9 @@ class NetworkManager: ObservableObject {
                 completion(.failure(URLError(.badServerResponse)))
                 return
             }
+            
             do {
-                let json = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]]
-                if let json = json {
+                if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] {
                     var recommendations: [SeoulList] = []
                     
                     for item in json.prefix(3) {  // Limit to the first 3 recommendations
@@ -51,13 +54,19 @@ class NetworkManager: ObservableObject {
                     }
                     
                     if recommendations.isEmpty {
-                        let noRecommendation = SeoulList(name: "추천해드릴 장소가 없어요 😢 \n다른 키워드를 입력해보세요!", address: "", description: "", inquiries: "", imageName: "")
-                        recommendations.append(noRecommendation)
+                        let noRecommendation = "추천해드릴 장소가 없어요 😢 \n다른 키워드를 입력해보세요!"
+                        self.norecmessage = noRecommendation
+                        DispatchQueue.main.async {
+                            self.recommendations = []
+                            self.norecmessage = noRecommendation
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.recommendations = recommendations
+                            self.norecmessage = ""
+                        }
                     }
                     
-                    DispatchQueue.main.async {
-                        self.recommendations = recommendations
-                    }
                     completion(.success(recommendations))
                 } else {
                     completion(.failure(URLError(.cannotParseResponse)))
