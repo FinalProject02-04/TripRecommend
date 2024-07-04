@@ -1,23 +1,16 @@
-//
-//  PostModel.swift
-//  SEOULI
-//
-//  Created by 김소리 on 6/27/24.
-//
-
 import Foundation
 
-struct PostModel: Identifiable {
-    var id = UUID()
+struct PostModel: Identifiable, Codable {
+    var id: String
     var title: String
     var username: String
     var subtitle: String
     var content: String
     var date: String
-    var image : String
-    var views: Int = 0
+    var image: String
+    var views: Int
     
-    init(id: UUID = UUID(), title: String, username: String, subtitle: String, content: String, date: String, image: String, views: Int) {
+    init(id: String = UUID().uuidString, title: String, username: String, subtitle: String, content: String, date: String, image: String, views: Int = 0) {
         self.id = id
         self.title = title
         self.username = username
@@ -25,6 +18,7 @@ struct PostModel: Identifiable {
         self.content = content
         self.date = date
         self.image = image
-        self.views = 0
+        self.views = views
     }
 }
+
