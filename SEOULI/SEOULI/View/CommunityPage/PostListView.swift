@@ -16,21 +16,24 @@ import PhotosUI
 // ObservableObject를 사용하여 데이터 관리
 class PostData: ObservableObject {
     @Published var communities: [PostModel] = []
+    
+    func addPost(post: PostModel) {
+        communities.append(post)
+    }
 }
 
 // MARK: - PostListView
 
 struct PostListView: View {
-    // 데이터 객체 초기화
-    @StateObject var postData = PostData()
+    @StateObject var postVM = PostVM()
     
     var body: some View {
         NavigationView {
             ZStack {
                 VStack {
                     ScrollView {
-                        ForEach(postData.communities) { post in
-                            NavigationLink(destination: PostDetailView(community: post).environmentObject(postData)) {
+                        ForEach(postVM.posts) { post in
+                            NavigationLink(destination: PostDetailView(community: post)) {
                                 PostCardView(community: post)
                                     .padding(.horizontal)
                                     .onAppear {
@@ -38,84 +41,71 @@ struct PostListView: View {
                                     }
                             }
                         }
-                    } // ScrollView
+                    }
                     
                     Spacer()
-                } // VStack
+                }
                 .padding()
-                // 내비게이션 바 타이틀 설정
-                .navigationBarTitle("커뮤니티", displayMode: .inline)
+                .navigationBarTitle("Community", displayMode: .inline)
                 
                 VStack {
-                    
                     Spacer()
                     
-                    HStack {
-                        
-                        Spacer()
-                                        
-                        NavigationLink(destination: PostWriteView().environmentObject(postData)) {
-                                Image(systemName: "pencil")
-                                    .font(.system(size: 24))
-                                    .foregroundColor(.white)
-                                    .padding()
-                                    .background(Color.theme)
-                                    .cornerRadius(25)
-                                    .shadow(color: Color.gray.opacity(0.4), radius: 4, x: 0, y: 2)
-                                        }
-                                        .padding()
-                                    }
-                                } // VStack
-                            } // ZStack
-                        } // NavigationView
+                    NavigationLink(destination: PostWriteView().environmentObject(postVM)) {
+                        Image(systemName: "pencil")
+                            .font(.system(size: 24))
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(25)
+                            .shadow(color: Color.gray.opacity(0.4), radius: 4, x: 0, y: 2)
                     }
+                    .padding()
+                }
+            }
+        }
+    }
     
-    // 게시물의 조회수를 증가시키는 함수
-    func increaseViews(for post: PostModel) {
-        if let index = postData.communities.firstIndex(where: { $0.id == post.id }) {
-            postData.communities[index].views += 1
+    private func increaseViews(for post: PostModel) {
+        // This function needs implementation if views need to be updated in Firestore as well.
+        if let index = postVM.posts.firstIndex(where: { $0.id == post.id }) {
+            postVM.posts[index].views += 1
         }
     }
 }
-
-// MARK: - PostCardView
 
 struct PostCardView: View {
     let community: PostModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            // 게시물 제목
             Text(community.title)
                 .font(.title)
                 .fontWeight(.bold)
                 .foregroundColor(.primary)
             
-            // 작성자 정보
-            Text("작성자: \(community.username)")
+            Text("By: \(community.username)")
                 .font(.subheadline)
                 .fontWeight(.bold)
                 .foregroundColor(.gray)
             
-            // 게시물 부제목
             Text(community.subtitle)
                 .font(.body)
                 .foregroundColor(.primary)
             
             HStack {
                 Spacer()
-                // 게시물 날짜
-                Text(community.date)
+                Text("Date: \(community.date)")
                     .font(.caption)
                     .foregroundColor(.gray)
-            } //HStack
+            }
             
             HStack {
                 Spacer()
-                Text("조회수: \(community.views)")
+                Text("Views: \(community.views)")
                     .font(.caption)
                     .foregroundColor(.gray)
-            } //HStack
+            }
         }
         .padding()
         .background(Color.white)
@@ -130,6 +120,8 @@ struct PostCardView: View {
     }
 }
 
-#Preview {
-    PostListView()
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        PostListView()
+    }
 }
