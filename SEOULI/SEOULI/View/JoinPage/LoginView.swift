@@ -12,8 +12,10 @@ struct LoginView: View {
     @State var password = ""
     @FocusState var isTextFieldFocused: Bool
     @State var path = NavigationPath()
-    @State private var showAlert = false // Alert 표시 여부를 관리하는 상태 변수
-    @State private var errorMessage: String = "" // Alert창의 메세지를 저장할 상태 변수
+    // Alert 표시 여부를 관리하는 상태 변수
+    @State private var showAlert = false
+    // Alert창의 메세지를 저장할 상태 변수
+    @State private var errorMessage: String = ""
     
     @Binding var isLogin: Bool
     
@@ -144,18 +146,6 @@ struct LoginView: View {
                             .clipShape(.buttonBorder)
                     })
                     
-//                    NavigationLink {
-//                        ContentView()
-//                    } label: {
-//                        Text("로그인")
-//                            .padding()
-//                            .frame(width: 200)
-//                            .background(.theme)
-//                            .foregroundStyle(.white)
-//                            .clipShape(.buttonBorder)
-//                    }
-                    
-                    
                     // MARK: 개인 회원 로그인
                     HStack(content: {
                         VStack{
@@ -230,9 +220,8 @@ struct LoginView: View {
         UserDefaults.standard.set($email, forKey: "userEmail")
         print("이메일 저장됨: \($email)")
     }
-    
 } // LoginView
-//
-//#Preview {
-//    LoginView(isLogin: .constant(false))
-//}
+
+#Preview {
+    LoginView(isLogin: .constant(false))
+}

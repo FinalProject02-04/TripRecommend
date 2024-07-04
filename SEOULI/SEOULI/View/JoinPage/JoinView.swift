@@ -6,6 +6,7 @@
  */
 
 import SwiftUI
+import Firebase
 
 struct JoinView: View {
     
@@ -37,6 +38,12 @@ struct JoinView: View {
     
     @State private var isPasswordValid = true // 비밀번호 유효성 상태 변수
     
+    @State private var verificationID: String?
+    @State private var showAlert = false
+    @State private var alertMessage = ""
+    @State private var isVerificationSent = false
+    @State private var isVerificationSuccessful = false
+    @State private var isLoading = false // 로딩 상태를 관리하는 변수
     
     // RegularExpression 구조체 인스턴스 생성
     private let regexValidator = RegularExpression()
@@ -115,14 +122,6 @@ struct JoinView: View {
                         // 폰트 사이즈
                         .font(.system(size: 16))
 
-                    
-//                    // 유효성 검사 결과에 따른 안내 메시지 표시
-//                    if !isPasswordValid {
-//                        Text("비밀번호는 알파벳과 숫자가 모두 포함된 최소 8자 이상이어야 합니다.")
-//                            .foregroundColor(.red)
-//                            .font(.system(size: 12))
-//                            .padding(.leading, 30)
-//                    }
                     
                     // MARK: 비밀번호 확인
                     Text("비밀번호 확인")
@@ -222,8 +221,8 @@ struct JoinView: View {
                         .padding(.leading,35)
                     
                     HStack {
-                        TextField("- 제외하고 번호를 입력하세요.", text: $phoneNumber)
-                            .keyboardType(.emailAddress)
+                        TextField("- 제외 번호를 입력하세요.", text: $phoneNumber)
+                            .keyboardType(.phonePad)
                             // 높이 조절
                             .frame(height: 40)
                             // 내각 여백
@@ -243,9 +242,9 @@ struct JoinView: View {
                             .padding(.leading, 30)
                             // 폰트 사이즈
                         .font(.system(size: 16))
-                        .keyboardType(.numberPad) // 전화번호 입력에 적합한 키보드 타입
                         
                         Button{
+                            sendVerificationCode()
                             
                         } label: {
                             Text("전송")
@@ -257,12 +256,13 @@ struct JoinView: View {
                                 .foregroundStyle(.white)
                                 .clipShape(.buttonBorder)
                                 .padding(.trailing, 30)
+                                .disabled(isVerificationSent)
                         }
                     }
                     .padding(.bottom, 5)
                     HStack {
                         TextField("인증번호를 입력하세요.", text: $verificationCode)
-                            .keyboardType(.emailAddress)
+                            .keyboardType(.numberPad)
                             // 높이 조절
                             .frame(height: 40)
                             // 내각 여백
@@ -284,7 +284,7 @@ struct JoinView: View {
                         .font(.system(size: 16))
                         
                         Button{
-                            //
+                            verifyCode()
                         }
                     label: {
                             Text("확인")
@@ -296,12 +296,8 @@ struct JoinView: View {
                                 .foregroundStyle(.white)
                                 .clipShape(.buttonBorder)
                                 .padding(.trailing, 30)
+                                .disabled(!isVerificationSent)
                         }
-//                    .alert("입력 되었습니다.", isPresented: $isAlert, actions: {
-//                        Button("네, 알겠습니다", action: {
-//                            path.removeLast()
-//                        })
-//                    })
  
                     }
                     .padding(.bottom, 50)
@@ -314,7 +310,10 @@ struct JoinView: View {
                         
                         Button{
                             Task{
-                                var userInsert = UserInfo(result: $result)
+                                alertMessage = "You have passed the verification!"
+                                showAlert = true
+                                
+                                let userInsert = UserInfo(result: $result)
                                 let result = try await userInsert.insertUser(email: email, password: password, name: name, nickname: nickname)
                                 print(result)
                                 joinAlert = true
@@ -353,15 +352,106 @@ struct JoinView: View {
                             .bold()
                             .font(.system(size: 24))
                     }
-                })
+                }) // toolbar
+                
+                // 전체 화면을 덮는 로딩 프로그레스바
+                if isLoading {
+                    Color.black.opacity(0.3)
+                        .edgesIgnoringSafeArea(.all)
+                    
+                    ProgressView("Loading...")
+                        .progressViewStyle(CircularProgressViewStyle())
+                        .foregroundColor(.white)
+                } // isLoading
                 
             })
+            .alert(isPresented: $showAlert) {
+                Alert(title: Text("Notification"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            } // alert
+    } // body
+    
+    // 전화번호 인증 코드 전송
+    private func sendVerificationCode() {
+        isLoading = true // 전송 중에 로딩 상태 활성화
+        
+        let formattedPhoneNumber = formatPhoneNumber(phoneNumber)
+        
+        guard !formattedPhoneNumber.isEmpty else {
+            isLoading = false // 오류 발생 시 로딩 상태 비활성화
+            alertMessage = "Invalid phone number format. Please enter a number starting with 010."
+            showAlert = true
+            return
+        }
+        
+        PhoneAuthProvider.provider().verifyPhoneNumber(formattedPhoneNumber, uiDelegate: nil) { verificationID, error in
+            isLoading = false // 작업 완료 시 로딩 상태 비활성화
             
-//        })
-//        .navigationBarBackButtonHidden(true)
+            if let error = error {
+                alertMessage = "Error: \(error.localizedDescription)"
+                showAlert = true
+                return
+            }
+            
+            if let verificationID = verificationID {
+                self.verificationID = verificationID
+                self.isVerificationSent = true
+                alertMessage = "Verification code sent successfully."
+                showAlert = true
+            }
+        }
+    }
+    
+    // 인증 코드 확인
+    private func verifyCode() {
+        isLoading = true // 확인 중에 로딩 상태 활성화
+        
+        guard let verificationID = verificationID else {
+            isLoading = false // 오류 발생 시 로딩 상태 비활성화
+            return
+        }
+        
+        let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID, verificationCode: verificationCode)
+        
+        Auth.auth().signIn(with: credential) { authResult, error in
+            isLoading = false // 작업 완료 시 로딩 상태 비활성화
+            
+            if let error = error {
+                alertMessage = "Verification failed: \(error.localizedDescription)"
+                showAlert = true
+                return
+            }
+            
+            Auth.auth().currentUser?.getIDTokenForcingRefresh(true) { idToken, error in
+                if let error = error {
+                    alertMessage = "Error: \(error.localizedDescription)"
+                    showAlert = true
+                    return
+                }
+                
+                if let idToken = idToken {
+                    alertMessage = "Verification successful! ID Token: \(idToken)"
+                    isVerificationSuccessful = true
+                    showAlert = true
+                }
+            }
+        }
+    }
+    
+    // 전화번호 형식 변환
+    private func formatPhoneNumber(_ number: String) -> String {
+        var formattedNumber = number.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        switch formattedNumber.prefix(3) {
+        case "010", "011", "016", "017", "018", "019":
+            formattedNumber = "+82" + formattedNumber.dropFirst()
+        default:
+            formattedNumber = ""
+        }
+        
+        return formattedNumber
     }
 }
 
-//#Preview {
-//    JoinView(path:LoginView().$path)
-//}
+#Preview {
+    JoinView(path:LoginView(isLogin: .constant(false)).$path)
+}
