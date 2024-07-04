@@ -1,457 +1,388 @@
-/*
- Author : 이 휘
- Date : 2024.07.03 Thursday
- Description : 1차 UI frame 작업
- JoinView.swift
- */
-
 import SwiftUI
 import Firebase
 
 struct JoinView: View {
-    
-    // MARK: 변수
-    @State var verificationCode = ""
-    @State var joinAlert = false
-    @State var isAlert = false
     @Binding var path: NavigationPath
     
+    // 사용자 입력 및 상태 관련 변수들
     @State private var email = ""
     @State private var password = ""
     @State private var passwordcheck = ""
     @State private var name = ""
     @State private var nickname = ""
     @State private var phoneNumber = ""
+    @State private var verificationCode = ""
+    
+    // Firebase와의 통신 상태 관리 변수들
+    @State private var isLoading = false // 로딩 중인지를 나타내는 상태 변수
+    @State private var showAlert = false // 알림창을 띄울지 여부를 나타내는 상태 변수
+    @State private var alertMessage = "" // 알림창에 표시할 메시지
+    
+    // Firebase 인증 관련 변수들
+    @State private var verificationID: String?
+    @State private var isVerificationSent = false // 인증 코드가 전송되었는지 여부를 나타내는 상태 변수
+    @State private var isVerificationSuccessful = false // 인증이 성공적으로 완료되었는지 여부를 나타내는 상태 변수
+    
+    // 입력 유효성 검사를 위한 변수들
+    @State private var isPhoneNumberValid = false
+    @State private var isVerificationCodeValid = false
+    
+    // 키보드 포커싱 관련 변수
+    @FocusState private var isFocused: Bool
     
     // Firebase Query Request가 완료 됬는지 확인하는 상태 변수
-    @State private var result: Bool = true
-
-    // 정규식
-    @State private var isValidEmail = true // 이메일
-    @State private var isValidPw = true // 비밀번호
-    @State private var isCheckPw = true // 일치 여부
+    @State var result: Bool = false
     
-    // 키보드를 내릴때 필요한 상태 변수
-    @FocusState private var isFocused: Bool
-    // 완료 버튼 후 뒤로가기
-    @Environment(\.dismiss) private var dismiss
-    
-    @State private var isPasswordValid = true // 비밀번호 유효성 상태 변수
-    
-    @State private var verificationID: String?
-    @State private var showAlert = false
-    @State private var alertMessage = ""
-    @State private var isVerificationSent = false
-    @State private var isVerificationSuccessful = false
-    @State private var isLoading = false // 로딩 상태를 관리하는 변수
-    
-    // RegularExpression 구조체 인스턴스 생성
-    private let regexValidator = RegularExpression()
-        
     var body: some View {
-//        NavigationView(content: {
-            ZStack(content: {
+        ZStack {
+            // 배경색 설정
+            Color(red: 0.9, green: 0.9843, blue: 1.0)
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack(alignment: .leading) {
+                Spacer()
                 
-                // MARK: 배경색
-                Color(red: 0.9, green: 0.9843, blue: 1.0)
-                    // 가장자리까지 확장되도록 설정
-                    .edgesIgnoringSafeArea(.all)
+                // MARK: 이메일 입력
+                Text("이메일")
+                    .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
+                    .bold()
+                    .padding(.leading, 35)
                 
-                VStack(alignment:.leading, content: {
-                    
-                    Spacer()
-                    
-                    // MARK: 이메일
-                    Text("이메일")
-                        // 원하는 색상으로 변경
-                        .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
-                        .bold()
-                        .padding(.leading,35)
-
-                    TextField("이메일을 입력하세요.", text: $email)
-                        .focused($isFocused)
-                        // 자동 대문자 비활성화
-                        .textInputAutocapitalization(.never)
-                        .keyboardType(.emailAddress)
-                        // 높이 조절
+                TextField("이메일을 입력하세요.", text: $email)
+                    .focused($isFocused)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.emailAddress)
+                    .frame(height: 40)
+                    .padding([.horizontal], 20)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                    .padding([.horizontal], 30)
+                    .font(.system(size: 16))
+                
+                // MARK: 비밀번호 입력
+                Text("비밀번호")
+                    .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
+                    .bold()
+                    .padding(.leading, 35)
+                
+                SecureField("비밀번호를 입력하세요.", text: $password)
+                    .frame(height: 40)
+                    .padding([.horizontal], 20)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                    .padding([.horizontal], 30)
+                    .font(.system(size: 16))
+                
+                // MARK: 비밀번호 확인 입력
+                Text("비밀번호 확인")
+                    .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
+                    .bold()
+                    .padding(.leading, 35)
+                
+                SecureField("비밀번호를 다시 입력하세요.", text: $passwordcheck)
+                    .frame(height: 40)
+                    .padding([.horizontal], 20)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                    .padding([.horizontal], 30)
+                    .font(.system(size: 16))
+                
+                // MARK: 이름 입력
+                Text("이름")
+                    .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
+                    .bold()
+                    .padding(.leading, 35)
+                
+                TextField("이름을 입력하세요.", text: $name)
+                    .frame(height: 40)
+                    .padding([.horizontal], 20)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                    .padding([.horizontal], 30)
+                    .font(.system(size: 16))
+                
+                // MARK: 닉네임 입력
+                Text("닉네임")
+                    .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
+                    .bold()
+                    .padding(.leading, 35)
+                
+                TextField("닉네임을 입력하세요.", text: $nickname)
+                    .frame(height: 40)
+                    .padding([.horizontal], 20)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                    .padding([.horizontal], 30)
+                    .font(.system(size: 16))
+                
+                // MARK: 휴대폰 인증 입력
+                Text("휴대폰 인증")
+                    .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
+                    .bold()
+                    .padding(.leading, 35)
+                
+                HStack {
+                    TextField("휴대폰 번호를 입력하세요.", text: $phoneNumber)
+                        .keyboardType(.phonePad)
                         .frame(height: 40)
-                        // 내각 여백
                         .padding([.horizontal], 20)
-                        // 배경색
                         .background(Color.white)
-                        // 둥근 테두리를 추가
                         .cornerRadius(8)
-                        // 그림자 추가
-                        .shadow(
-                            color: Color.gray.opacity(0.4),
-                            radius: 5, x: 0, y: 2
-                        )
-                        // 테두리 둥근 정도, 색상
+                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                        // 외각 여백
-                        .padding([.horizontal], 30)
-                        // 폰트 사이즈
+                        .padding(.leading, 30)
                         .font(.system(size: 16))
-
+                        .onChange(of: phoneNumber, perform: handlePhoneNumberChange)
                     
-                    // MARK: 비밀번호
-                    Text("비밀번호")
-                        // 원하는 색상으로 변경
-                        .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
-                        .bold()
-                        .padding(.leading,35)
-                    SecureField("비밀번호 입력하세요.", text: $password)
-                        .keyboardType(.emailAddress)
-                        // 높이 조절
-                        .frame(height: 40)
-                        // 내각 여백
-                        .padding([.horizontal], 20)
-                        // 배경색
-                        .background(Color.white)
-                        // 둥근 테두리를 추가
-                        .cornerRadius(8)
-                        // 그림자 추가
-                        .shadow(
-                            color: Color.gray.opacity(0.4),
-                            radius: 5, x: 0, y: 2
-                        )
-                        // 테두리 둥근 정도, 색상
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                        // 외각 여백
-                        .padding([.horizontal], 30)
-                        // 폰트 사이즈
-                        .font(.system(size: 16))
-
-                    
-                    // MARK: 비밀번호 확인
-                    Text("비밀번호 확인")
-                        // 원하는 색상으로 변경
-                        .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
-                        .bold()
-                        .padding(.leading,35)
-                    SecureField("비밀번호 입력하세요.", text: $passwordcheck)
-                        .keyboardType(.emailAddress)
-                        // 높이 조절
-                        .frame(height: 40)
-                        // 내각 여백
-                        .padding([.horizontal], 20)
-                        // 배경색
-                        .background(Color.white)
-                        // 둥근 테두리를 추가
-                        .cornerRadius(8)
-                        // 그림자 추가
-                        .shadow(
-                            color: Color.gray.opacity(0.4),
-                            radius: 5, x: 0, y: 2
-                        )
-                        // 테두리 둥근 정도, 색상
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                        // 외각 여백
-                        .padding([.horizontal], 30)
-                        // 폰트 사이즈
-                        .font(.system(size: 16))
-                    
-//                    Text("비밀번호가 일치합니다.")
-//                        .foregroundStyle(.blue)
-//                        .bold()
-//                        .font(.system(size: 12))
-//                        .padding(.leading, 30)
-                    
-                    // MARK: 이름
-                    Text("이름")
-                        // 원하는 색상으로 변경
-                        .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
-                        .bold()
-                        .padding(.leading,35)
-                    TextField("이름을 입력하세요.", text: $name)
-                        .keyboardType(.emailAddress)
-                        // 높이 조절
-                        .frame(height: 40)
-                        // 내각 여백
-                        .padding([.horizontal], 20)
-                        // 배경색
-                        .background(Color.white)
-                        // 둥근 테두리를 추가
-                        .cornerRadius(8)
-                        // 그림자 추가
-                        .shadow(
-                            color: Color.gray.opacity(0.4),
-                            radius: 5, x: 0, y: 2
-                        )
-                        // 테두리 둥근 정도, 색상
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                        // 외각 여백
-                        .padding([.horizontal], 30)
-                        // 폰트 사이즈
-                        .font(.system(size: 16))
-                    
-                    // MARK: 닉네임
-                    Text("닉네임")
-                        // 원하는 색상으로 변경
-                        .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
-                        .bold()
-                        .padding(.leading,35)
-                    TextField("닉네임을 입력하세요.", text: $nickname)
-                        .keyboardType(.emailAddress)
-                        // 높이 조절
-                        .frame(height: 40)
-                        // 내각 여백
-                        .padding([.horizontal], 20)
-                        // 배경색
-                        .background(Color.white)
-                        // 둥근 테두리를 추가
-                        .cornerRadius(8)
-                        // 그림자 추가
-                        .shadow(
-                            color: Color.gray.opacity(0.4),
-                            radius: 5, x: 0, y: 2
-                        )
-                        // 테두리 둥근 정도, 색상
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                        // 외각 여백
-                        .padding([.horizontal], 30)
-                        // 폰트 사이즈
-                        .font(.system(size: 16))
-                    
-                    // MARK: 휴대폰 인증
-                    Text("휴대폰 인증")
-                        // 원하는 색상으로 변경
-                        .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
-                        .bold()
-                        .padding(.leading,35)
-                    
-                    HStack {
-                        TextField("- 제외 번호를 입력하세요.", text: $phoneNumber)
-                            .keyboardType(.phonePad)
-                            // 높이 조절
-                            .frame(height: 40)
-                            // 내각 여백
-                            .padding([.horizontal], 20)
-                            // 배경색
-                            .background(Color.white)
-                            // 둥근 테두리를 추가
-                            .cornerRadius(8)
-                            // 그림자 추가
-                            .shadow(
-                                color: Color.gray.opacity(0.4),
-                                radius: 5, x: 0, y: 2
-                            )
-                            // 테두리 둥근 정도, 색상
-                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                            // 외각 여백
-                            .padding(.leading, 30)
-                            // 폰트 사이즈
-                        .font(.system(size: 16))
-                        
-                        Button{
+                    // 전송 버튼
+                    Button(action: {
+                        // 전화번호 유효성 검사
+                        if !isPhoneNumberValid {
+                            alertMessage = "유효한 전화번호를 입력해주세요. 예: 01012345678"
+                            showAlert = true
+                        } else {
                             sendVerificationCode()
-                            
-                        } label: {
-                            Text("전송")
-                                .padding(10)
-                                .bold()
-                                .font(.system(size: 16))
-                                .frame(width: 70)
-                                .background(.theme)
-                                .foregroundStyle(.white)
-                                .clipShape(.buttonBorder)
-                                .padding(.trailing, 30)
-                                .disabled(isVerificationSent)
                         }
+                    }) {
+                        Text("전송")
+                            .padding(10)
+                            .bold()
+                            .font(.system(size: 16))
+                            .frame(width: 70)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .padding(.trailing, 30)
+                            .disabled(!isPhoneNumberValid || isVerificationSent)
                     }
-                    .padding(.bottom, 5)
-                    HStack {
-                        TextField("인증번호를 입력하세요.", text: $verificationCode)
-                            .keyboardType(.numberPad)
-                            // 높이 조절
-                            .frame(height: 40)
-                            // 내각 여백
-                            .padding([.horizontal], 20)
-                            // 배경색
-                            .background(Color.white)
-                            // 둥근 테두리를 추가
-                            .cornerRadius(8)
-                            // 그림자 추가
-                            .shadow(
-                                color: Color.gray.opacity(0.4),
-                                radius: 5, x: 0, y: 2
-                            )
-                            // 테두리 둥근 정도, 색상
-                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
-                            // 외각 여백
-                            .padding(.leading, 30)
-                            // 폰트 사이즈
+                }
+                .padding(.bottom, 5)
+                
+                // 인증번호 입력
+                HStack {
+                    TextField("인증번호를 입력하세요.", text: $verificationCode)
+                        .keyboardType(.numberPad)
+                        .frame(height: 40)
+                        .padding([.horizontal], 20)
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
+                        .padding(.leading, 30)
                         .font(.system(size: 16))
-                        
-                        Button{
+                        .onChange(of: verificationCode, perform: handleVerificationCodeChange)
+                    
+                    // 확인 버튼
+                    Button(action: {
+                        // 인증번호 유효성 검사
+                        if !isVerificationCodeValid {
+                            alertMessage = "유효한 인증번호를 입력해주세요. 예: 123456"
+                            showAlert = true
+                        } else {
                             verifyCode()
                         }
-                    label: {
-                            Text("확인")
-                                .padding(10)
-                                .bold()
-                                .font(.system(size: 16))
-                                .frame(width: 70)
-                                .background(.theme)
-                                .foregroundStyle(.white)
-                                .clipShape(.buttonBorder)
-                                .padding(.trailing, 30)
-                                .disabled(!isVerificationSent)
-                        }
- 
+                    }) {
+                        Text("확인")
+                            .padding(10)
+                            .bold()
+                            .font(.system(size: 16))
+                            .frame(width: 70)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .padding(.trailing, 30)
+                            .disabled(!isVerificationCodeValid || !isVerificationSent || isVerificationSuccessful)
                     }
-                    .padding(.bottom, 50)
+                }
+                .padding(.bottom, 50)
+                
+                // 가입하기 버튼
+                HStack {
+                    Spacer()
                     
-                    
-                    // MARK: 가입버튼
-                    HStack {
-                        
-                        Spacer()
-                        
-                        Button{
+                    Button(action: {
+                        // 비밀번호 일치 여부 확인
+                        if password != passwordcheck {
+                            alertMessage = "비밀번호가 일치하지 않습니다."
+                            showAlert = true
+                        } else if !isVerificationSuccessful {
+                            alertMessage = "인증이 완료되지 않았습니다."
+                            showAlert = true
+                        } else {
                             Task{
-                                alertMessage = "You have passed the verification!"
-                                showAlert = true
-                                
                                 let userInsert = UserInfo(result: $result)
                                 let result = try await userInsert.insertUser(email: email, password: password, name: name, nickname: nickname)
-                                print(result)
-                                joinAlert = true
+                                 print(result)
+                                registerUser()
                             }
-
-                            
-                        }label: {
-                            Text("가입하기")
-                                .frame(width: 200)
-                                .padding()
-                                .bold()
-                                .background(.theme)
-                                .foregroundStyle(.white)
-                                .clipShape(.buttonBorder)
                         }
-                        .alert("가입완료", isPresented: $joinAlert, actions: {
-                            Button("OK", role: .none, action: {
-                                path.removeLast()
-                                print("성공")
-                            })
-                        },
-                        message: {
-                            Text("가입이 완료되었습니다.")
-                        })
-                        
-                        Spacer()
+                    }) {
+                        Text("가입하기")
+                            .bold()
+                            .padding()
+                            .font(.system(size: 16))
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue)
+                            .foregroundColor(.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                            .padding(.horizontal, 30)
                     }
                     
                     Spacer()
-
-                }) // VStack
-                .padding([.leading, .trailing], 15)
-                .toolbar(content: {
-                    ToolbarItem(placement: .principal) {
-                        Text("회원가입")
-                            .bold()
-                            .font(.system(size: 24))
-                    }
-                }) // toolbar
-                
-                // 전체 화면을 덮는 로딩 프로그레스바
-                if isLoading {
-                    Color.black.opacity(0.3)
-                        .edgesIgnoringSafeArea(.all)
-                    
-                    ProgressView("Loading...")
-                        .progressViewStyle(CircularProgressViewStyle())
-                        .foregroundColor(.white)
-                } // isLoading
-                
-            })
-            .alert(isPresented: $showAlert) {
-                Alert(title: Text("Notification"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-            } // alert
-    } // body
-    
-    // 전화번호 인증 코드 전송
-    private func sendVerificationCode() {
-        isLoading = true // 전송 중에 로딩 상태 활성화
-        
-        let formattedPhoneNumber = formatPhoneNumber(phoneNumber)
-        
-        guard !formattedPhoneNumber.isEmpty else {
-            isLoading = false // 오류 발생 시 로딩 상태 비활성화
-            alertMessage = "Invalid phone number format. Please enter a number starting with 010."
-            showAlert = true
-            return
-        }
-        
-        PhoneAuthProvider.provider().verifyPhoneNumber(formattedPhoneNumber, uiDelegate: nil) { verificationID, error in
-            isLoading = false // 작업 완료 시 로딩 상태 비활성화
+                }
+                .padding(.bottom, 30)
+            } // VStack
+            .padding([.leading, .trailing], 15)
+            .toolbar(content: {
+                ToolbarItem(placement: .principal) {
+                    Text("회원가입")
+                        .bold()
+                        .font(.system(size: 24))
+                }
+            }) // toolbar
             
+            
+            if isLoading {
+                VStack {
+                    Text("가입 진행 중...")
+                        .font(.system(size: 24))
+                        .padding()
+                    ProgressView()
+                }
+                .frame(width: 250, height: 150)
+                .background(Color.white)
+                .cornerRadius(20)
+                .shadow(radius: 10)
+            }
+        }
+//        .navigationBarTitle("회원가입")
+//        .navigationBarHidden(true)
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text("알림"), message: Text(alertMessage), dismissButton: .default(Text("확인")))
+        }
+    }
+    
+    // 휴대폰 번호 유효성 검사
+    private func handlePhoneNumberChange(_ phoneNumber: String) {
+        isPhoneNumberValid = validatePhoneNumber(phoneNumber)
+    }
+    
+    private func validatePhoneNumber(_ phoneNumber: String) -> Bool {
+        // 전화번호가 "010"으로 시작하고, 총 11자리 숫자로 구성된 경우를 확인하기 위한 정규 표현식
+        let phoneRegex = "^010[0-9]{8}$"
+      
+        // NSPredicate를 사용하여 정규 표현식과 전화번호를 비교합니다.
+        return NSPredicate(format: "SELF MATCHES %@", phoneRegex).evaluate(with: phoneNumber)
+    }
+    
+    // 인증 코드 유효성 검사
+    private func handleVerificationCodeChange(_ verificationCode: String) {
+        isVerificationCodeValid = validateVerificationCode(verificationCode)
+    }
+    
+    private func validateVerificationCode(_ verificationCode: String) -> Bool {
+        let codeRegex = "^[0-9]{6}$" // 인증번호가 6자리일 경우
+        return NSPredicate(format: "SELF MATCHES %@", codeRegex).evaluate(with: verificationCode)
+    }
+    
+    // 인증 코드 전송
+    private func sendVerificationCode() {
+        isLoading = true
+        let formattedPhoneNumber = "+82" + phoneNumber.dropFirst() // 국제 전화번호 형식으로 변환
+        PhoneAuthProvider.provider().verifyPhoneNumber(formattedPhoneNumber, uiDelegate: nil) { verificationID, error in
+            isLoading = false
             if let error = error {
-                alertMessage = "Error: \(error.localizedDescription)"
+                alertMessage = "인증 코드 전송 실패: \(error.localizedDescription)"
                 showAlert = true
                 return
             }
-            
-            if let verificationID = verificationID {
-                self.verificationID = verificationID
-                self.isVerificationSent = true
-                alertMessage = "Verification code sent successfully."
-                showAlert = true
-            }
+            self.verificationID = verificationID
+            alertMessage = "인증 코드가 전송되었습니다."
+            showAlert = true
+            isVerificationSent = true
         }
     }
     
     // 인증 코드 확인
     private func verifyCode() {
-        isLoading = true // 확인 중에 로딩 상태 활성화
-        
         guard let verificationID = verificationID else {
-            isLoading = false // 오류 발생 시 로딩 상태 비활성화
+            alertMessage = "인증 ID를 찾을 수 없습니다."
+            showAlert = true
             return
         }
         
-        let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID, verificationCode: verificationCode)
+        isLoading = true
+        let credential = PhoneAuthProvider.provider().credential(
+            withVerificationID: verificationID,
+            verificationCode: verificationCode
+        )
         
         Auth.auth().signIn(with: credential) { authResult, error in
-            isLoading = false // 작업 완료 시 로딩 상태 비활성화
-            
+            isLoading = false
             if let error = error {
-                alertMessage = "Verification failed: \(error.localizedDescription)"
+                alertMessage = "인증 실패: \(error.localizedDescription)"
                 showAlert = true
                 return
             }
-            
-            Auth.auth().currentUser?.getIDTokenForcingRefresh(true) { idToken, error in
-                if let error = error {
-                    alertMessage = "Error: \(error.localizedDescription)"
-                    showAlert = true
-                    return
-                }
-                
-                if let idToken = idToken {
-                    alertMessage = "Verification successful! ID Token: \(idToken)"
-                    isVerificationSuccessful = true
-                    showAlert = true
-                }
-            }
+            alertMessage = "인증이 완료되었습니다."
+            showAlert = true
+            isVerificationSuccessful = true
         }
     }
     
-    // 전화번호 형식 변환
-    private func formatPhoneNumber(_ number: String) -> String {
-        var formattedNumber = number.trimmingCharacters(in: .whitespacesAndNewlines)
+    // 사용자 등록
+    private func registerUser() {
+        isLoading = true
         
-        switch formattedNumber.prefix(3) {
-        case "010", "011", "016", "017", "018", "019":
-            formattedNumber = "+82" + formattedNumber.dropFirst()
-        default:
-            formattedNumber = ""
-        }
-        
-        return formattedNumber
+        alertMessage = "사용자 등록이 완료되었습니다."
+        showAlert = true
+//        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
+//            isLoading = false
+//            if let error = error {
+//                alertMessage = "사용자 등록 실패: \(error.localizedDescription)"
+//                showAlert = true
+//                return
+//            }
+//            alertMessage = "사용자 등록이 완료되었습니다."
+//            showAlert = true
+            
+//            // 사용자 정보를 Firebase에 저장
+//            guard let userID = Auth.auth().currentUser?.uid else { return }
+//            let userData: [String: Any] = [
+//                "email": email,
+//                "name": name,
+//                "nickname": nickname,
+//                "phoneNumber": phoneNumber
+//            ]
+//            Firestore.firestore().collection("users").document(userID).setData(userData) { error in
+//                if let error = error {
+//                    alertMessage = "사용자 정보 저장 실패: \(error.localizedDescription)"
+//                    showAlert = true
+//                    return
+//                }
+//                alertMessage = "사용자 정보가 성공적으로 저장되었습니다."
+//                showAlert = true
+                
+                // 로그인 화면으로 이동
+        path.removeLast()
     }
 }
+//    }
+//}
 
-#Preview {
-    JoinView(path:LoginView(isLogin: .constant(false)).$path)
+
+struct JoinView_Previews: PreviewProvider {
+    static var previews: some View {
+        JoinView(path: LoginView(isLogin: .constant(false)).$path)
+    }
 }
