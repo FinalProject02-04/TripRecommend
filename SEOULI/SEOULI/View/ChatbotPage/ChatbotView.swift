@@ -50,7 +50,7 @@ struct ChatbotView: View {
     @StateObject private var networkManager = NetworkManager()
     @FocusState private var isInputActive: Bool
     @State private var isFirstTimePresented = true
-
+    
     var body: some View {
         ZStack {
             // HWIBOT Floating Button
@@ -115,8 +115,6 @@ struct ChatbotView: View {
     }
 }
 
-
-// CHAT BUBBLE VIEW
 struct ChatBubble: View {
     @Binding var isPresented: Bool
     @Binding var isLoading: Bool
@@ -145,7 +143,22 @@ struct ChatBubble: View {
             ScrollView {
                 VStack(spacing: 10) {
                     ForEach(messages) { msg in
-                        ChatBubbleRow(text: msg.text, isFromCurrentUser: msg.isFromCurrentUser, recommendations: msg.recommendations)
+                        // Display different types of messages in ChatBubbleRow
+                        if msg.text == "추천받고 싶은 장소에 대한 키워드를 입력해주세요!😊" {
+                            Text(msg.text)
+                                .foregroundColor(.black)
+                                .padding(10)
+                                .background(Color.gray.opacity(0.3))
+                                .cornerRadius(10)
+                                .padding(.trailing,123)
+                        } else {
+                            ChatBubbleRow(
+                                text: msg.text,
+                                isFromCurrentUser: msg.isFromCurrentUser,
+                                recommendations: msg.recommendations,
+                                networkManager: networkManager
+                            )
+                        }
                     }
                     if isLoading {
                         LoadingBubbleView()
@@ -189,7 +202,6 @@ struct ChatBubble: View {
         .animation(.spring(), value: isPresented)
     }
 
-    // SENDING MESSAGE FUNCTION
     private func sendMessage() {
         let userMessage = ChatMessage(text: message, isFromCurrentUser: true)
         messages.append(userMessage)
@@ -215,21 +227,19 @@ struct ChatBubble: View {
             }
         }
 
-        message = "" // Clear the text field
-        isInputActive = false // Hide keyboard
+        message = ""
+        isInputActive = false
     }
 }
 
-    
-// CHAT BUBBLE ROW VIEW
 struct ChatBubbleRow: View {
     let text: String
     let isFromCurrentUser: Bool
     let recommendations: [SeoulList]?
+    let networkManager: NetworkManager
 
     var body: some View {
         HStack {
-            // IS FROM USER
             if isFromCurrentUser {
                 Spacer()
                 Text(text)
@@ -238,15 +248,12 @@ struct ChatBubbleRow: View {
                     .foregroundColor(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             } else {
-                // NOT FROM USER
                 VStack(alignment: .leading) {
-                    
-                    if let recommendations = recommendations {
-                        // Introductory Text
-                         Text("제가 추천하는 장소는...")
+                    if let recommendations = recommendations, !recommendations.isEmpty {
+                        Text("제가 추천하는 장소는...")
                             .foregroundColor(.black)
-                             .padding(.bottom, 5)
-                         
+                            .padding(.bottom, 5)
+                        
                         ForEach(recommendations, id: \.id) { recommendation in
                             NavigationLink(destination: SeoulListDetailView(location: recommendation)) {
                                 Text("장소명: ")
@@ -259,7 +266,7 @@ struct ChatBubbleRow: View {
                                 .foregroundColor(.black)
                         }
                     } else {
-                        Text(text)
+                        Text(networkManager.norecmessage)
                             .foregroundColor(.black)
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
@@ -274,7 +281,6 @@ struct ChatBubbleRow: View {
     }
 }
 
-// LOADING BUBBLE VIEW
 struct LoadingBubbleView: View {
     @State private var dot1Scale: CGFloat = 1.0
     @State private var dot2Scale: CGFloat = 1.0
