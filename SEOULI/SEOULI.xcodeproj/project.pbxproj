@@ -25,6 +25,7 @@
 		9318113A2C35043A004401EB /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 931811392C35043A004401EB /* FirebaseStorage */; };
 		9318113C2C351019004401EB /* PurchaseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9318113B2C351019004401EB /* PurchaseModel.swift */; };
 		9318113E2C3510B8004401EB /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 9318113D2C3510B8004401EB /* FirebaseFirestore */; };
+		931811402C3671CC004401EB /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 9318113F2C3671CC004401EB /* FirebaseFirestoreSwift */; };
 		931EDF502C2CF8830097B7F8 /* PostModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931EDF4F2C2CF8830097B7F8 /* PostModel.swift */; };
 		9323B90C2C2A899900E751AD /* SEOULIApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B90B2C2A899900E751AD /* SEOULIApp.swift */; };
 		9323B90E2C2A899900E751AD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B90D2C2A899900E751AD /* ContentView.swift */; };
@@ -110,6 +111,7 @@
 				9397594E2C2D32AA00DC0700 /* TossPayments in Frameworks */,
 				931810D92C326E0C004401EB /* FirebaseAuth in Frameworks */,
 				931810DC2C326E7A004401EB /* GoogleSignIn in Frameworks */,
+				931811402C3671CC004401EB /* FirebaseFirestoreSwift in Frameworks */,
 				9318113A2C35043A004401EB /* FirebaseStorage in Frameworks */,
 				931810DE2C326E7A004401EB /* GoogleSignInSwift in Frameworks */,
 				9318113E2C3510B8004401EB /* FirebaseFirestore in Frameworks */,
@@ -311,6 +313,7 @@
 				931810DD2C326E7A004401EB /* GoogleSignInSwift */,
 				931811392C35043A004401EB /* FirebaseStorage */,
 				9318113D2C3510B8004401EB /* FirebaseFirestore */,
+				9318113F2C3671CC004401EB /* FirebaseFirestoreSwift */,
 			);
 			productName = SEOULI;
 			productReference = 9323B9082C2A899900E751AD /* SEOULI.app */;
@@ -676,6 +679,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 931810D72C326E0C004401EB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		9318113F2C3671CC004401EB /* FirebaseFirestoreSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 931810D72C326E0C004401EB /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestoreSwift;
 		};
 		9397594D2C2D32AA00DC0700 /* TossPayments */ = {
 			isa = XCSwiftPackageProductDependency;
