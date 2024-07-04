@@ -13,7 +13,7 @@ class SeoulListVM: ObservableObject {
     @Published var errorMessage: String?
 
     func fetchDataFromAPI() {
-        guard let url = URL(string: "http://192.168.50.83:8000/place/list") else {
+        guard let url = URL(string: "http://43.200.34.227/place/list") else {
             self.errorMessage = "Invalid URL"
             return
         }

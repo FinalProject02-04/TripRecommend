@@ -18,7 +18,10 @@
  Description : R&D 작업
  
  Date : 2024.07.03 Wednesday
- Description : 모델사용해서 추천해주기(영어 가능)
+ Description : 모델사용해서 추천해주기
+ 
+ Date : 2024.07.04 Thursday
+ Description : 추천장소 링크걸어 해당하는 디테일페이지 이동 완료
  
 */
 
@@ -29,6 +32,13 @@ struct ChatMessage: Identifiable {
     let id = UUID()
     let text: String
     let isFromCurrentUser: Bool
+    let recommendations: [SeoulList]?
+    
+    init(text: String, isFromCurrentUser: Bool, recommendations: [SeoulList]? = nil) {
+        self.text = text
+        self.isFromCurrentUser = isFromCurrentUser
+        self.recommendations = recommendations
+    }
 }
 
 struct ChatbotView: View {
@@ -76,11 +86,11 @@ struct ChatbotView: View {
                     message: $message,
                     messages: $messages,
                     networkManager: networkManager
-//                    isInputActive: $isInputActive
                 )
                 .transition(.move(edge: .bottom))
                 .zIndex(1)
                 .onAppear {
+                    // Ensure sendInitialMessage() is called only once
                     if isFirstTimePresented {
                         sendInitialMessage()
                         isFirstTimePresented = false
@@ -89,12 +99,12 @@ struct ChatbotView: View {
             }
         }
     }
+    
     private func sendInitialMessage() {
-           let initialMessage = "추천받고 싶은 장소에 대한 키워드를 입력해주세요!😊"
-           let botMessage = ChatMessage(text: initialMessage, isFromCurrentUser: false)
-           messages.append(botMessage)
-       }
-   
+        let initialMessage = "추천받고 싶은 장소에 대한 키워드를 입력해주세요!😊"
+        let botMessage = ChatMessage(text: initialMessage, isFromCurrentUser: false)
+        messages.append(botMessage)
+    }
     
     // ANIMATION FOR HWIBOT BUTTON
     private func startAnimation() {
@@ -105,6 +115,7 @@ struct ChatbotView: View {
     }
 }
 
+
 // CHAT BUBBLE VIEW
 struct ChatBubble: View {
     @Binding var isPresented: Bool
@@ -113,7 +124,7 @@ struct ChatBubble: View {
     @Binding var messages: [ChatMessage]
     @ObservedObject var networkManager: NetworkManager
     @FocusState private var isInputActive: Bool
-    
+
     var body: some View {
         VStack {
             HStack {
@@ -130,15 +141,11 @@ struct ChatBubble: View {
                 }
                 .padding()
             }
-            
+
             ScrollView {
                 VStack(spacing: 10) {
-                    ForEach(messages, id: \.id) { msg in
-                        if msg.isFromCurrentUser {
-                            ChatBubbleRow(text: msg.text, isFromCurrentUser: true)
-                        } else {
-                            ChatBubbleRow(text: msg.text, isFromCurrentUser: false)
-                        }
+                    ForEach(messages) { msg in
+                        ChatBubbleRow(text: msg.text, isFromCurrentUser: msg.isFromCurrentUser, recommendations: msg.recommendations)
                     }
                     if isLoading {
                         LoadingBubbleView()
@@ -146,7 +153,7 @@ struct ChatBubble: View {
                 }
                 .padding(.vertical)
             }
-            
+
             HStack {
                 TextField("키워드를 입력하세요!", text: $message)
                     .padding(10)
@@ -155,7 +162,7 @@ struct ChatBubble: View {
                     .overlay(RoundedRectangle(cornerRadius: 36).stroke(Color.gray.opacity(0.6), lineWidth: 1))
                     .frame(height: 50)
                     .focused($isInputActive)
-                
+
                 Button(action: {
                     if !message.isEmpty {
                         sendMessage()
@@ -181,102 +188,130 @@ struct ChatBubble: View {
         .offset(y: isPresented ? 0 : UIScreen.main.bounds.height)
         .animation(.spring(), value: isPresented)
     }
+
+    // SENDING MESSAGE FUNCTION
+    private func sendMessage() {
+        let userMessage = ChatMessage(text: message, isFromCurrentUser: true)
+        messages.append(userMessage)
+
+        isLoading = true
+
+        networkManager.fetchRecommendations(for: userMessage.text) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let recommendations):
+                    let responseText = recommendations.map { "장소명: \($0.name)\n주소📍 \($0.address)" }.joined(separator: "\n\n")
+                    let responseMessage = ChatMessage(
+                        text: responseText,
+                        isFromCurrentUser: false,
+                        recommendations: recommendations
+                    )
+                    messages.append(responseMessage)
+                case .failure(let error):
+                    let errorMessage = ChatMessage(text: "Error: \(error.localizedDescription)", isFromCurrentUser: false)
+                    messages.append(errorMessage)
+                }
+                isLoading = false
+            }
+        }
+
+        message = "" // Clear the text field
+        isInputActive = false // Hide keyboard
+    }
+}
+
     
-        // SENDING MESSAGE FUNCTION
-        private func sendMessage() {
-            let userMessage = ChatMessage(text: message, isFromCurrentUser: true)
-            messages.append(userMessage)
+// CHAT BUBBLE ROW VIEW
+struct ChatBubbleRow: View {
+    let text: String
+    let isFromCurrentUser: Bool
+    let recommendations: [SeoulList]?
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                isLoading = true
-
-                networkManager.fetchRecommendations(for: userMessage.text) { result in
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let recommendations):
-                            let responseText = recommendations.joined(separator: "\n")
-                            let responseMessage = ChatMessage(text: responseText, isFromCurrentUser: false)
-                            messages.append(responseMessage)
-                        case .failure(let error):
-                            let errorMessage = ChatMessage(text: "Error: \(error.localizedDescription)", isFromCurrentUser: false)
-                            messages.append(errorMessage)
+    var body: some View {
+        HStack {
+            // IS FROM USER
+            if isFromCurrentUser {
+                Spacer()
+                Text(text)
+                    .padding(10)
+                    .background(Color.blue.opacity(0.9))
+                    .foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+            } else {
+                // NOT FROM USER
+                VStack(alignment: .leading) {
+                    
+                    if let recommendations = recommendations {
+                        // Introductory Text
+                         Text("제가 추천하는 장소는...")
+                            .foregroundColor(.black)
+                             .padding(.bottom, 5)
+                         
+                        ForEach(recommendations, id: \.id) { recommendation in
+                            NavigationLink(destination: SeoulListDetailView(location: recommendation)) {
+                                Text("장소명: ")
+                                    .foregroundColor(.black)
+                                Text("\(recommendation.name)")
+                                    .underline()
+                                    .foregroundColor(.blue)
+                            }
+                            Text("주소📍 \(recommendation.address)\n")
+                                .foregroundColor(.black)
                         }
-                        isLoading = false
+                    } else {
+                        Text(text)
+                            .foregroundColor(.black)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
                 }
-            }
-            message = "" // Clear the text field
-            isInputActive = false // Hide keyboard
-        }
-    }
-    
-    
-    // CHAT BUBBLE ROW VIEW
-    struct ChatBubbleRow: View {
-        let text: String
-        let isFromCurrentUser: Bool
-        
-        var body: some View {
-            HStack {
-                if isFromCurrentUser {
-                    Spacer()
-                    Text(text)
-                        .padding(10)
-                        .background(Color.blue.opacity(0.9))
-                        .foregroundColor(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                } else {
-                    Text(text)
-                        .padding(10)
-                        .background(Color.gray.opacity(0.3))
-                        .foregroundColor(.black)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                    Spacer()
-                }
-            }
-            .padding(.horizontal)
-        }
-    }
-    
-
-    // LOADING BUBBLE VIEW
-    struct LoadingBubbleView: View {
-        @State private var dot1Scale: CGFloat = 1.0
-        @State private var dot2Scale: CGFloat = 1.0
-        @State private var dot3Scale: CGFloat = 1.0
-        
-        var body: some View {
-            HStack {
-                HStack(spacing: 5) {
-                    Circle()
-                        .fill(Color.gray.opacity(0.8))
-                        .frame(width: 9, height: 9)
-                        .scaleEffect(dot1Scale)
-                        .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true), value: dot1Scale)
-                    Circle()
-                        .fill(Color.gray.opacity(0.8))
-                        .frame(width: 9, height: 9)
-                        .scaleEffect(dot2Scale)
-                        .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.2), value: dot2Scale)
-                    Circle()
-                        .fill(Color.gray.opacity(0.8))
-                        .frame(width: 9, height: 9)
-                        .scaleEffect(dot3Scale)
-                        .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.4), value: dot3Scale)
-                }
-                .padding(15)
+                .padding(10)
                 .background(Color.gray.opacity(0.3))
-                .cornerRadius(20)
+                .cornerRadius(10)
                 Spacer()
             }
-            .onAppear {
-                dot1Scale = 1.3
-                dot2Scale = 1.3
-                dot3Scale = 1.3
-            }
-            .padding(.horizontal)
         }
+        .padding(.horizontal)
     }
+}
+
+// LOADING BUBBLE VIEW
+struct LoadingBubbleView: View {
+    @State private var dot1Scale: CGFloat = 1.0
+    @State private var dot2Scale: CGFloat = 1.0
+    @State private var dot3Scale: CGFloat = 1.0
+    
+    var body: some View {
+        HStack {
+            HStack(spacing: 5) {
+                Circle()
+                    .fill(Color.gray.opacity(0.8))
+                    .frame(width: 9, height: 9)
+                    .scaleEffect(dot1Scale)
+                    .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true), value: dot1Scale)
+                Circle()
+                    .fill(Color.gray.opacity(0.8))
+                    .frame(width: 9, height: 9)
+                    .scaleEffect(dot2Scale)
+                    .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.2), value: dot2Scale)
+                Circle()
+                    .fill(Color.gray.opacity(0.8))
+                    .frame(width: 9, height: 9)
+                    .scaleEffect(dot3Scale)
+                    .animation(Animation.easeInOut(duration: 0.4).repeatForever(autoreverses: true).delay(0.4), value: dot3Scale)
+            }
+            .padding(15)
+            .background(Color.gray.opacity(0.3))
+            .cornerRadius(20)
+            Spacer()
+        }
+        .onAppear {
+            dot1Scale = 1.3
+            dot2Scale = 1.3
+            dot3Scale = 1.3
+        }
+        .padding(.horizontal)
+    }
+}
 
 #Preview {
     ChatbotView()
