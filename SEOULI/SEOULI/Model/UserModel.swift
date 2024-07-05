@@ -23,25 +23,3 @@ struct UserModel{
         self.userdeldate = userdeldate
     }
 }
-
-//
-//
-//struct User {
-//    var email: String
-//    var password: String
-//    var name: String
-//    var nickname: String
-//    var registrationDate: Date
-//    var deletionDate: Date?
-//    var isDeleted: Bool
-//    
-//    init(email: String, password: String, name: String, nickname: String, registrationDate: Date, deletionDate: Date? = nil, isDeleted: Bool) {
-//        self.email = email
-//        self.password = password
-//        self.name = name
-//        self.nickname = nickname
-//        self.registrationDate = registrationDate
-//        self.deletionDate = deletionDate
-//        self.isDeleted = isDeleted
-//    }
-//}

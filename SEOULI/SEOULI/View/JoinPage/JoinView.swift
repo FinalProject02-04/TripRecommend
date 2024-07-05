@@ -4,7 +4,7 @@ import Firebase
 struct JoinView: View {
     @Binding var path: NavigationPath
     
-    // 사용자 입력 및 상태 관련 변수들
+    // MARK: 사용자 입력 및 상태 관련 변수들
     @State private var email = ""
     @State private var password = ""
     @State private var passwordcheck = ""
@@ -12,24 +12,29 @@ struct JoinView: View {
     @State private var nickname = ""
     @State private var phoneNumber = ""
     @State private var verificationCode = ""
+    @State private var isEditing: Bool = true // 이메일 및 이름 텍스트 필드를 읽기 전용으로 설정할 변수
+
     
-    // Firebase와의 통신 상태 관리 변수들
-    @State private var isLoading = false // 로딩 중인지를 나타내는 상태 변수
-    @State private var showAlert = false // 알림창을 띄울지 여부를 나타내는 상태 변수
-    @State private var alertMessage = "" // 알림창에 표시할 메시지
+    // MARK: Firebase와의 통신 상태 관리 변수들
+    // 로딩 중인지를 나타내는 상태 변수
+    @State private var isLoading = false
+    // 알림창을 띄울지 여부를 나타내는 상태 변수
+    @State private var showAlert = false
+    // 알림창에 표시할 메시지
+    @State private var alertMessage = ""
     
-    // Firebase 인증 관련 변수들
+    // MARK: Firebase 인증 관련 변수들
     @State private var verificationID: String?
-    @State private var isVerificationSent = false // 인증 코드가 전송되었는지 여부를 나타내는 상태 변수
-    @State private var isVerificationSuccessful = false // 인증이 성공적으로 완료되었는지 여부를 나타내는 상태 변수
+    // 인증 코드가 전송되었는지 여부를 나타내는 상태 변수
+    @State private var isVerificationSent = false
+    // 인증이 성공적으로 완료되었는지 여부를 나타내는 상태 변수
+    @State private var isVerificationSuccessful = false
     
-    // 입력 유효성 검사를 위한 변수들
+    // MARK: 입력 유효성 검사를 위한 변수들
     @State private var isPhoneNumberValid = false
     @State private var isVerificationCodeValid = false
-    
     // 키보드 포커싱 관련 변수
     @FocusState private var isFocused: Bool
-    
     // Firebase Query Request가 완료 됬는지 확인하는 상태 변수
     @State var result: Bool = false
     
@@ -48,7 +53,7 @@ struct JoinView: View {
                     .bold()
                     .padding(.leading, 35)
                 
-                TextField("이메일을 입력하세요.", text: $email)
+                TextField("이메일을 입력하세요.", text: .constant(email))
                     .focused($isFocused)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.emailAddress)
@@ -60,6 +65,14 @@ struct JoinView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                     .padding([.horizontal], 30)
                     .font(.system(size: 16))
+                    .disabled(!isEditing) // 읽기 전용 설정
+                    .onAppear {
+                        // UserDefaults에서 userEmail 값 가져오기
+                        if let userEmail = UserDefaults.standard.string(forKey: "userEmail") {
+                            email = userEmail
+                            isEditing = false // userEmail 값이 있으면 읽기 전용으로 설정
+                        }
+                    }
                 
                 // MARK: 비밀번호 입력
                 Text("비밀번호")
@@ -99,7 +112,7 @@ struct JoinView: View {
                     .bold()
                     .padding(.leading, 35)
                 
-                TextField("이름을 입력하세요.", text: $name)
+                TextField("이름을 입력하세요.", text: .constant(name))
                     .frame(height: 40)
                     .padding([.horizontal], 20)
                     .background(Color.white)
@@ -108,6 +121,14 @@ struct JoinView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                     .padding([.horizontal], 30)
                     .font(.system(size: 16))
+                    .disabled(!isEditing) // 읽기 전용 설정
+                    .onAppear {
+                        // UserDefaults에서 userName 값 가져오기
+                        if let userName = UserDefaults.standard.string(forKey: "userName") {
+                            name = userName
+                            isEditing = false // userName 값이 있으면 읽기 전용으로 설정
+                        }
+                    }
                 
                 // MARK: 닉네임 입력
                 Text("닉네임")
@@ -144,7 +165,7 @@ struct JoinView: View {
                         .font(.system(size: 16))
                         .onChange(of: phoneNumber, perform: handlePhoneNumberChange)
                     
-                    // 전송 버튼
+                    // MARK: 전송 버튼
                     Button(action: {
                         // 전화번호 유효성 검사
                         if !isPhoneNumberValid {
@@ -168,7 +189,7 @@ struct JoinView: View {
                 }
                 .padding(.bottom, 5)
                 
-                // 인증번호 입력
+                // MARK: 인증번호 입력
                 HStack {
                     TextField("인증번호를 입력하세요.", text: $verificationCode)
                         .keyboardType(.numberPad)
@@ -182,7 +203,7 @@ struct JoinView: View {
                         .font(.system(size: 16))
                         .onChange(of: verificationCode, perform: handleVerificationCodeChange)
                     
-                    // 확인 버튼
+                    // MARK: 확인 버튼
                     Button(action: {
                         // 인증번호 유효성 검사
                         if !isVerificationCodeValid {
@@ -206,7 +227,7 @@ struct JoinView: View {
                 }
                 .padding(.bottom, 50)
                 
-                // 가입하기 버튼
+                // MARK: 가입하기 버튼
                 HStack {
                     Spacer()
                     
@@ -251,7 +272,7 @@ struct JoinView: View {
                 }
             }) // toolbar
             
-            
+            // MARK: 로딩 창
             if isLoading {
                 VStack {
                     Text("가입 진행 중...")
@@ -272,11 +293,12 @@ struct JoinView: View {
         }
     }
     
-    // 휴대폰 번호 유효성 검사
+    // MARK: 휴대폰 번호 유효성 검사 함수
     private func handlePhoneNumberChange(_ phoneNumber: String) {
         isPhoneNumberValid = validatePhoneNumber(phoneNumber)
     }
     
+    // MARK: 전화번호 정규식
     private func validatePhoneNumber(_ phoneNumber: String) -> Bool {
         // 전화번호가 "010"으로 시작하고, 총 11자리 숫자로 구성된 경우를 확인하기 위한 정규 표현식
         let phoneRegex = "^010[0-9]{8}$"
@@ -285,20 +307,22 @@ struct JoinView: View {
         return NSPredicate(format: "SELF MATCHES %@", phoneRegex).evaluate(with: phoneNumber)
     }
     
-    // 인증 코드 유효성 검사
+    // MARK: 인증 코드 유효성 검사
     private func handleVerificationCodeChange(_ verificationCode: String) {
         isVerificationCodeValid = validateVerificationCode(verificationCode)
     }
     
+    // MARK: 인증번호 정규식
     private func validateVerificationCode(_ verificationCode: String) -> Bool {
         let codeRegex = "^[0-9]{6}$" // 인증번호가 6자리일 경우
         return NSPredicate(format: "SELF MATCHES %@", codeRegex).evaluate(with: verificationCode)
     }
     
-    // 인증 코드 전송
+    // MARK: 인증 코드 전송
     private func sendVerificationCode() {
         isLoading = true
-        let formattedPhoneNumber = "+82" + phoneNumber.dropFirst() // 국제 전화번호 형식으로 변환
+        // 국제 전화번호 형식으로 변환
+        let formattedPhoneNumber = "+82" + phoneNumber.dropFirst()
         PhoneAuthProvider.provider().verifyPhoneNumber(formattedPhoneNumber, uiDelegate: nil) { verificationID, error in
             isLoading = false
             if let error = error {
@@ -313,7 +337,7 @@ struct JoinView: View {
         }
     }
     
-    // 인증 코드 확인
+    // MARK: 인증 코드 확인
     private func verifyCode() {
         guard let verificationID = verificationID else {
             alertMessage = "인증 ID를 찾을 수 없습니다."
@@ -340,7 +364,7 @@ struct JoinView: View {
         }
     }
     
-    // 사용자 등록
+    // MARK: 사용자 등록
     private func registerUser() {
         isLoading = true
         
