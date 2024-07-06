@@ -9,6 +9,7 @@
 import SwiftUI
 import Firebase
 import FirebaseFirestore
+import GoogleSignIn
 
 // UserInfo 구조체 정의
 struct UserInfo {
@@ -50,6 +51,7 @@ struct UserInfo {
                     documentId: document.documentID,
                     userid: document.data()["user_email"] as! String, // 이메일
                     userpw: document.data()["user_pw"] as! String, // 비밀번호
+                    usernickname: document.data()["user_nickname"] as! String, //닉네임
                     userjoindate: document.data()["join_date"] as! String, // 가입 날짜
                     userdeldate: document.data()["delete_date"] as! String // 삭제 날짜
                 )
@@ -59,7 +61,7 @@ struct UserInfo {
         }
 
         // 만약 userInfo가 nil이라면 기본 값으로 빈 UserModel 객체 반환
-        return userInfo ?? UserModel(documentId: "", userid: "", userpw: "", userjoindate: "", userdeldate: "")
+        return userInfo ?? UserModel(documentId: "", userid: "", userpw: "", usernickname: "", userjoindate: "", userdeldate: "")
     }
     
     // MARK: 이메일 중복 확인을 위한 비동기 함수

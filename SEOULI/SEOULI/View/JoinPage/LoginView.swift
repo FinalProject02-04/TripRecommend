@@ -6,51 +6,50 @@
  Description : 1차 UI frame 작업
  */
 import SwiftUI
-import GoogleSignIn
-import FirebaseAuth
-import FirebaseFirestore
-import FirebaseCore
+import GoogleSignIn // <<<<<
+import FirebaseAuth // <<<<<
+import FirebaseFirestore // <<<<<
+import FirebaseCore // <<<<<
 
 struct LoginView: View {
     
+    // MARK: 변수 지정
     @State var email = ""
     @State var password = ""
     @FocusState var isTextFieldFocused: Bool
     @State var path = NavigationPath()
-    // Alert 표시 여부를 관리하는 상태 변수
     @State private var showAlert = false
-    // Alert창의 메세지를 저장할 상태 변수
     @State private var errorMessage: String = ""
     @Binding var isLogin: Bool
-    // Firebase Query Request가 완료 됬는지 확인하는 상태 변수
     @State var result: Bool = false
-    
+
     var body: some View {
         
         NavigationStack(path: $path){
             ZStack {
                 VStack {
-
+                    
                     Spacer(minLength: 300)
                     
                     // MARK: 배경색 설정
-                    LinearGradient(gradient: Gradient(colors: [Color.white, Color.theme]),
-                                   startPoint: .top,
-                                   endPoint: .bottom)
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.white, Color.theme]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                    // 전체화면에 적용
                     .edgesIgnoringSafeArea(.all)
-                    
-                } // VStack(배경색)
+                } // VStack (배경색)
                 
                 VStack(content: {
                     
-                    Spacer()
+                    Spacer() // 빈 공간을 추가합니다.
                     
                     // MARK: LOGO
                     Image("logo")
                         .resizable()
                         .frame(width: 230, height: 50)
                     
-                    // 간격 조절
                     Spacer().frame(height: 50)
                     
                     // MARK: 아이디
@@ -63,9 +62,7 @@ struct LoginView: View {
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
                         .padding([.horizontal], 30)
                         .font(.system(size: 20))
-                 
                     
-                    // 간격 조절
                     Spacer().frame(height: 20)
                     
                     // MARK: 비밀번호
@@ -80,12 +77,10 @@ struct LoginView: View {
                         .padding([.horizontal], 30)
                         .font(.system(size: 20))
                     
-                    // 간격 조절
                     Spacer().frame(height: 20)
                     
-                    // MARK: ID, Password 찾기
                     HStack {
-                        
+                        // MARK: ID 찾기 버튼
                         Button {
                             path.append("FindInfoView_Id")
                         } label: {
@@ -93,9 +88,12 @@ struct LoginView: View {
                                 .foregroundStyle(.black)
                                 .padding(.leading, 10)
                         }
+                        
                         Divider()
                             .frame(height: 14)
                             .overlay(Rectangle().frame(width: 1))
+                        
+                        // MARK: Password 찾기 버튼
                         Button {
                             path.append("FindInfoView_Pw")
                         } label: {
@@ -105,46 +103,52 @@ struct LoginView: View {
                     } // HStack
                     .padding(.top, 30)
                     
-                    // 간격 조절
                     Spacer().frame(height: 30)
                     
                     // MARK: 로그인 버튼
                     Button(action: {
-                        
-                        
-                        
-                        // 로그인 로직
-                        Task{
+                        // 비동기 작업을 실행.
+                        Task {
+                            // VM에서 사용자 정보 Select
                             let userQuery = UserInfo(result: $result)
+                            // Firebase에서 정보 가져오기(비동기)
                             let userInfo = try await userQuery.fetchUserInfo(userid: email, userpw: password)
                             
-                            print("Firebase Query Result: \(result)")
-
+                            print("Firebase Query 결과(true/flase): \(result)")
+                            
+                            // MARK: Query 성공한 경우
                             if result {
                                 print("로그인성공")
                                 print("사용자 정보: \(userInfo)")
-                                
                                 print(userInfo.documentId)
-                                // firebase request 성공
-                                if userInfo.documentId.isEmpty{
-                                    
+                                
+                                // 사용자 정보가 비어 있는 경우
+                                if userInfo.documentId.isEmpty {
                                     print("ID, PW 잘못 입력")
-                                    // id, pw 잘못 입력
+                                    // 알림창을 표시.
                                     self.showAlert = true
+                                    // 알림창 메세지.
                                     self.errorMessage = "아이디와 비밀번호를 확인해주세요."
-                                }else{
-                                    // id, pw 제대로 입력
+                                    
+                                // 사용자 정보가 유효한 경우
+                                } else {
+                                    // 로그인 상태를 true로 설정.
                                     self.isLogin = true
+                                    // 이메일을 UserDefaults(Storge)에 저장.
                                     UserDefaults.standard.set(email, forKey: "userEmail")
+                                    print("이메일 Storge에 저장: \($email)")
+                                    UserDefaults.standard.set(userInfo.usernickname, forKey: "userNickname")
+                                    print("이메일 Storge에 저장: \(userInfo.usernickname)")
+                                    
                                 }
-                            }else{
-                                // firebase request 실패
+                            // MARK: Query 실패한 경우
+                            } else {
+                                // 알림창을 표시.
                                 self.showAlert = true
-                                self.errorMessage = "Failed to connect to the server"
+                                // 알림창 메세지.
+                                self.errorMessage = "서버에 연결에 실패했습니다."
                             }
-                            
                         } // Task
-                        
                     }, label: {
                         Text("로그인")
                             .padding()
@@ -156,36 +160,44 @@ struct LoginView: View {
                     
                     // MARK: 개인 회원 로그인
                     HStack(content: {
-                        VStack{
+                        VStack {
                             Divider()
                                 .overlay(Rectangle().frame(height: 1))
                                 .padding(.leading, 30)
                         }
+                        
                         Text("개인회원 SNS 로그인")
                             .frame(width: 160)
                             .bold()
                         
-                        VStack{
+                        VStack {
                             Divider()
                                 .overlay(Rectangle().frame(height: 1))
                                 .padding(.trailing, 30)
                         }
-
                     }) // HStack
                     .padding([.top, .bottom], 30)
                     
                     // MARK: 소셜 로그인 버튼
                     Button(action: {
+                        // 비동기 작업을 실행.
                         Task {
+                            // 실행
                             do {
+                                // VM 구글 로그인 실행(비동기)
                                 try await googleOauth()
+                            // 오류 잡기
                             } catch {
-                                print("Google OAuth Error: \(error.localizedDescription)")
-                                self.showAlert = true
-                                self.errorMessage = "Google OAuth Error: \(error.localizedDescription)"
+                                print("구글 로그인 에러 : \(error.localizedDescription)")
+                                
+                                DispatchQueue.main.async {
+                                    // 알림창을 표시.
+                                    self.showAlert = true
+                                    // 알림창 메세지
+                                    self.errorMessage = "구글 로그인 시 문제가 발생했습니다."
+                                }
                             }
                         }
-                        
                     }, label: {
                         Image("google_icon")
                             .resizable()
@@ -195,8 +207,10 @@ struct LoginView: View {
                     
                     // MARK: 회원 가입
                     HStack {
+                        
                         Text("계정이 없으세요?")
                         
+                        // MARK: 가입하기 번튼
                         Button(action: {
                             path.append("JoinView")
                         }, label: {
@@ -205,7 +219,6 @@ struct LoginView: View {
                                 .underline()
                                 .foregroundColor(.black)
                         })
-                        
                     } // HStack
                     .padding(.top, 30)
                     
@@ -213,146 +226,182 @@ struct LoginView: View {
                     
                 }) // VStack
             } // ZStack
+            // Navigation 경로 설정
             .navigationDestination(for: String.self) { value in
+                
+                // 경로 이름별 설정
                 switch value {
+                // 아이디 찾기 화면
                 case "FindInfoView_Id":
                     FindInfoView(selectedFindInfo: 0, path: $path)
+                // 비밀번호 찾기 화면.
                 case "FindInfoView_Pw":
                     FindInfoView(selectedFindInfo: 1, path: $path)
+                // 회원가입 화면.
                 case "JoinView":
                     JoinView(path: $path)
+                // 비밀번호 변경 화면.
                 case "ChangePwView":
                     ChangePwView(path: $path)
+                // 메인 콘텐츠 화면.
                 case "ContentView":
                     ContentView(isLogin: $isLogin)
+                // 알 수 없는 화면.
                 default:
-                    Text("Unknown View")
+                    Text("알 수 없는 화면입니다.")
                 }
             }
         } // NavigationStack
-    } //body
+    } // body
     
-    // 이메일 저장 함수
-    private func saveEmail() {
-        UserDefaults.standard.set($email, forKey: "userEmail")
-        print("이메일 저장됨: \($email)")
-    }
-    
+    // MARK: 구글 OAuth 인증 함수
     func googleOauth() async throws {
+        print("googleOauth 함수 호출")
         
-        print("googleOauth 함수까지 들어옴")
-        
-        // Google 로그인을 위해 Firebase의 클라이언트 ID를 가져옴
+        // Firebase의 클라이언트 ID를 가져옴
         guard let clientID = FirebaseApp.app()?.options.clientID else {
+            // Client ID가 없으면 오류를 발생.
             fatalError("no firebase clientID found")
         }
 
-        // Google Sign In 구성 객체 생성
+        // Google Sign-In 설정을 구성.
         let config = GIDConfiguration(clientID: clientID)
+        // 설정을 Google Sign-In 인스턴스에 적용.
         GIDSignIn.sharedInstance.configuration = config
         
-        // rootView 가져오기
+        // 현재 활성화된 장면을 가져옴.
         let scene = await UIApplication.shared.connectedScenes.first as? UIWindowScene
-        guard let rootViewController = await scene?.windows.first?.rootViewController
-        else {
+        // rootViewController가 없으면 오류를 발생.
+        guard let rootViewController = await scene?.windows.first?.rootViewController else {
             fatalError("There is no root view controller!")
         }
         
-        // Google 로그인을 통한 인증 요청
-        let result = try await GIDSignIn.sharedInstance.signIn(
-            withPresenting: rootViewController
-        )
+        // 비동기로 Google 로그인 진행
+        let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
+        // 로그인된 사용자를 가져옴.
         let user = result.user
         guard let idToken = user.idToken?.tokenString else {
-            return
+            return // ID 토큰이 없으면 반환.
         }
         
-        // Firebase 인증을 위한 GoogleAuthProvider credential 생성
+        // Google 자격 증명을 생성.
         let credential = GoogleAuthProvider.credential(
             withIDToken: idToken, accessToken: user.accessToken.tokenString
         )
+        // Firebase에 자격 증명을 사용해 로그인.
         try await Auth.auth().signIn(with: credential)
         
         // 사용자의 이메일 가져오기
         guard let email = user.profile?.email else {
-            return
+            return // 이메일이 없으면 반환.
         }
+        // 가져온 이메일 확인
+        print("가져온 이메일 : \(email)")
         
-        print("이메일은 가져왔니? \(email)")
-        
-        // 사용자의 추가 정보 가져오기
+        // 현재 사용자 정보를 가져옴.
         let currentUser = Auth.auth().currentUser
-        currentUser?.reload { error in
-            guard let displayName = currentUser?.displayName else {
-                return
-            }
-            
-            // 사용자 데이터베이스 확인
-            self.checkUserInDatabase(email: email, name: displayName)
+        // 사용자 정보를 비동기로 갱신.
+        try await currentUser?.reload()
+        
+        guard let displayName = currentUser?.displayName else {
+            return // 사용자 이름이 없으면 반환.
         }
-    }
+        
+        // Firebase DB에서 사용자 정보를 확인.
+        checkUserInDatabase(email: email, name: displayName)
+    } // googleOauth
 
-    // 데이터베이스에서 유저 체크 함수
+
+    // MARK: Firebase DB에서 User check 함수
     func checkUserInDatabase(email: String, name: String) {
         
-        print("checkUserInDatabase 함수 호출됨")
-        print("이메일: \(email), 이름: \(name)")
+        print("checkUserInDatabase 함수 호출")
+        // 비교할 이메일과 이름 가져오기
+        print("비교할 이메일과 이름 가져오기\n이메일: \(email), 이름: \(name)")
         
         // Firestore 데이터베이스 인스턴스 생성
-        let db = Firestore.firestore()
+        let db = Firestore.firestore() // Firestore 인스턴스를 가져옵니다.
         // "users" 컬렉션에서 이메일 필드가 입력된 이메일과 일치하는 문서를 찾는 쿼리 생성
+        // 이메일이 일치하는 사용자를 쿼리합니다.
         let userRef = db.collection("user").whereField("user_email", isEqualTo: email)
         
         print("Firestore 쿼리 준비됨: \(userRef)")
         
         // Firestore에서 사용자 정보 조회
         userRef.getDocuments { snapshot, error in
-            // 데이터베이스 오류 처리
+            // 데이터베이스 오류인 경우
             if let error = error {
-                // 데이터베이스 오류 메시지를 로그로 출력
+                // 오류 메세지 출력
                 print("데이터베이스 오류: \(error.localizedDescription)")
-                // 경고창 표시 여부 플래그를 true로 설정
-                self.showAlert = true
-                // 경고창에 표시할 오류 메시지 설정
-                self.errorMessage = "데이터베이스 오류: \(error.localizedDescription)"
+                
+                // Main Thread 사용하여 비동기 작업
+                DispatchQueue.main.async {
+                    // 알림창 표시 여부
+                    self.showAlert = true
+                    // 알림창 메세지
+                    self.errorMessage = "데이터베이스 오류입니다."
+                }
                 return
             }
             
+            // Query 결과가 없는 경우
             guard let snapshot = snapshot else {
-                print("Firestore 쿼리 결과 없음")
+                // 결과 출력
+                print("Firestore Query 결과 없음")
                 return
             }
-            
+            // Query 결과가 비어 있는 경우
             if snapshot.isEmpty {
-                // Firestore 쿼리 결과가 있지만, 사용자가 존재하지 않는 경우
+
                 print("사용자가 존재하지 않음")
                 
-                // 사용자가 존재하지 않을 경우 회원가입을 유도하는 경고창 표시
-                self.showAlert = true
-                self.errorMessage = "이 이메일은 등록되지 않았습니다. 회원가입 하시겠습니까?"
-                
+                // Main Thread 사용하여 비동기 작업
                 DispatchQueue.main.async {
-                    let alert = UIAlertController(title: "회원가입", message: "이 계정으로 회원가입 하시겠습니까?", preferredStyle: .alert)
+//                    // 알림창 표시 여부
+//                    self.showAlert = true
+//                    // 알림창 메세지
+//                    self.errorMessage = "
                     
+                    // 경고창을 생성.
+                    let alert = UIAlertController(
+                        // 경고창의 제목
+                        title: "회원가입",
+                        // 경고창의 메시지
+                        message: "이 이메일은 등록되지 않았습니다. 회원가입 하시겠습니까?",
+                        // 경고창의 스타일을 설정.
+                        preferredStyle: .alert
+                    )
+                    // "예" 버튼을 추가.
                     alert.addAction(UIAlertAction(title: "예", style: .default) { _ in
+                        // JoinView로 이동.
                         self.path.append("JoinView")
+                        // 이메일을 저장.
                         UserDefaults.standard.set(email, forKey: "userEmail")
+                        // 이름을 저장.
                         UserDefaults.standard.set(name, forKey: "userName")
                     })
-                    
+                    // "아니오" 버튼을 추가.
                     alert.addAction(UIAlertAction(title: "아니오", style: .cancel))
                     
-                    UIApplication.shared.windows.first?.rootViewController?.present(alert, animated: true, completion: nil)
-                }
-            } else {
-                // Firestore 쿼리 결과가 있고, 사용자가 존재하는 경우
-                print("사용자가 존재함")
+                    // UIWindowScene을 가져와서 타입 캐스팅을 시도
+                    guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                          let rootVC = scene.windows.first?.rootViewController else {
+                        // rootViewController가 없으면 fatalError를 발생.
+                        fatalError("There is no root view controller!")
+                    }
+
+                    // rootViewController에서 present 메서드를 호출하여 alert를 화면에 표시.
+                    rootVC.present(alert, animated: true, completion: nil)
+                } // DispatchQueue
                 
-                // 사용자가 존재하므로 로그인 상태를 true로 설정
+            // 쿼리 결과가 있는 경우
+            } else {
+                print("사용자가 존재함")
+                // 로그인 상태를 true로 설정.
                 self.isLogin = true
                 
-                // snapshot 안의 문서들을 순회하면서 email 값을 출력
                 for document in snapshot.documents {
+                    // 사용자 데이터를 가져옴.
                     let userData = document.data()
                     if let email = userData["user_email"] as? String {
                         print("사용자 이메일: \(email)")
@@ -360,7 +409,7 @@ struct LoginView: View {
                 }
             }
         }
-    } //checkUserInDatabase
+    } // checkUserInDatabase
 }
 
 #Preview {
