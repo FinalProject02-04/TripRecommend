@@ -163,7 +163,9 @@ struct JoinView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                         .padding(.leading, 30)
                         .font(.system(size: 16))
-                        .onChange(of: phoneNumber, perform: handlePhoneNumberChange)
+                        .onChange(of: phoneNumber) {
+                            handlePhoneNumberChange(phoneNumber)
+                        }
                     
                     // MARK: 전송 버튼
                     Button(action: {
@@ -201,7 +203,9 @@ struct JoinView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                         .padding(.leading, 30)
                         .font(.system(size: 16))
-                        .onChange(of: verificationCode, perform: handleVerificationCodeChange)
+                        .onChange(of: verificationCode) {
+                            handleVerificationCodeChange(verificationCode)
+                        }
                     
                     // MARK: 확인 버튼
                     Button(action: {
