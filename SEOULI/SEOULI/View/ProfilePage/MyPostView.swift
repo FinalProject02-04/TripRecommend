@@ -1,92 +1,100 @@
-//
-//  MyPostView.swift
-//  SEOULI
-//
-//  Created by 김소리 on 6/25/24.
-
-/*
- Author : 김수민
- 
- Date : 2024.06.27 Thursday
- Description : 1차 UI frame 작업
- 
- */
-
 import SwiftUI
 
 struct MyPostView: View {
     
-    let posts: [PostModel] = [
-        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: "", views: 0),
-        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: "", views: 0),
-        PostModel(title: "동대문문화원", username: "이휘", subtitle: "연인과 가도 가족과 같이 가도 좋은 곳", content: "" ,date: "2024-06-25", image: "", views: 0),
-    ]
+    @StateObject private var postVM = PostVM()
+    @State private var userNickname: String = ""
     
     var body: some View {
         
-            ZStack(alignment: .top) {
-                Color("Background Color")
-                    .edgesIgnoringSafeArea(.all)
-                
-                VStack(spacing: 0) {
-                    ScrollView(showsIndicators: false) { // scrollbar 숨기기
-                        VStack(spacing: 20) {
-                            ForEach(posts) { post in
-                                NavigationLink(destination: PostDetailView(community: post)) {
-                                    MyPostCard(post: post)
-                                }
+        ZStack(alignment: .top) {
+            Color("Background Color")
+                .edgesIgnoringSafeArea(.all)
+            
+            VStack(spacing: 0) {
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 20) {
+                        ForEach(filteredPosts()) { post in
+                            NavigationLink(destination: PostDetailView(community: post)) {
+                                MyPostCard(post: post)
                             }
                         }
-                        .padding()
-                    } // ScrollView
-                    .background(Color("Background Color"))
-                    .padding(.top, 60)
-                } // VStack
-                .toolbar(content: {
-                    ToolbarItem(placement: .principal) {
-                        Text("나의 게시물")
-                            .bold()
-                            .foregroundColor(Color("Text Color"))
-                            .font(.title)
                     }
-                })
-            } // ZStack
-            .edgesIgnoringSafeArea(.all)
-    } // body
+                    .padding()
+                }
+                .background(Color("Background Color"))
+                .padding(.top, 60)
+            }
+            .toolbar(content: {
+                ToolbarItem(placement: .principal) {
+                    Text("나의 게시물")
+                        .bold()
+                        .foregroundColor(Color("Text Color"))
+                        .font(.title)
+                }
+            })
+        }
+        .edgesIgnoringSafeArea(.all)
+        .onAppear {
+            // 사용자의 닉네임을 UserDefaults에서 가져옴
+            if let nickname = UserDefaults.standard.string(forKey: "userNickname") {
+                self.userNickname = nickname
+            }
+            
+            // 게시물 데이터를 가져옴
+            postVM.fetchPosts()
+        }
+    }
+    
+    // 사용자가 작성한 게시물만 필터링하여 반환
+    private func filteredPosts() -> [PostModel] {
+        return postVM.posts.filter { $0.username == userNickname }
+    }
 }
 
 struct MyPostCard: View {
     var post: PostModel
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(post.title)
-                    .font(.headline)
-                    .foregroundColor(.black)
-                
-                Text(post.subtitle)
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
-                
-                Text(post.date)
-                    .font(.subheadline)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(post.title)
+                .font(.title)
+                .fontWeight(.bold)
+                .foregroundColor(.primary)
+            
+            Text("By: \(post.username)") // Display the username
+                .font(.subheadline)
+                .fontWeight(.bold)
+                .foregroundColor(.gray)
+            
+            Text(post.subtitle)
+                .font(.body)
+                .foregroundColor(.primary)
+            
+            HStack {
+                Spacer()
+                Text("Date: \(post.date)")
+                    .font(.caption)
                     .foregroundColor(.gray)
             }
-            .padding(.leading, 8)
-            
-            Spacer()
         }
         .padding()
         .background(Color.white)
-        .cornerRadius(8)
-        .shadow(radius: 4)
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 10)
+        .cornerRadius(10)
+        .shadow(color: Color.gray.opacity(0.4), radius: 4, x: 0, y: 2)
+        .padding(.bottom)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.clear, lineWidth: 1)
+                .padding(.horizontal, -10)
+        )
+        .padding(.horizontal) // 추가: 수평 패딩
     }
 }
 
-
-#Preview {
-    MyPostView()
+struct MyPostView_Previews: PreviewProvider {
+    static var previews: some View {
+        MyPostView()
+    }
 }
+
