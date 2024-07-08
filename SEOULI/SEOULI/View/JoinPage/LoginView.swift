@@ -105,58 +105,47 @@ struct LoginView: View {
                     
                     Spacer().frame(height: 30)
                     
-                    // MARK: 로그인 버튼
                     Button(action: {
-                        // 비동기 작업을 실행.
                         Task {
-                            // VM에서 사용자 정보 Select
-                            let userQuery = UserInfo(result: $result)
-                            // Firebase에서 정보 가져오기(비동기)
-                            let userInfo = try await userQuery.fetchUserInfo(userid: email, userpw: password)
-                            
-                            print("Firebase Query 결과(true/flase): \(result)")
-                            
-                            // MARK: Query 성공한 경우
-                            if result {
-                                print("로그인성공")
-                                print("사용자 정보: \(userInfo)")
-                                print(userInfo.documentId)
+                            do {
+                                let userQuery = UserInfo(result: $result)
+                                let userInfo = try await userQuery.fetchUserInfo(userid: email, userpw: password)
                                 
-                                // 사용자 정보가 비어 있는 경우
-                                if userInfo.documentId.isEmpty {
-                                    print("ID, PW 잘못 입력")
-                                    // 알림창을 표시.
-                                    self.showAlert = true
-                                    // 알림창 메세지.
-                                    self.errorMessage = "아이디와 비밀번호를 확인해주세요."
-                                    
-                                // 사용자 정보가 유효한 경우
+                                if result {
+                                    if userInfo.documentId.isEmpty {
+                                        self.showAlert = true
+                                        self.errorMessage = "아이디와 비밀번호를 확인해주세요."
+                                    } else {
+                                        self.isLogin = true
+                                        UserDefaults.standard.set(email, forKey: "userEmail")
+                                        UserDefaults.standard.set(userInfo.usernickname, forKey: "userNickname")
+                                    }
                                 } else {
-                                    // 로그인 상태를 true로 설정.
-                                    self.isLogin = true
-                                    // 이메일을 UserDefaults(Storge)에 저장.
-                                    UserDefaults.standard.set(email, forKey: "userEmail")
-                                    print("이메일 Storge에 저장: \($email)")
-                                    UserDefaults.standard.set(userInfo.usernickname, forKey: "userNickname")
-                                    print("이메일 Storge에 저장: \(userInfo.usernickname)")
-                                    
+                                    self.showAlert = true
+                                    self.errorMessage = "서버에 연결에 실패했습니다."
                                 }
-                            // MARK: Query 실패한 경우
-                            } else {
-                                // 알림창을 표시.
+                            } catch {
+                                print("Error fetching user info: \(error)")
                                 self.showAlert = true
-                                // 알림창 메세지.
-                                self.errorMessage = "서버에 연결에 실패했습니다."
+                                self.errorMessage = "사용자 정보를 가져오는데 실패했습니다."
                             }
-                        } // Task
-                    }, label: {
+                        }
+                    }) {
                         Text("로그인")
                             .padding()
                             .frame(width: 200)
                             .background(.theme)
                             .foregroundStyle(.white)
                             .clipShape(.buttonBorder)
-                    })
+                    }
+                    .alert(isPresented: $showAlert) {
+                        Alert(
+                            title: Text("알림"),
+                            message: Text(errorMessage),
+                            dismissButton: .default(Text("확인"))
+                        )
+                    }
+
                     
                     // MARK: 개인 회원 로그인
                     HStack(content: {
@@ -378,7 +367,7 @@ struct LoginView: View {
                         // 이메일을 저장.
                         UserDefaults.standard.set(email, forKey: "userEmail")
                         // 이름을 저장.
-                        UserDefaults.standard.set(name, forKey: "userName")
+                        UserDefaults.standard.set(name, forKey: "userNickname")
                     })
                     // "아니오" 버튼을 추가.
                     alert.addAction(UIAlertAction(title: "아니오", style: .cancel))
