@@ -90,7 +90,7 @@ struct PostCardView: View {
                 .fontWeight(.bold)
                 .foregroundColor(Color("Text Color"))
 
-            Text("By: \(community.username)") // 사용자 이름 표시
+            Text("작성자: \(community.username)") // 사용자 이름 표시
                 .font(.subheadline)
                 .fontWeight(.bold)
                 .foregroundColor(Color("Text Color"))
@@ -101,7 +101,7 @@ struct PostCardView: View {
 
             HStack {
                 Spacer()
-                Text("Date: \(community.date)")
+                Text("날짜: \(community.date)")
                     .font(.caption)
                     .foregroundColor(Color("Text Color")) 
             }
