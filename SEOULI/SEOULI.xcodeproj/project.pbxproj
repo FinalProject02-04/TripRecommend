@@ -8,8 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		931810C12C2D585E004401EB /* NoticeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810C02C2D585E004401EB /* NoticeDetailView.swift */; };
-		931810D22C2E63DF004401EB /* RecommendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810D12C2E63DF004401EB /* RecommendView.swift */; };
-		931810D42C2E6B73004401EB /* RecommendResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810D32C2E6B73004401EB /* RecommendResultView.swift */; };
 		931810D62C324AB2004401EB /* ProductVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 931810D52C324AB2004401EB /* ProductVM.swift */; };
 		931810D92C326E0C004401EB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 931810D82C326E0C004401EB /* FirebaseAuth */; };
 		931810DC2C326E7A004401EB /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 931810DB2C326E7A004401EB /* GoogleSignIn */; };
@@ -55,12 +53,12 @@
 		9323B9962C2BDF6100E751AD /* ProductModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9323B9952C2BDF6100E751AD /* ProductModel.swift */; };
 		9397594E2C2D32AA00DC0700 /* TossPayments in Frameworks */ = {isa = PBXBuildFile; productRef = 9397594D2C2D32AA00DC0700 /* TossPayments */; };
 		939759522C2D3CE200DC0700 /* ChangePwView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939759512C2D3CE200DC0700 /* ChangePwView.swift */; };
+		93AF07512C3BA7F600893952 /* NoticeModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AF07502C3BA7F600893952 /* NoticeModel.swift */; };
+		93AF07532C3BA7FF00893952 /* NoticeVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93AF07522C3BA7FF00893952 /* NoticeVM.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		931810C02C2D585E004401EB /* NoticeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeDetailView.swift; sourceTree = "<group>"; };
-		931810D12C2E63DF004401EB /* RecommendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendView.swift; sourceTree = "<group>"; };
-		931810D32C2E6B73004401EB /* RecommendResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecommendResultView.swift; sourceTree = "<group>"; };
 		931810D52C324AB2004401EB /* ProductVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductVM.swift; sourceTree = "<group>"; };
 		931810DF2C326E8E004401EB /* SeoulListVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeoulListVM.swift; sourceTree = "<group>"; };
 		931810E12C326F63004401EB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -101,6 +99,8 @@
 		9323B9932C2BB05300E751AD /* SeoulListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeoulListModel.swift; sourceTree = "<group>"; };
 		9323B9952C2BDF6100E751AD /* ProductModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductModel.swift; sourceTree = "<group>"; };
 		939759512C2D3CE200DC0700 /* ChangePwView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePwView.swift; sourceTree = "<group>"; };
+		93AF07502C3BA7F600893952 /* NoticeModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeModel.swift; sourceTree = "<group>"; };
+		93AF07522C3BA7FF00893952 /* NoticeVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeVM.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,15 +121,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		931810D02C2E63B8004401EB /* RecommendPage */ = {
-			isa = PBXGroup;
-			children = (
-				931810D12C2E63DF004401EB /* RecommendView.swift */,
-				931810D32C2E6B73004401EB /* RecommendResultView.swift */,
-			);
-			path = RecommendPage;
-			sourceTree = "<group>";
-		};
 		9323B8FF2C2A899900E751AD = {
 			isa = PBXGroup;
 			children = (
@@ -173,7 +164,6 @@
 		9323B9192C2A922300E751AD /* View */ = {
 			isa = PBXGroup;
 			children = (
-				931810D02C2E63B8004401EB /* RecommendPage */,
 				9323B9202C2A927600E751AD /* SplashPage */,
 				9323B91F2C2A926D00E751AD /* JoinPage */,
 				9323B91E2C2A926100E751AD /* ChatbotPage */,
@@ -274,6 +264,7 @@
 				931811332C34DE50004401EB /* RegularExpressionVM.swift */,
 				931811352C34EA53004401EB /* RecommandVM.swift */,
 				931811372C34F663004401EB /* PostVM.swift */,
+				93AF07522C3BA7FF00893952 /* NoticeVM.swift */,
 			);
 			path = VM;
 			sourceTree = "<group>";
@@ -286,6 +277,7 @@
 				931EDF4F2C2CF8830097B7F8 /* PostModel.swift */,
 				9318112D2C33B9E5004401EB /* UserModel.swift */,
 				9318113B2C351019004401EB /* PurchaseModel.swift */,
+				93AF07502C3BA7F600893952 /* NoticeModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -375,10 +367,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93AF07532C3BA7FF00893952 /* NoticeVM.swift in Sources */,
 				9323B9942C2BB05300E751AD /* SeoulListModel.swift in Sources */,
 				9323B92B2C2A93B800E751AD /* SeoulListDetailView.swift in Sources */,
-				931810D22C2E63DF004401EB /* RecommendView.swift in Sources */,
 				9323B9372C2A944600E751AD /* FindInfoView.swift in Sources */,
+				93AF07512C3BA7F600893952 /* NoticeModel.swift in Sources */,
 				931810C12C2D585E004401EB /* NoticeDetailView.swift in Sources */,
 				9323B9532C2A956400E751AD /* PurchaseVM.swift in Sources */,
 				9323B92F2C2A93FE00E751AD /* ProductDetailView.swift in Sources */,
@@ -388,7 +381,6 @@
 				931810E52C327826004401EB /* AuthenticationVM.swift in Sources */,
 				931811362C34EA53004401EB /* RecommandVM.swift in Sources */,
 				931811322C33D33F004401EB /* EditPostView.swift in Sources */,
-				931810D42C2E6B73004401EB /* RecommendResultView.swift in Sources */,
 				9323B9552C2A962F00E751AD /* ProfileView.swift in Sources */,
 				931810D62C324AB2004401EB /* ProductVM.swift in Sources */,
 				9323B90E2C2A899900E751AD /* ContentView.swift in Sources */,
