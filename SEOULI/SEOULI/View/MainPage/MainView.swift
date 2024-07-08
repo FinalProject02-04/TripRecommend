@@ -24,7 +24,7 @@ import SwiftUI
 
 struct MainView: View {
         
-    // radomply picked locations
+    // radomly picked locations from SeoulList
     let pickedlocations: [SeoulList] = [
         
         SeoulList(name: "피규어뮤지엄W", address: "서울특별시 강남구 선릉로158길 3", description: "서울시 강남구 청담동에 위치한 피규어뮤지엄W는 피규어와 토이를 테마로 테마파크의 기능을 접목시킨 새로운 개념의 뮤지엄이다. 피규어뮤지엄W에서는 진귀한 피규어를 만나고, 감상하고, 체험하고, 즐길 수 있는 경험을 제공함으로써 어린이, 청소년, 성인 등 모든 이들에게 새로운 놀이문화와 건전한 취미생활을 제시하는 문화 관광 랜드마크를 건립하고자 한다. 총 6개의 테마로 이루어진 전시공간은 어린이뿐 아니라 온 가족이 즐길 수 있는 놀이공간, 카페가 있는 그랜드 홀, 직접 피규어를 구입할 수 있는 매니아 샵 등 다양한 컨텐츠를 만나고 즐길 수 있도록 마련되었다.", inquiries: "02-512-8865", imageName: "https://cdn.visitkorea.or.kr/img/call?cmd=VIEW&id=7917bc53-e00d-4962-9c51-3ebe5d01c94f"),
@@ -72,7 +72,7 @@ struct MainView: View {
                                 .padding(.trailing, 130)
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                             
-                            // our recommended locations (test)
+                        // our recommended locations
                         ScrollView(.horizontal, showsIndicators: false){
                             HStack() {
                                ForEach(pickedlocations) { location in
@@ -150,10 +150,10 @@ struct MainView: View {
                             .padding(.top,30)
                         } // VStack
                             .padding(.top, 85)
-                ) // overlay
-                .onAppear(perform: {
-                    loadProduct()
-                })
+                    ) // overlay
+                    .onAppear(perform: {
+                        loadProduct()
+                    })
                 // HWIBOT VIEW
                 ChatbotView()
     
@@ -173,6 +173,7 @@ struct MainView: View {
         }
     
     
+    // calling images for the packages using API
     struct ImageRow: View {
         var product: ProductModel
         var body: some View {

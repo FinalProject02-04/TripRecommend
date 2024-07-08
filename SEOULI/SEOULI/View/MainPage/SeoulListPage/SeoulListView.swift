@@ -17,7 +17,10 @@
  Description : DB 연결
  
  Date : 2024.07.03 Wednesday
- Description : List 마무리작업 + lazy loading추가 
+ Description : List 마무리작업 + lazy loading 추가
+ 
+ Date : 2024.07.08 Monday
+ Description : 주석달기, 마무리작업 
  
  */
 
@@ -52,13 +55,15 @@ struct SeoulListView: View {
                     ScrollView {
                         LazyVStack {
                             ForEach(displayedLocations.filter {
+                                // search bar functions
                                 searchText.isEmpty ? true : $0.name.localizedStandardContains(searchText)
                             }) { location in
+                                // navigation links to detail page
                                 NavigationLink(destination: SeoulListDetailView(location: location)) {
                                     LocationRow(location: location)
                                 }
                             }
-
+                            // lazy loading progress view
                             if isLoading {
                                 ProgressView()
                                     .padding()
@@ -80,7 +85,8 @@ struct SeoulListView: View {
             }
         }
     }
-
+    
+    // lazy scroll (10 items per scroll)
     private func loadMoreLocations() {
         guard !isLoading else { return }
         isLoading = true
