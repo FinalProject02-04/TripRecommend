@@ -29,24 +29,18 @@ struct ContentView: View {
                                 Text("Package")
                             }
                             .tag(1)
-                        RecommendView()
-                            .tabItem {
-                                Image(systemName: "globe")
-                                Text("Recommend")
-                            }
-                            .tag(2)
                         PostListView()
                             .tabItem {
                                 Image(systemName: "message.fill")
                                 Text("Community")
                             }
-                            .tag(3)
+                            .tag(2)
                         ProfileView(isLogin: $isLogin)
                             .tabItem {
                                 Image(systemName: "person.fill")
                                 Text("Profile")
                             }
-                            .tag(4)
+                            .tag(3)
                     }
                     .toolbarBackground(.theme, for: .tabBar)
                     .toolbarBackground(.visible, for: .tabBar)

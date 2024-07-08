@@ -18,7 +18,9 @@ import SwiftUI
 struct MyResoView: View {
     
     @State var product: [PurchaseModel] = []
-    @State private var userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "none"
+    @State private var userEmail = UserDefaults.standard.string(forKey: "userEmail") ?? "sori"
+    
+    @State var showAlert : Bool = false
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -47,7 +49,6 @@ struct MyResoView: View {
             })
         } // ZStack
         .onAppear{
-            print(userEmail)
             selectList()
         }
         .edgesIgnoringSafeArea(.all)
@@ -58,7 +59,6 @@ struct MyResoView: View {
         Task{
             product = try await api.selectPurchase(user_id: userEmail)
         }
-        
     }
 }
 
