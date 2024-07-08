@@ -20,11 +20,17 @@ struct RegularExpression {
     }
 
     func isValidEmail(_ email: String) -> Bool { // 이메일의 유효성을 검사하는 메서드를 정의합니다.
+        if email.isEmpty {
+            return true // 빈 문자열일 경우 true 반환
+        }
         let range = NSRange(location: 0, length: email.utf16.count) // 이메일 문자열 전체를 범위로 설정하여 NSRange 객체를 생성합니다.
         return emailRegex.firstMatch(in: email, options: [], range: range) != nil // 이메일이 정규 표현식과 일치하는지 확인하고, 일치하는 경우 true, 일치하지 않는 경우 false를 반환합니다.
     }
     
     func isValidPassword(_ password: String) -> Bool { // 비밀번호의 유효성을 검사하는 메서드를 정의합니다.
+        if password.isEmpty {
+            return true // 빈 문자열일 경우 true 반환
+        }
         let range = NSRange(location: 0, length: password.utf16.count) // 비밀번호 문자열 전체를 범위로 설정하여 NSRange 객체를 생성합니다.
         return passwordRegex.firstMatch(in: password, options: [], range: range) != nil // 비밀번호가 정규 표현식과 일치하는지 확인하고, 일치하는 경우 true, 일치하지 않는 경우 false를 반환합니다.
     }

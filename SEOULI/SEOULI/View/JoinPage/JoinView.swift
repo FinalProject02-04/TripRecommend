@@ -20,30 +20,30 @@ struct JoinView: View {
     @State private var phoneNumber = ""
     @State private var verificationCode = ""
     @State private var isEditing: Bool = true // 이메일 및 이름 텍스트 필드를 읽기 전용으로 설정할 변수
-
+    
+    // MARK: 유효성 검사 메시지 관련 변수들
+    @State private var emailErrorMessage = ""
+    @State private var passwordErrorMessage = ""
+    @State private var passwordCheckMessage = ""
     
     // MARK: Firebase와의 통신 상태 관리 변수들
-    // 로딩 중인지를 나타내는 상태 변수
     @State private var isLoading = false
-    // 알림창을 띄울지 여부를 나타내는 상태 변수
     @State private var showAlert = false
-    // 알림창에 표시할 메시지
     @State private var alertMessage = ""
     
     // MARK: Firebase 인증 관련 변수들
     @State private var verificationID: String?
-    // 인증 코드가 전송되었는지 여부를 나타내는 상태 변수
     @State private var isVerificationSent = false
-    // 인증이 성공적으로 완료되었는지 여부를 나타내는 상태 변수
     @State private var isVerificationSuccessful = false
     
     // MARK: 입력 유효성 검사를 위한 변수들
     @State private var isPhoneNumberValid = false
     @State private var isVerificationCodeValid = false
-    // 키보드 포커싱 관련 변수
     @FocusState private var isFocused: Bool
-    // Firebase Query Request가 완료 됬는지 확인하는 상태 변수
     @State var result: Bool = false
+    
+    // 정규식 유효성 검사를 위한 객체
+    private let regexValidator = RegularExpression()
     
     
     var body: some View {
@@ -53,7 +53,7 @@ struct JoinView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack(alignment: .leading) {
-                Spacer()
+//                Spacer()
                 
                 // MARK: 이메일 입력
                 Text("이메일")
@@ -82,6 +82,14 @@ struct JoinView: View {
                         }
                     }
                 
+                if regexValidator.isValidEmail(email) == false{
+                    Text("이메일을 다시 입력하시오.")
+                        .font(.system(size: 10))
+                        .foregroundColor(.red)
+                        .padding(.leading, 35)
+                }
+                
+                
                 // MARK: 비밀번호 입력
                 Text("비밀번호")
                     .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
@@ -98,6 +106,14 @@ struct JoinView: View {
                     .padding([.horizontal], 30)
                     .font(.system(size: 16))
                 
+                if regexValidator.isValidPassword(password) == false {
+                    Text("알파벳과 숫자 포함 최소 8자 이상이어야 합니다.")
+                        .font(.system(size: 12))
+                        .bold()
+                        .foregroundColor(.red)
+                        .padding(.leading, 35)
+                }
+                
                 // MARK: 비밀번호 확인 입력
                 Text("비밀번호 확인")
                     .foregroundColor(Color(red: 0.259, green: 0.345, blue: 0.518))
@@ -113,6 +129,30 @@ struct JoinView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                     .padding([.horizontal], 30)
                     .font(.system(size: 16))
+                
+                if !password.isEmpty && !passwordcheck.isEmpty{
+                    if password == passwordcheck {
+                        Text("비밀번호가 일치합니다.")
+                            .font(.system(size: 12))
+                            .bold()
+                            .foregroundColor(.blue)
+                            .padding(.leading, 35)
+                    } else{
+                        Text("비밀번호가 일치하지 않습니다.")
+                            .font(.system(size: 12))
+                            .bold()
+                            .foregroundColor(.red)
+                            .padding(.leading, 35)
+                    }
+                } else if password.isEmpty && !passwordcheck.isEmpty{
+                    Text("비밀번호를 입력해주세요.")
+                        .font(.system(size: 12))
+                        .bold()
+                        .foregroundColor(.red)
+                        .padding(.leading, 35)
+                }
+                
+
                 
                 // MARK: 이름 입력
                 Text("이름")
