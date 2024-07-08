@@ -18,7 +18,7 @@
 import SwiftUI
 
 struct NoticeDetailView: View {
-    var post : PostModel
+    var notice : NoticeModel
     var body: some View {
         ZStack {
             
@@ -29,24 +29,20 @@ struct NoticeDetailView: View {
             ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text(post.title)
+                    Text(notice.notice_title)
                         .font(.largeTitle)
                         .fontWeight(.bold)
                         .foregroundColor(Color("Text Color"))
                     
                     HStack {
-                        Text("\(post.username) | \(post.date)")
+                        Text(notice.notice_date)
                             .font(.subheadline)
                             .fontWeight(.regular)
                             .foregroundColor(.gray)
                     }
                 }
                 
-                Text(post.subtitle)
-                    .font(.body)
-                    .foregroundColor(Color("Text Color"))
-                
-                Text("저희 앱이 새롭게 업데이트되었습니다. 앞으로도 더 나은 서비스를 제공하기 위해 최선을 다하겠습니다!")
+                Text(notice.notice_content)
                     .foregroundColor(Color("Text Color"))
                     
                     Image("동대문문화원")
@@ -64,5 +60,5 @@ struct NoticeDetailView: View {
 }
 
 #Preview {
-    NoticeDetailView(post: PostModel(title: "Seouli Update", username: "Seouli Team", subtitle: "새롭게 업데이트된 서울리!", content: "" ,date: "2024/06/32", image: "", views: 0))
+    NoticeDetailView(notice: NoticeModel(notice_seq: 1, notice_title: "공지 제목", notice_content: "공지 내용 공지 내용 공지 내용 공지 내용 공지 내용", notice_date: "2024-07-08"))
 }
