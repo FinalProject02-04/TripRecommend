@@ -142,6 +142,9 @@ struct ProfileView: View {
                               .bold()
                       }) {
                           Button(action: {
+                              // 이메일을 저장.
+                              UserDefaults.standard.set("", forKey: "userEmail")
+                              UserDefaults.standard.set("", forKey: "userName")
                               // 로그아웃 action
                               withAnimation {
                                 isLogin.toggle()

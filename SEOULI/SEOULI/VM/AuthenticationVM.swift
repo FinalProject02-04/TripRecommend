@@ -90,8 +90,53 @@ struct UserInfo {
         return isSameEmail // 이메일 중복 여부 반환
     }
     
+    // MARK: 전화번호 중복 확인 및 이메일 표시 함수
+    func checkUserPhone(phoneNumber: String) async throws {
+        let db = Firestore.firestore()
+        
+        do {
+            // Firestore에서 해당 전화번호가 존재하는지 확인
+            let querySnapshot = try await db.collection("user")
+                .whereField("user_phone", isEqualTo: phoneNumber)
+                .getDocuments()
+            
+            // 문서가 비어 있으면 동일한 전화번호가 없다는 의미
+            if querySnapshot.documents.isEmpty {
+                showAlert(message: "전화번호에 매치되는 이메일이 없습니다.")
+            } else {
+                // 동일한 전화번호가 있는 경우 이메일 정보를 가져와 알림창으로 표시
+                if let document = querySnapshot.documents.first {
+                    if let email = document.data()["user_email"] as? String {
+                        showAlert(message: "매치되는 이메일: \(email)")
+                    }
+                }
+            }
+
+        } catch {
+            print("Error getting documents: \(error)") // 에러 발생 시 로그 출력
+            showAlert(message: "데이터베이스 오류: \(error.localizedDescription)")
+        }
+    }
+
+    // MARK: 알림창 표시 함수
+    func showAlert(message: String) {
+        // 최상위 뷰 컨트롤러 가져오기
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first,
+           let topController = window.rootViewController {
+            let alertController = UIAlertController(title: "알림", message: message, preferredStyle: .alert)
+            alertController.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
+            
+            // 현재의 최상위 뷰 컨트롤러를 찾아서 알림창을 표시
+            topController.present(alertController, animated: true, completion: nil)
+        }
+    }
+    
+    
+    
+    
     // MARK: 사용자를 Firestore에 추가하는 비동기 함수
-    func insertUser(email: String, password: String, name: String, nickname: String) async throws -> Bool {
+    func insertUser(email: String, password: String, name: String, nickname: String, phoneNumber:String) async throws -> Bool {
         formatter.dateFormat = "yyyy-MM-dd" // 날짜 형식 지정
         formatter.locale = Locale(identifier: "ko_KR") // 한국 시간대 설정
         
@@ -107,6 +152,7 @@ struct UserInfo {
                 "user_pw": password, // 비밀번호
                 "user_name": name, // 이름
                 "user_nickname": nickname, // 닉네임
+                "user_phone": phoneNumber, // 전화번호
                 "join_date": formattedDate, // 가입 날짜
                 "delete_date": "", // 삭제 날짜
                 "isDeleted": false // 삭제 여부
@@ -117,6 +163,39 @@ struct UserInfo {
         } catch {
             result = false // 실패 시 false
         }
+        return result // 결과 값 반환
+    }
+    
+    // MARK: 사용자를 Firestore에 추가하는 비동기 함수
+    // 이메일을 사용하여 비밀번호와 닉네임을 업데이트하는 비동기 함수
+    func updateUserByEmail(email: String, newPassword: String, newNickname: String) async throws -> Bool {
+        var result = false // 결과 값 초기화
+        
+        do {
+            // Firestore의 사용자 컬렉션에서 이메일로 문서를 검색
+            let querySnapshot = try await db.collection("user").whereField("user_email", isEqualTo: email).getDocuments()
+            
+            // 이메일에 해당하는 문서를 찾았는지 확인
+            guard let document = querySnapshot.documents.first else {
+                print("No document found with the given email.")
+                return false // 해당 이메일의 문서가 없으면 false 반환
+            }
+            
+            // 문서 ID 가져오기
+            let documentID = document.documentID
+            
+            // 문서 업데이트 (비밀번호와 닉네임 수정)
+            try await db.collection("user").document(documentID).updateData([
+                "user_pw": newPassword, // 비밀번호 업데이트
+                "user_nickname": newNickname // 닉네임 업데이트
+            ])
+            
+            result = true // 업데이트 성공 시 true
+        } catch {
+            print("Error updating document: \(error)") // 오류 로그 출력
+            result = false // 실패 시 false
+        }
+        
         return result // 결과 값 반환
     }
 }
