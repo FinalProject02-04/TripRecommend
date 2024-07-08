@@ -62,14 +62,25 @@ struct PostDetailView: View {
                         .multilineTextAlignment(.leading)
                     
                     if !editedImage.isEmpty {
-                        loadImage(named: editedImage)
-                            .map {
-                                Image(uiImage: $0)
+                        AsyncImage(url: URL(string: editedImage)) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .frame(width: 350, height: 300)
+                            case .success(let image):
+                                image
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 350, height: 300)
-                                    .clipped()
+                            case .failure:
+                                Image(systemName: "xmark.circle")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 350, height: 300)
+                            @unknown default:
+                                EmptyView()
                             }
+                        }
                     }
                     
                     Spacer()
@@ -166,13 +177,6 @@ struct PostDetailView: View {
                 presentationMode.wrappedValue.dismiss() // Dismiss the sheet when the alert is dismissed
             }
         }
-    }
-    
-    func loadImage(named imageName: String) -> UIImage? {
-        guard !imageName.isEmpty else { return nil }
-        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileURL = documentDirectory.appendingPathComponent(imageName)
-        return UIImage(contentsOfFile: fileURL.path)
     }
 }
 

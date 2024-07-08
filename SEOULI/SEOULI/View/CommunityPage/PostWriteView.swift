@@ -1,41 +1,41 @@
 import SwiftUI
-import PhotosUI
+import FirebaseStorage
 
 struct PostWriteView: View {
     @State private var title: String = ""
     @State private var subtitle: String = ""
     @State private var content: String = ""
     @State private var selectedImage: UIImage?
-    @State private var showImagePicker = false
-    @State private var selectedFileNameForAttachment: String = ""
+    @State private var selectedImageURL: String = ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var postVM: PostVM
     @FocusState private var isInputActive: Bool
+    @State private var showImagePicker: Bool = false
 
     var body: some View {
         NavigationView {
             VStack {
-                ScrollView { // ScrollView로 감싸서 키보드가 활성화될 때 스크롤
+                ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
                         Spacer()
 
-                        TextField("장소명", text: $title)
+                        TextField("Title", text: $title)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(height: 44)
                             .padding(.horizontal)
-                            .focused($isInputActive) // FocusState 적용
+                            .focused($isInputActive)
 
-                        TextField("One Liner", text: $subtitle)
+                        TextField("Subtitle", text: $subtitle)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(height: 44)
                             .padding(.horizontal)
-                            .focused($isInputActive) // FocusState 적용
+                            .focused($isInputActive)
 
                         ZStack(alignment: .topLeading) {
                             if content.isEmpty {
-                                Text("내용을 입력하세요")
+                                Text("Enter content here")
                                     .foregroundColor(.gray)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 10)
@@ -47,13 +47,13 @@ struct PostWriteView: View {
                                     RoundedRectangle(cornerRadius: 8)
                                         .stroke(Color.black, lineWidth: 1)
                                 )
-                                .focused($isInputActive) // FocusState 적용
+                                .focused($isInputActive)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal)
 
                         HStack(spacing: 10) {
-                            TextField("첨부파일", text: $selectedFileNameForAttachment)
+                            TextField("Attachment", text: $selectedImageURL)
                                 .disabled(true)
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                                 .frame(height: 44)
@@ -62,15 +62,15 @@ struct PostWriteView: View {
                             Button(action: {
                                 self.showImagePicker.toggle()
                             }) {
-                                Text("첨부파일 선택")
+                                Text("Select Image")
                                     .foregroundColor(.white)
                                     .padding()
-                                    .background(Color.blue)
+                                    .background(Color.theme)
                                     .cornerRadius(8)
                             }
                             .padding(.horizontal)
                             .sheet(isPresented: $showImagePicker) {
-                                ImagePicker(selectedImage: $selectedImage, selectedFileName: $selectedFileNameForAttachment)
+                                ImagePicker(selectedImage: $selectedImage, selectedImageURL: $selectedImageURL)
                             }
                         }
 
@@ -78,95 +78,125 @@ struct PostWriteView: View {
                             Spacer()
                             Button(action: {
                                 if validateFields() {
-                                    // Get the username from UserDefaults
-                                    let username = UserDefaults.standard.string(forKey: "userNickname") ?? "Unknown User"
-                                    postVM.addPost(title: title, subtitle: subtitle, content: content, image: selectedFileNameForAttachment, username: username) { error in
-                                        if let error = error {
-                                            showAlert = true
-                                            alertMessage = "게시물 저장 중 오류가 발생했습니다: \(error.localizedDescription)"
-                                        } else {
-                                            showAlert = true
-                                            alertMessage = "게시물이 성공적으로 추가되었습니다."
-                                            presentationMode.wrappedValue.dismiss()
-                                        }
-                                    }
+                                    uploadImageAndSavePost()
                                 } else {
-                                    showAlert = true
-                                    alertMessage = "장소명과 One Liner를 모두 입력해주세요."
+                                    showAlert(message: "Please fill in Title and Subtitle.")
                                 }
                             }) {
-                                Text("작성완료")
+                                Text("Post")
                                     .foregroundColor(.white)
                                     .padding()
                                     .frame(width: 200)
-                                    .background(Color.blue)
+                                    .background(Color.theme)
                                     .cornerRadius(20)
                             }
                             Spacer()
                         }
                         .padding(.horizontal)
-                        .alert(isPresented: $showAlert) {
-                            Alert(
-                                title: Text("알림"),
-                                message: Text(alertMessage),
-                                dismissButton: .default(Text("확인"))
-                            )
-                        }
 
                         Spacer()
                     }
                     .padding()
                 }
-                .background(Color("Background Color").ignoresSafeArea()) // 배경색 설정 및 SafeArea 무시
+                .background(Color("Background Color").ignoresSafeArea())
                 .onTapGesture {
-                    self.isInputActive = false // 사용자가 ScrollView를 탭하면 키보드가 내려감
+                    self.isInputActive = false
                 }
                 .navigationBarTitle("", displayMode: .inline)
             }
         }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text("Alert"),
+                message: Text(alertMessage),
+                dismissButton: .default(Text("OK"))
+            )
+        }
     }
 
-    private func validateFields() -> Bool {
+    func validateFields() -> Bool {
         return !title.isEmpty && !subtitle.isEmpty
+    }
+
+    func uploadImageAndSavePost() {
+        guard let selectedImage = selectedImage,
+              let imageData = selectedImage.jpegData(compressionQuality: 0.8) else {
+            self.showAlert(message: "Selected image is nil or cannot be converted to JPEG data.")
+            return
+        }
+
+        let fileName = UUID().uuidString + ".jpg"
+
+        // Firebase Storage에 이미지 업로드
+        let storage = Storage.storage()
+        let storageRef = storage.reference()
+        let imageRef = storageRef.child("images/\(fileName)")
+
+        let metadata = StorageMetadata()
+        metadata.contentType = "image/jpeg"
+
+        imageRef.putData(imageData, metadata: metadata) { metadata, error in
+            if let error = error {
+                self.showAlert(message: "Image upload error: \(error.localizedDescription)")
+            } else {
+                // 이미지 업로드 성공 후 다운로드 URL 가져오기
+                imageRef.downloadURL { url, error in
+                    if let error = error {
+                        self.showAlert(message: "Failed to retrieve download URL: \(error.localizedDescription)")
+                    } else if let url = url {
+                        self.selectedImageURL = url.absoluteString
+                        self.savePostToFirestore()
+                    } else {
+                        self.showAlert(message: "Unknown error occurred while retrieving download URL.")
+                    }
+                }
+            }
+        }
+    }
+
+    func savePostToFirestore() {
+        // UserDefaults에서 닉네임 가져오기
+        let username = UserDefaults.standard.string(forKey: "userNickname") ?? "Unknown User"
+
+        postVM.addPost(title: title, subtitle: subtitle, content: content, image: selectedImageURL, username: username) { error in
+            if let error = error {
+                self.showAlert(message: "Error saving post: \(error.localizedDescription)")
+            } else {
+                self.alertMessage = "Post successfully added."
+                self.showAlert = true
+                self.presentationMode.wrappedValue.dismiss()
+            }
+        }
+    }
+
+    func showAlert(message: String) {
+        self.alertMessage = message
+        self.showAlert = true
     }
 }
 
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var selectedImage: UIImage?
-    @Binding var selectedFileName: String
+    @Binding var selectedImageURL: String
 
-    class Coordinator: NSObject, PHPickerViewControllerDelegate {
+    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
         var parent: ImagePicker
 
         init(parent: ImagePicker) {
             self.parent = parent
         }
 
-        func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-            picker.dismiss(animated: true, completion: nil)
-
-            guard let provider = results.first?.itemProvider else { return }
-
-            if provider.canLoadObject(ofClass: UIImage.self) {
-                provider.loadObject(ofClass: UIImage.self) { (image, error) in
-                    DispatchQueue.main.async {
-                        if let image = image as? UIImage {
-                            self.parent.selectedImage = image
-                            // 이미지 파일명을 생성하고 저장
-                            self.parent.selectedFileName = UUID().uuidString + ".jpg"
-                            self.saveImage(image: image, fileName: self.parent.selectedFileName)
-                        }
-                    }
-                }
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let uiImage = info[.originalImage] as? UIImage {
+                parent.selectedImage = uiImage
+                parent.selectedImageURL = "Finish" // 업로드 중일 때의 임시 텍스트
             }
+
+            picker.dismiss(animated: true)
         }
-        
-        private func saveImage(image: UIImage, fileName: String) {
-            if let data = image.jpegData(compressionQuality: 0.8) {
-                let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-                let fileURL = directory.appendingPathComponent(fileName)
-                try? data.write(to: fileURL)
-            }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            picker.dismiss(animated: true)
         }
     }
 
@@ -174,16 +204,18 @@ struct ImagePicker: UIViewControllerRepresentable {
         return Coordinator(parent: self)
     }
 
-    func makeUIViewController(context: Context) -> PHPickerViewController {
-        var configuration = PHPickerConfiguration()
-        configuration.filter = .images
-        configuration.selectionLimit = 1
-
-        let picker = PHPickerViewController(configuration: configuration)
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
         picker.delegate = context.coordinator
         return picker
     }
 
-    func updateUIViewController(_ uiViewController: PHPickerViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+}
+
+struct PostWriteView_Previews: PreviewProvider {
+    static var previews: some View {
+        PostWriteView()
+    }
 }
 
