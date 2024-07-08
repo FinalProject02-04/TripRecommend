@@ -31,6 +31,7 @@ struct PostDetailView: View {
                     Text(editedTitle)
                         .font(.largeTitle)
                         .fontWeight(.bold)
+                        .foregroundColor(Color("Text Color")) // 사용자 지정 텍스트 색상 사용
                         .multilineTextAlignment(.leading)
                     
                     HStack {
@@ -48,10 +49,12 @@ struct PostDetailView: View {
                 
                 Text(editedSubtitle)
                     .font(.body)
+                    .foregroundColor(Color("Text Color")) // 사용자 지정 텍스트 색상 사용
                     .multilineTextAlignment(.leading)
                 
                 Text(editedContent)
                     .font(.body)
+                    .foregroundColor(Color("Text Color")) // 사용자 지정 텍스트 색상 사용
                     .multilineTextAlignment(.leading)
                 
                 if !editedImage.isEmpty {
@@ -69,7 +72,9 @@ struct PostDetailView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .navigationBarTitle("커뮤니티", displayMode: .inline)
+            .background(Color("Background Color")) // 배경색 설정
+            .ignoresSafeArea()
+            .navigationBarTitle("", displayMode: .inline)
             .navigationBarItems(trailing:
                 Button(action: {
                     showingActionSheet = true
