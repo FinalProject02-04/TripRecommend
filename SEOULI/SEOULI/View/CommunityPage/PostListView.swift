@@ -21,22 +21,22 @@ struct PostListView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                Color("Background Color") // Set the background color
-                    .edgesIgnoringSafeArea(.all) // Extend the background color to the edges
+                Color("Background Color") // 배경 색상 설정
+                    .edgesIgnoringSafeArea(.all) // 배경 색상을 화면 끝까지 확장
                 
                 List {
                     ForEach(postVM.posts) { post in
                         ZStack {
                             PostCardView(community: post)
-                                .listRowInsets(EdgeInsets()) // Remove default list row insets
-                            
-                            NavigationLink(destination: PostDetailView(community: post).environmentObject(postData)) {
-                                EmptyView()
-                            }
-                            .buttonStyle(PlainButtonStyle())
+                                .listRowInsets(EdgeInsets()) // 기본 리스트 행의 인세트 제거
+                                .background(NavigationLink(destination: PostDetailView(community: post).environmentObject(postData)) {
+                                    EmptyView()
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                                .opacity(0)) // 링크의 불투명도를 0으로 설정
                         }
-                        .background(Color.clear) // Set background to clear to avoid additional coloring
-                        .listRowBackground(Color("Background Color")) // Match background color
+                        .background(Color.clear) // 추가 색상을 피하기 위해 배경을 투명으로 설정
+                        .listRowBackground(Color("Background Color")) // 배경 색상과 맞춤
                     }
                     .onDelete { indices in
                         indices.forEach { index in
@@ -51,7 +51,7 @@ struct PostListView: View {
                         }
                     }
                 }
-                .listStyle(PlainListStyle()) // Use plain list style to avoid default styles
+                .listStyle(PlainListStyle()) // 기본 스타일을 피하기 위해 평범한 리스트 스타일 사용
                 
                 VStack {
                     Spacer()
@@ -72,9 +72,9 @@ struct PostListView: View {
                     }
                 }
             }
-            .navigationBarTitle("Community", displayMode: .inline)
+            .navigationBarTitle("", displayMode: .inline)
             .onAppear {
-                postVM.fetchPosts() // Ensure the list is updated on appearance
+                postVM.fetchPosts() // 리스트가 나타날 때 업데이트 되도록 설정
             }
         }
     }
@@ -88,22 +88,22 @@ struct PostCardView: View {
             Text(community.title)
                 .font(.title)
                 .fontWeight(.bold)
-                .foregroundColor(.primary)
+                .foregroundColor(Color("Text Color"))
 
-            Text("By: \(community.username)") // Display the username
+            Text("By: \(community.username)") // 사용자 이름 표시
                 .font(.subheadline)
                 .fontWeight(.bold)
-                .foregroundColor(.gray)
+                .foregroundColor(Color("Text Color"))
 
             Text(community.subtitle)
                 .font(.body)
-                .foregroundColor(.primary)
+                .foregroundColor(Color("Text Color"))
 
             HStack {
                 Spacer()
                 Text("Date: \(community.date)")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color("Text Color")) 
             }
         }
         .padding()
@@ -112,6 +112,8 @@ struct PostCardView: View {
                 .fill(Color.white)
                 .shadow(color: Color.gray.opacity(0.4), radius: 4, x: 0, y: 2)
         )
-        .padding(.vertical, 4) // Adjust vertical padding to space out cards
+        .padding(.vertical, 4) // 카드 간격 조정을 위한 세로 여백 조정
     }
 }
+
+

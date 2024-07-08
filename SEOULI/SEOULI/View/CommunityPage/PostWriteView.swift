@@ -12,104 +12,117 @@ struct PostWriteView: View {
     @State private var alertMessage: String = ""
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var postVM: PostVM
+    @FocusState private var isInputActive: Bool
 
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: 20) {
-                Spacer()
+            VStack {
+                ScrollView { // ScrollView로 감싸서 키보드가 활성화될 때 스크롤
+                    VStack(alignment: .leading, spacing: 20) {
+                        Spacer()
 
-                TextField("장소명", text: $title)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(height: 44)
-                    .padding(.horizontal)
+                        TextField("장소명", text: $title)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(height: 44)
+                            .padding(.horizontal)
+                            .focused($isInputActive) // FocusState 적용
 
-                TextField("One Liner", text: $subtitle)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .frame(height: 44)
-                    .padding(.horizontal)
+                        TextField("One Liner", text: $subtitle)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(height: 44)
+                            .padding(.horizontal)
+                            .focused($isInputActive) // FocusState 적용
 
-                ZStack(alignment: .topLeading) {
-                    if content.isEmpty {
-                        Text("내용을 입력하세요")
-                            .foregroundColor(.gray)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 10)
-                    }
-                    TextEditor(text: $content)
-                        .frame(height: 300)
-                        .padding(.horizontal, 4)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.black, lineWidth: 1)
-                        )
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal)
-
-                HStack(spacing: 10) {
-                    TextField("첨부파일", text: $selectedFileNameForAttachment)
-                        .disabled(true)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(height: 44)
+                        ZStack(alignment: .topLeading) {
+                            if content.isEmpty {
+                                Text("내용을 입력하세요")
+                                    .foregroundColor(.gray)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 10)
+                            }
+                            TextEditor(text: $content)
+                                .frame(height: 300)
+                                .padding(.horizontal, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color.black, lineWidth: 1)
+                                )
+                                .focused($isInputActive) // FocusState 적용
+                        }
+                        .frame(maxWidth: .infinity)
                         .padding(.horizontal)
 
-                    Button(action: {
-                        self.showImagePicker.toggle()
-                    }) {
-                        Text("첨부파일 선택")
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.theme)
-                            .cornerRadius(8)
-                    }
-                    .padding(.horizontal)
-                    .sheet(isPresented: $showImagePicker) {
-                        ImagePicker(selectedImage: $selectedImage, selectedFileName: $selectedFileNameForAttachment)
-                    }
-                }
+                        HStack(spacing: 10) {
+                            TextField("첨부파일", text: $selectedFileNameForAttachment)
+                                .disabled(true)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(height: 44)
+                                .padding(.horizontal)
 
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        if validateFields() {
-                            // Get the username from UserDefaults
-                            let username = UserDefaults.standard.string(forKey: "userNickname") ?? "Unknown User"
-                            postVM.addPost(title: title, subtitle: subtitle, content: content, image: selectedFileNameForAttachment, username: username) { error in
-                                if let error = error {
-                                    showAlert = true
-                                    alertMessage = "게시물 저장 중 오류가 발생했습니다: \(error.localizedDescription)"
+                            Button(action: {
+                                self.showImagePicker.toggle()
+                            }) {
+                                Text("첨부파일 선택")
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .background(Color.blue)
+                                    .cornerRadius(8)
+                            }
+                            .padding(.horizontal)
+                            .sheet(isPresented: $showImagePicker) {
+                                ImagePicker(selectedImage: $selectedImage, selectedFileName: $selectedFileNameForAttachment)
+                            }
+                        }
+
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                if validateFields() {
+                                    // Get the username from UserDefaults
+                                    let username = UserDefaults.standard.string(forKey: "userNickname") ?? "Unknown User"
+                                    postVM.addPost(title: title, subtitle: subtitle, content: content, image: selectedFileNameForAttachment, username: username) { error in
+                                        if let error = error {
+                                            showAlert = true
+                                            alertMessage = "게시물 저장 중 오류가 발생했습니다: \(error.localizedDescription)"
+                                        } else {
+                                            showAlert = true
+                                            alertMessage = "게시물이 성공적으로 추가되었습니다."
+                                            presentationMode.wrappedValue.dismiss()
+                                        }
+                                    }
                                 } else {
                                     showAlert = true
-                                    alertMessage = "게시물이 성공적으로 추가되었습니다."
-                                    presentationMode.wrappedValue.dismiss()
+                                    alertMessage = "장소명과 One Liner를 모두 입력해주세요."
                                 }
+                            }) {
+                                Text("작성완료")
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(width: 200)
+                                    .background(Color.blue)
+                                    .cornerRadius(20)
                             }
-                        } else {
-                            showAlert = true
-                            alertMessage = "장소명과 One Liner를 모두 입력해주세요."
+                            Spacer()
                         }
-                    }) {
-                        Text("작성완료")
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(width: 200)
-                            .background(Color.theme)
-                            .cornerRadius(20)
-                    }
-                    Spacer()
-                }
-                .padding(.horizontal)
-                .alert(isPresented: $showAlert) {
-                    Alert(
-                        title: Text("알림"),
-                        message: Text(alertMessage),
-                        dismissButton: .default(Text("확인"))
-                    )
-                }
+                        .padding(.horizontal)
+                        .alert(isPresented: $showAlert) {
+                            Alert(
+                                title: Text("알림"),
+                                message: Text(alertMessage),
+                                dismissButton: .default(Text("확인"))
+                            )
+                        }
 
-                Spacer()
+                        Spacer()
+                    }
+                    .padding()
+                }
+                .background(Color("Background Color").ignoresSafeArea()) // 배경색 설정 및 SafeArea 무시
+                .onTapGesture {
+                    self.isInputActive = false // 사용자가 ScrollView를 탭하면 키보드가 내려감
+                }
+                .navigationBarTitle("", displayMode: .inline)
             }
-            .padding()
         }
     }
 

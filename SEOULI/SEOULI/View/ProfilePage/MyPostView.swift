@@ -60,22 +60,22 @@ struct MyPostCard: View {
             Text(post.title)
                 .font(.title)
                 .fontWeight(.bold)
-                .foregroundColor(.primary)
+                .foregroundColor(Color("Text Color")) // 사용자 지정 텍스트 색상 사용
             
             Text("By: \(post.username)") // Display the username
                 .font(.subheadline)
                 .fontWeight(.bold)
-                .foregroundColor(.gray)
+                .foregroundColor(Color("Text Color")) // 사용자 지정 텍스트 색상 사용
             
             Text(post.subtitle)
                 .font(.body)
-                .foregroundColor(.primary)
+                .foregroundColor(Color("Text Color")) // 사용자 지정 텍스트 색상 사용
             
             HStack {
                 Spacer()
                 Text("Date: \(post.date)")
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color("Text Color")) // 사용자 지정 텍스트 색상 사용
             }
         }
         .padding()
