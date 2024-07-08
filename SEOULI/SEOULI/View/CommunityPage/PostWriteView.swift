@@ -12,22 +12,22 @@ struct PostWriteView: View {
     @State private var alertMessage: String = ""
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var postVM: PostVM
-    
+
     var body: some View {
         NavigationView {
             VStack(alignment: .leading, spacing: 20) {
                 Spacer()
-                
+
                 TextField("장소명", text: $title)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .frame(height: 44)
                     .padding(.horizontal)
-                
+
                 TextField("One Liner", text: $subtitle)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .frame(height: 44)
                     .padding(.horizontal)
-                
+
                 ZStack(alignment: .topLeading) {
                     if content.isEmpty {
                         Text("내용을 입력하세요")
@@ -45,21 +45,21 @@ struct PostWriteView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal)
-                
+
                 HStack(spacing: 10) {
                     TextField("첨부파일", text: $selectedFileNameForAttachment)
                         .disabled(true)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(height: 44)
                         .padding(.horizontal)
-                    
+
                     Button(action: {
                         self.showImagePicker.toggle()
                     }) {
                         Text("첨부파일 선택")
                             .foregroundColor(.white)
                             .padding()
-                            .background(Color.blue)
+                            .background(Color.theme)
                             .cornerRadius(8)
                     }
                     .padding(.horizontal)
@@ -67,30 +67,36 @@ struct PostWriteView: View {
                         ImagePicker(selectedImage: $selectedImage, selectedFileName: $selectedFileNameForAttachment)
                     }
                 }
-                
-                Button(action: {
-                    if validateFields() {
-                        postVM.addPost(title: title, subtitle: subtitle, content: content, image: selectedFileNameForAttachment, username: "username") { error in
-                            if let error = error {
-                                showAlert = true
-                                alertMessage = "게시물 저장 중 오류가 발생했습니다: \(error.localizedDescription)"
-                            } else {
-                                showAlert = true
-                                alertMessage = "게시물이 성공적으로 추가되었습니다."
-                                presentationMode.wrappedValue.dismiss()
+
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        if validateFields() {
+                            // Get the username from UserDefaults
+                            let username = UserDefaults.standard.string(forKey: "userNickname") ?? "Unknown User"
+                            postVM.addPost(title: title, subtitle: subtitle, content: content, image: selectedFileNameForAttachment, username: username) { error in
+                                if let error = error {
+                                    showAlert = true
+                                    alertMessage = "게시물 저장 중 오류가 발생했습니다: \(error.localizedDescription)"
+                                } else {
+                                    showAlert = true
+                                    alertMessage = "게시물이 성공적으로 추가되었습니다."
+                                    presentationMode.wrappedValue.dismiss()
+                                }
                             }
+                        } else {
+                            showAlert = true
+                            alertMessage = "장소명과 One Liner를 모두 입력해주세요."
                         }
-                    } else {
-                        showAlert = true
-                        alertMessage = "장소명과 One Liner를 모두 입력해주세요."
+                    }) {
+                        Text("작성완료")
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(width: 200)
+                            .background(Color.theme)
+                            .cornerRadius(20)
                     }
-                }) {
-                    Text("작성완료")
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 200)
-                        .background(Color.blue)
-                        .cornerRadius(20)
+                    Spacer()
                 }
                 .padding(.horizontal)
                 .alert(isPresented: $showAlert) {
@@ -100,13 +106,13 @@ struct PostWriteView: View {
                         dismissButton: .default(Text("확인"))
                     )
                 }
-                
+
                 Spacer()
             }
             .padding()
         }
     }
-    
+
     private func validateFields() -> Bool {
         return !title.isEmpty && !subtitle.isEmpty
     }
@@ -133,10 +139,20 @@ struct ImagePicker: UIViewControllerRepresentable {
                     DispatchQueue.main.async {
                         if let image = image as? UIImage {
                             self.parent.selectedImage = image
-                            self.parent.selectedFileName = provider.suggestedName ?? "image.jpg"
+                            // 이미지 파일명을 생성하고 저장
+                            self.parent.selectedFileName = UUID().uuidString + ".jpg"
+                            self.saveImage(image: image, fileName: self.parent.selectedFileName)
                         }
                     }
                 }
+            }
+        }
+        
+        private func saveImage(image: UIImage, fileName: String) {
+            if let data = image.jpegData(compressionQuality: 0.8) {
+                let directory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                let fileURL = directory.appendingPathComponent(fileName)
+                try? data.write(to: fileURL)
             }
         }
     }

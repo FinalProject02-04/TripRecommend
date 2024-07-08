@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State var selectpage = 0
     @Binding var isLogin: Bool
+    @StateObject var postData = PostData()
     
     var body: some View {
         NavigationView{
@@ -53,6 +54,7 @@ struct ContentView: View {
                     .toolbarColorScheme(.dark, for: .tabBar)
                 })
             })
+            .environmentObject(postData) // PostData를 환경 객체로 전달
         }
         
     }

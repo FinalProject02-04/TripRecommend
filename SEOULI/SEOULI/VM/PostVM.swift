@@ -29,8 +29,43 @@ class PostVM: ObservableObject {
         }
     }
     
+    func updatePost(post: PostModel, completion: @escaping (Error?) -> Void) {
+        do {
+            try db.collection("posts").document(post.id).setData(from: post) { error in
+                if let error = error {
+                    print("Error updating document: \(error)")
+                    completion(error)
+                } else {
+                    if let index = self.posts.firstIndex(where: { $0.id == post.id }) {
+                        self.posts[index] = post
+                    }
+                    print("Post updated in Firestore successfully!")
+                    completion(nil)
+                }
+            }
+        } catch let error {
+            print("Error writing post to Firestore: \(error)")
+            completion(error)
+        }
+    }
+
+    func deletePost(post: PostModel, completion: @escaping (Error?) -> Void) {
+        db.collection("posts").document(post.id).delete { error in
+            if let error = error {
+                print("Error deleting document: \(error)")
+                completion(error)
+            } else {
+                if let index = self.posts.firstIndex(where: { $0.id == post.id }) {
+                    self.posts.remove(at: index)
+                }
+                print("Post deleted from Firestore successfully!")
+                completion(nil)
+            }
+        }
+    }
+    
     func fetchPosts() {
-        db.collection("posts").addSnapshotListener { (querySnapshot, error) in
+        db.collection("posts").getDocuments { (querySnapshot, error) in
             guard let documents = querySnapshot?.documents else {
                 print("No documents")
                 return
@@ -41,6 +76,7 @@ class PostVM: ObservableObject {
             }
         }
     }
+
     
     private func getCurrentDate() -> String {
         let formatter = DateFormatter()
