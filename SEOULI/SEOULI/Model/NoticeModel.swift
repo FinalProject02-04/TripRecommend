@@ -7,11 +7,12 @@
 
 import Foundation
 
-struct NoticeModel : Decodable{
-    var notice_seq : Int
+struct NoticeModel: Decodable{
+    var notice_seq: Int
     var notice_title: String
     var notice_content: String
-    var notice_date : String
+    var notice_date: String
+    var notice_img: String
 }
 
 extension NoticeModel: Hashable {
