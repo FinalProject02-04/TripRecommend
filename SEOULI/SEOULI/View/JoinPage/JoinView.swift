@@ -1,3 +1,10 @@
+/*
+ JoinView.swift
+ 
+ Author : 이 휘
+ Date : 2024.07.05 Fri
+ Description : 1차 UI frame 작업
+ */
 import SwiftUI
 import Firebase
 
@@ -37,6 +44,7 @@ struct JoinView: View {
     @FocusState private var isFocused: Bool
     // Firebase Query Request가 완료 됬는지 확인하는 상태 변수
     @State var result: Bool = false
+    
     
     var body: some View {
         ZStack {
@@ -246,7 +254,7 @@ struct JoinView: View {
                         } else {
                             Task{
                                 let userInsert = UserInfo(result: $result)
-                                let result = try await userInsert.insertUser(email: email, password: password, name: name, nickname: nickname)
+                                let result = try await userInsert.insertUser(email: email, password: password, name: name, nickname: nickname, phoneNumber: phoneNumber)
                                  print(result)
                                 registerUser()
                             }
@@ -290,8 +298,6 @@ struct JoinView: View {
                 .shadow(radius: 10)
             }
         }
-//        .navigationBarTitle("회원가입")
-//        .navigationBarHidden(true)
         .alert(isPresented: $showAlert) {
             Alert(title: Text("알림"), message: Text(alertMessage), dismissButton: .default(Text("확인")))
         }
@@ -374,37 +380,9 @@ struct JoinView: View {
         
         alertMessage = "사용자 등록이 완료되었습니다."
         showAlert = true
-//        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-//            isLoading = false
-//            if let error = error {
-//                alertMessage = "사용자 등록 실패: \(error.localizedDescription)"
-//                showAlert = true
-//                return
-//            }
-//            alertMessage = "사용자 등록이 완료되었습니다."
-//            showAlert = true
-            
-//            // 사용자 정보를 Firebase에 저장
-//            guard let userID = Auth.auth().currentUser?.uid else { return }
-//            let userData: [String: Any] = [
-//                "email": email,
-//                "name": name,
-//                "nickname": nickname,
-//                "phoneNumber": phoneNumber
-//            ]
-//            Firestore.firestore().collection("users").document(userID).setData(userData) { error in
-//                if let error = error {
-//                    alertMessage = "사용자 정보 저장 실패: \(error.localizedDescription)"
-//                    showAlert = true
-//                    return
-//                }
-//                alertMessage = "사용자 정보가 성공적으로 저장되었습니다."
-//                showAlert = true
-                
-                // 로그인 화면으로 이동
         path.removeLast()
     }
-}
+} // JoinView
 //    }
 //}
 
