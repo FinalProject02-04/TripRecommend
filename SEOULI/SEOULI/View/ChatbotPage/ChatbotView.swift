@@ -31,7 +31,7 @@
 import SwiftUI
 
 // MESSAGE MODEL
-struct ChatMessage: Identifiable {
+struct ChatMessage: Identifiable, Equatable {
     let id = UUID()
     let text: String
     let isFromCurrentUser: Bool
@@ -42,8 +42,11 @@ struct ChatMessage: Identifiable {
         self.isFromCurrentUser = isFromCurrentUser
         self.recommendations = recommendations
     }
+    
+    static func == (lhs: ChatMessage, rhs: ChatMessage) -> Bool {
+        lhs.id == rhs.id
+    }
 }
-
 
 struct ChatbotView: View {
     // State variables to manage various UI states
@@ -55,7 +58,8 @@ struct ChatbotView: View {
     @StateObject private var networkManager = NetworkManager()
     @FocusState private var isInputActive: Bool
     @State private var isFirstTimePresented = true
-    
+    @State private var lastMessageId: UUID?
+
     var body: some View {
         ZStack {
             // HWIBOT Floating Button
@@ -90,7 +94,8 @@ struct ChatbotView: View {
                     isLoading: $isLoading,
                     message: $message,
                     messages: $messages,
-                    networkManager: networkManager
+                    networkManager: networkManager,
+                    lastMessageId: $lastMessageId
                 )
                 .transition(.move(edge: .bottom))
                 .zIndex(1)
@@ -110,6 +115,7 @@ struct ChatbotView: View {
         let initialMessage = "추천받고 싶은 장소에 대한 키워드를 입력해주세요!😊"
         let botMessage = ChatMessage(text: initialMessage, isFromCurrentUser: false)
         messages.append(botMessage)
+        lastMessageId = botMessage.id
     }
     
     // ANIMATION FOR HWIBOT BUTTON
@@ -129,7 +135,8 @@ struct ChatBubble: View {
     @Binding var messages: [ChatMessage]
     @ObservedObject var networkManager: NetworkManager
     @FocusState private var isInputActive: Bool
-    
+    @Binding var lastMessageId: UUID?
+
     var body: some View {
         VStack {
             HStack {
@@ -147,32 +154,39 @@ struct ChatBubble: View {
                 .padding()
             }
             
-            ScrollView {
-                VStack(spacing: 10) {
-                    ForEach(messages) { msg in
-                        if msg.text == "추천받고 싶은 장소에 대한 키워드를 입력해주세요!😊" {
-                            Text(msg.text)
-                                .foregroundColor(.black)
-                                .padding(10)
-                                .background(Color.gray.opacity(0.3))
-                                .cornerRadius(10)
-                                .padding(.trailing,123)
-                        } else {
-                            ChatBubbleRow(
-                                text: msg.text,
-                                isFromCurrentUser: msg.isFromCurrentUser,
-                                recommendations: msg.recommendations,
-                                networkManager: networkManager
-                            )
+            ScrollViewReader { scrollViewProxy in
+                ScrollView {
+                    VStack(spacing: 10) {
+                        ForEach(messages) { msg in
+                            if msg.text == "추천받고 싶은 장소에 대한 키워드를 입력해주세요!😊" {
+                                Text(msg.text)
+                                    .foregroundColor(.black)
+                                    .padding(10)
+                                    .background(Color.gray.opacity(0.3))
+                                    .cornerRadius(10)
+                                    .padding(.trailing,123)
+                            } else {
+                                ChatBubbleRow(
+                                    text: msg.text,
+                                    isFromCurrentUser: msg.isFromCurrentUser,
+                                    recommendations: msg.recommendations,
+                                    networkManager: networkManager
+                                )
+                            }
+                        }
+                        if isLoading {
+                            LoadingBubbleView()
                         }
                     }
-                    if isLoading {
-                        LoadingBubbleView()
+                    .padding(.vertical)
+                    .onChange(of: messages) { _ in
+                        if let lastMessageId = lastMessageId {
+                            scrollViewProxy.scrollTo(lastMessageId, anchor: .bottom)
+                        }
                     }
                 }
-                .padding(.vertical)
             }
-            
+
             HStack {
                 TextField("키워드를 입력하세요!", text: $message)
                     .padding(10)
@@ -214,6 +228,7 @@ struct ChatBubble: View {
         // user's message instance
         let userMessage = ChatMessage(text: message, isFromCurrentUser: true)
         messages.append(userMessage)
+        lastMessageId = userMessage.id
         
         isLoading = true
         
@@ -236,6 +251,7 @@ struct ChatBubble: View {
                     
                     // Append the bot's response to the messages array.
                     messages.append(responseMessage)
+                    lastMessageId = responseMessage.id
                     
                 case .failure(let error):
                     
@@ -244,6 +260,7 @@ struct ChatBubble: View {
                     
                     // Append the error message to the messages array.
                     messages.append(errorMessage)
+                    lastMessageId = errorMessage.id
                 }
                 isLoading = false
             }
