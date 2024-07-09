@@ -198,7 +198,7 @@ struct ImagePicker: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let uiImage = info[.originalImage] as? UIImage {
                 parent.selectedImage = uiImage
-                parent.selectedImageURL = "Finish" // 업로드 중일 때의 임시 텍스트
+                parent.selectedImageURL = "" // 업로드 중일 때의 임시 텍스트
             }
 
             picker.dismiss(animated: true)
