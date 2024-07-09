@@ -11,6 +11,23 @@ import Firebase
 import FirebaseFirestore
 import GoogleSignIn
 
+struct LoadingView: View {
+    var body: some View {
+        // 배경을 반투명하게 설정
+        Color.black.opacity(0.5)
+            .edgesIgnoringSafeArea(.all)
+        ProgressView("loading...")
+            // 인디케이터 색상 변경
+            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+            .padding()
+//            .background(Color.white)
+            .font(.system(size: 20))
+            .foregroundStyle(Color(.white))
+            .cornerRadius(10)
+            .shadow(radius: 10)
+    }
+}
+
 // UserInfo 구조체 정의
 struct UserInfo {
     
@@ -64,58 +81,60 @@ struct UserInfo {
         return userInfo ?? UserModel(documentId: "", userid: "", userpw: "", usernickname: "", userjoindate: "", userdeldate: "")
     }
     
-    // MARK: 이메일 중복 확인을 위한 비동기 함수
-    func checkUserEmail(userid: String) async throws -> Bool {
-        var isSameEmail: Bool = true // 초기 값 true
-        result = false // 결과 값 초기화
+    // MARK: 이메일 존재 및 삭제 여부 확인을 위한 비동기 함수
+    func checkJoin(phone: String) async throws -> Bool? {
+        // 삭제 여부 초기 값
+        var result: Bool = false
         
         do {
-            // Firestore에서 해당 이메일이 존재하는지 확인
-            let db = Firestore.firestore()
-            let querySnapshot = try await db.collection("user") // 사용자 컬렉션 접근
-                .whereField("userid", isEqualTo: userid) // 이메일 필터링
-                .getDocuments() // 문서 가져오기, 에러 발생 가능성 있음
+            // Firestore의 사용자 컬렉션에서 이메일로 문서를 검색
+            let querySnapshot = try await db.collection("user").whereField("user_phone", isEqualTo: phone).getDocuments()
             
-            // 문서가 비어 있으면 동일한 이메일이 없다는 의미
-            if querySnapshot.documents.isEmpty {
-                isSameEmail = false // 같은 이메일이 없음
-            } else {
-                isSameEmail = true // 같은 이메일이 있음
+            // 이메일에 해당하는 문서를 찾았는지 확인
+            guard querySnapshot.documents.first != nil else {
+                print("DB에 그런 번호 없다!")
+                return false // 해당 이메일의 문서가 없으면 false 반환
             }
+            print("잡았다 요놈!")
+            result = true
 
         } catch {
             print("Error getting documents: \(error)") // 에러 발생 시 로그 출력
         }
 
-        return isSameEmail // 이메일 중복 여부 반환
+        return result // 삭제 여부 반환
     }
     
+    
     // MARK: 전화번호 중복 확인 및 이메일 표시 함수
-    func checkUserPhone(phoneNumber: String) async throws {
-        let db = Firestore.firestore()
+    func checkUserPhone(phoneNumber: String) async throws -> String? {
+        
+        // 삭제 여부 초기 값
+        var result: String = ""
         
         do {
-            // Firestore에서 해당 전화번호가 존재하는지 확인
-            let querySnapshot = try await db.collection("user")
-                .whereField("user_phone", isEqualTo: phoneNumber)
-                .getDocuments()
+            
+            // Firestore의 사용자 컬렉션에서 이메일로 문서를 검색
+            let querySnapshot = try await db.collection("user").whereField("user_phone", isEqualTo: phoneNumber).getDocuments()
             
             // 문서가 비어 있으면 동일한 전화번호가 없다는 의미
             if querySnapshot.documents.isEmpty {
-                showAlert(message: "전화번호에 매치되는 이메일이 없습니다.")
+                return "전화번호에 매치되는 이메일이 없습니다."
             } else {
                 // 동일한 전화번호가 있는 경우 이메일 정보를 가져와 알림창으로 표시
                 if let document = querySnapshot.documents.first {
                     if let email = document.data()["user_email"] as? String {
-                        showAlert(message: "매치되는 이메일: \(email)")
+                        return "이메일 : \(email)"
                     }
                 }
             }
 
         } catch {
             print("Error getting documents: \(error)") // 에러 발생 시 로그 출력
-            showAlert(message: "데이터베이스 오류: \(error.localizedDescription)")
+            return "다시시도 해주세요."
         }
+        
+        return result // 삭제 여부 반환
     }
 
     // MARK: 알림창 표시 함수
@@ -166,7 +185,7 @@ struct UserInfo {
         return result // 결과 값 반환
     }
     
-    // MARK: 사용자를 Firestore에 추가하는 비동기 함수
+    // MARK: 회원정보 변경 함수
     // 이메일을 사용하여 비밀번호와 닉네임을 업데이트하는 비동기 함수
     func updateUserByEmail(email: String, newPassword: String, newNickname: String) async throws -> Bool {
         var result = false // 결과 값 초기화
@@ -197,5 +216,49 @@ struct UserInfo {
         }
         
         return result // 결과 값 반환
+    }
+    
+    
+    // MARK: 회원탈퇴 함수
+    func deleteUser(email: String) async throws -> Bool {
+        var result = false // 결과 값 초기화
+        
+        do {
+            // Firestore의 사용자 컬렉션에서 이메일로 문서를 검색
+            let querySnapshot = try await db.collection("user").whereField("user_email", isEqualTo: email).getDocuments()
+            
+            // 이메일에 해당하는 문서를 찾았는지 확인
+            guard let document = querySnapshot.documents.first else {
+                print("주어진 이메일로 문서를 찾을 수 없습니다..")
+                return false // 해당 이메일의 문서가 없으면 false 반환
+            }
+            
+            // 문서 ID 가져오기
+            let documentID = document.documentID
+            
+            // 현재 날짜를 yyyy-MM-dd 형식으로 가져오기
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd"
+            let currentDate = dateFormatter.string(from: Date())
+            
+            // 문서 업데이트 (isDeleted를 true로 설정하고 delete_date를 현재 날짜로 설정)
+            try await db.collection("user").document(documentID).updateData([
+                "isDeleted": true, // isDeleted를 true로 업데이트
+                "delete_date": currentDate // delete_date를 현재 날짜로 업데이트
+            ])
+            
+            result = true // 업데이트 성공 시 true
+        } catch {
+            print("문서 업데이트 오류: \(error)") // 오류 로그 출력
+            result = false // 실패 시 false
+        }
+        
+        return result // 결과 값 반환
+    }
+
+}
+struct LoadingView_Previews: PreviewProvider {
+    static var previews: some View {
+        LoadingView()
     }
 }

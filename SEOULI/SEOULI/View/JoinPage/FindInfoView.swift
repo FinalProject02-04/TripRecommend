@@ -20,12 +20,6 @@ struct FindInfoView: View {
     
     
     // MARK: 사용자 입력 및 상태 관련 변수들
-    @State private var email = ""
-    @State private var password = ""
-    @State private var passwordcheck = ""
-    @State private var name = ""
-    @State private var nickname = ""
-    @State private var phoneNumber = ""
     @State private var isEditing: Bool = true // 이메일 및 이름 텍스트 필드를 읽기 전용으로 설정할 변수
 
     
@@ -69,12 +63,18 @@ struct FindInfoView: View {
                     .pickerStyle(SegmentedPickerStyle())
                     .padding()
                     
+                    
+                    
+                    //MARK: 아이디 찾기
+                    
+                    
+                    
                     if selectedFindInfo == 0{
                         
                         // MARK: 휴대폰 인증 입력
                         
                         HStack {
-                            TextField("휴대폰 번호를 입력하세요.", text: $phoneNumber)
+                            TextField("전화번호를 입력하세요.", text: $idPhoneNumber)
                                 .keyboardType(.phonePad)
                                 .frame(height: 40)
                                 .padding([.horizontal], 20)
@@ -84,18 +84,18 @@ struct FindInfoView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                                 .padding(.leading, 30)
                                 .font(.system(size: 16))
-                                .onChange(of: phoneNumber) {
-                                    handlePhoneNumberChange(phoneNumber)
+                                .onChange(of: idPhoneNumber) {
+                                    handlePhoneNumberChange(idPhoneNumber)
                                 }
                             
                             // MARK: 전송 버튼
                             Button(action: {
                                 // 전화번호 유효성 검사
                                 if !isPhoneNumberValid {
-                                    alertMessage = "유효한 전화번호를 입력해주세요. 예: 01012345678"
+                                    alertMessage = "올바른 전화번호를 입력해주세요."
                                     showAlert = true
                                 } else {
-                                    sendVerificationCode()
+                                    sendVerificationCode(phoneNumber: idPhoneNumber)
                                 }
                             }) {
                                 Text("전송")
@@ -103,7 +103,7 @@ struct FindInfoView: View {
                                     .bold()
                                     .font(.system(size: 16))
                                     .frame(width: 70)
-                                    .background(Color.blue)
+                                    .background(Color.theme)
                                     .foregroundColor(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                     .padding(.trailing, 30)
@@ -132,7 +132,7 @@ struct FindInfoView: View {
                             Button(action: {
                                 // 인증번호 유효성 검사
                                 if !isVerificationCodeValid {
-                                    alertMessage = "유효한 인증번호를 입력해주세요. 예: 123456"
+                                    alertMessage = "올바른 인증번호를 입력해주세요."
                                     showAlert = true
                                 } else {
                                     verifyCode()
@@ -143,7 +143,7 @@ struct FindInfoView: View {
                                     .bold()
                                     .font(.system(size: 16))
                                     .frame(width: 70)
-                                    .background(Color.blue)
+                                    .background(Color.theme)
                                     .foregroundColor(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                                     .padding(.trailing, 30)
@@ -155,39 +155,40 @@ struct FindInfoView: View {
                         Spacer()
                         
                         // MARK: 아이디 찾기 버튼
-                        Button{
-                            
-                            Task{
-                                let userQuery = UserInfo(result: $result)
-                                // Firebase에서 정보 가져오기(비동기)
-                                let _: () = try await userQuery.checkUserPhone(phoneNumber: phoneNumber)
+                        VStack{
+                            Button{
+                                
+                                Task{
+                                    let userInfo = UserInfo(result: $result)
+                                    // Firebase에서 정보 가져오기(비동기)
+                                    let checkEmail = try await userInfo.checkUserPhone(phoneNumber: idPhoneNumber)
+                                    alertMessage = checkEmail ?? ""
+                                    showAlert = true
+                                    
+                                }
+                            } label: {
+                                Text("아이디 찾기")
+                                    .padding()
+                                    .frame(width: 200)
+                                    .bold()
+                                    .background(.theme)
+                                    .foregroundStyle(.white)
+                                    .clipShape(.buttonBorder)
                             }
-                            
-
-                            
-                        } label: {
-                            Text("아이디 찾기")
-                                .padding()
-                                .frame(width: 200)
-                                .bold()
-                                .background(.theme)
-                                .foregroundStyle(.white)
-                                .clipShape(.buttonBorder)
                         }
-//                        .alert("아이디 확인", isPresented: $resultIdAlert, actions: {
-//                            Button("OK", role: .none, action: {
-//                                path.removeLast()
-//                                print("성공")
-//                            })
-//                        },
-//                        message: {
-//                            Text("hwicoding0625@gmail.com")
-//                        })
-                        
+
                     } else{
+                        
+                        
+                        
+                        //MARK: 비밀번호 찾기
+                        
+                        
+                        
+                        
                         // MARK: 휴대폰 번호 입력
                         HStack {
-                            TextField("- 제외하고 번호를 입력하세요.", text: $pwPhoneNumber)
+                            TextField("전화번호를 입력하세요.", text: $pwPhoneNumber)
                                 .keyboardType(.emailAddress)
                                 // 높이 조절
                                 .frame(height: 40)
@@ -215,7 +216,7 @@ struct FindInfoView: View {
                                     alertMessage = "유효한 전화번호를 입력해주세요. 예: 01012345678"
                                     showAlert = true
                                 } else {
-                                    sendVerificationCode()
+                                    sendVerificationCode(phoneNumber: pwPhoneNumber)
                                 }
                                 
                             } label: {
@@ -287,7 +288,7 @@ struct FindInfoView: View {
                                 Text("인증되었습니다.")
                             })
                         } // HStack
-                        .padding(.bottom, 5)
+                        .padding(.bottom, 50)
                         
                         Spacer()
                         
@@ -316,6 +317,9 @@ struct FindInfoView: View {
                     }
                 })
             }) // ZStack
+            .alert(isPresented: $showAlert) {
+                Alert(title: Text("알림"), message: Text(alertMessage), dismissButton: .default(Text("확인")))
+            }
 
     }
     
@@ -345,7 +349,7 @@ struct FindInfoView: View {
     }
     
     // MARK: 인증 코드 전송
-    private func sendVerificationCode() {
+    private func sendVerificationCode(phoneNumber: String) {
         isLoading = true
         // 국제 전화번호 형식으로 변환
         let formattedPhoneNumber = "+82" + phoneNumber.dropFirst()
