@@ -21,14 +21,14 @@ struct PostWriteView: View {
                     VStack(alignment: .leading, spacing: 20) {
                         Spacer()
 
-                        TextField("Title", text: $title)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        TextField("제목", text: $title)
+                            .textFieldStyle(CustomTextFieldStyle())
                             .frame(height: 44)
                             .padding(.horizontal)
                             .focused($isInputActive)
 
-                        TextField("Subtitle", text: $subtitle)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        TextField("One Liner", text: $subtitle)
+                            .textFieldStyle(CustomTextFieldStyle())
                             .frame(height: 44)
                             .padding(.horizontal)
                             .focused($isInputActive)
@@ -53,16 +53,16 @@ struct PostWriteView: View {
                         .padding(.horizontal)
 
                         HStack(spacing: 10) {
-                            TextField("Attachment", text: $selectedImageURL)
+                            TextField("첨부파일", text: $selectedImageURL)
                                 .disabled(true)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .textFieldStyle(CustomTextFieldStyle())
                                 .frame(height: 44)
                                 .padding(.horizontal)
 
                             Button(action: {
                                 self.showImagePicker.toggle()
                             }) {
-                                Text("Select Image")
+                                Text("첨부파일")
                                     .foregroundColor(.white)
                                     .padding()
                                     .background(Color.theme)
@@ -80,10 +80,10 @@ struct PostWriteView: View {
                                 if validateFields() {
                                     uploadImageAndSavePost()
                                 } else {
-                                    showAlert(message: "Please fill in Title and Subtitle.")
+                                    showAlert(message: "제목과 One Liner를 모두 작성해주세요.")
                                 }
                             }) {
-                                Text("Post")
+                                Text("작성완료")
                                     .foregroundColor(.white)
                                     .padding()
                                     .frame(width: 200)
@@ -107,9 +107,9 @@ struct PostWriteView: View {
         }
         .alert(isPresented: $showAlert) {
             Alert(
-                title: Text("Alert"),
+                title: Text("알림"),
                 message: Text(alertMessage),
-                dismissButton: .default(Text("OK"))
+                dismissButton: .default(Text("확인"))
             )
         }
     }
@@ -162,7 +162,7 @@ struct PostWriteView: View {
             if let error = error {
                 self.showAlert(message: "Error saving post: \(error.localizedDescription)")
             } else {
-                self.alertMessage = "Post successfully added."
+                self.alertMessage = "게시물이 성공적으로 작성되었습니다."
                 self.showAlert = true
                 self.presentationMode.wrappedValue.dismiss()
             }
@@ -172,6 +172,15 @@ struct PostWriteView: View {
     func showAlert(message: String) {
         self.alertMessage = message
         self.showAlert = true
+    }
+}
+
+// CustomTextFieldStyle 정의
+struct CustomTextFieldStyle: TextFieldStyle {
+    func _body(configuration: TextField<Self._Label>) -> some View {
+        configuration
+            .padding(10)
+            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray, lineWidth: 1))
     }
 }
 
