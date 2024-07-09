@@ -74,6 +74,9 @@ struct JoinView: View {
                     .padding([.horizontal], 30)
                     .font(.system(size: 16))
                     .disabled(!isEditing) // 읽기 전용 설정
+                    .onChange(of: email) {
+                        email = email.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
                     .onAppear {
                         // UserDefaults에서 userEmail 값 가져오기
                         if let userEmail = UserDefaults.standard.string(forKey: "userEmail") {
@@ -105,6 +108,9 @@ struct JoinView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                     .padding([.horizontal], 30)
                     .font(.system(size: 16))
+                    .onChange(of: password) {
+                        password = password.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
                 
                 if regexValidator.isValidPassword(password) == false {
                     Text("알파벳과 숫자 포함 최소 8자 이상이어야 합니다.")
@@ -129,6 +135,9 @@ struct JoinView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                     .padding([.horizontal], 30)
                     .font(.system(size: 16))
+                    .onChange(of: passwordcheck) {
+                        passwordcheck = passwordcheck.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
                 
                 if !password.isEmpty && !passwordcheck.isEmpty{
                     if password == passwordcheck {
@@ -170,6 +179,9 @@ struct JoinView: View {
                     .padding([.horizontal], 30)
                     .font(.system(size: 16))
                     .disabled(!isEditing) // 읽기 전용 설정
+                    .onChange(of: name) {
+                        name = name.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
                     .onAppear {
                         // UserDefaults에서 userName 값 가져오기
                         if let userName = UserDefaults.standard.string(forKey: "userName") {
@@ -193,6 +205,9 @@ struct JoinView: View {
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray))
                     .padding([.horizontal], 30)
                     .font(.system(size: 16))
+                    .onChange(of: nickname) {
+                        nickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
                 
                 // MARK: 휴대폰 인증 입력
                 Text("휴대폰 인증")
@@ -212,6 +227,7 @@ struct JoinView: View {
                         .padding(.leading, 30)
                         .font(.system(size: 16))
                         .onChange(of: phoneNumber) {
+                            phoneNumber = phoneNumber.trimmingCharacters(in: .whitespacesAndNewlines)
                             handlePhoneNumberChange(phoneNumber)
                         }
                     
@@ -252,6 +268,7 @@ struct JoinView: View {
                         .padding(.leading, 30)
                         .font(.system(size: 16))
                         .onChange(of: verificationCode) {
+                            verificationCode = verificationCode.trimmingCharacters(in: .whitespacesAndNewlines)
                             handleVerificationCodeChange(verificationCode)
                         }
                     

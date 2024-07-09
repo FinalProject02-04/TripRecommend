@@ -62,6 +62,9 @@ struct LoginView: View {
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
                         .padding([.horizontal], 30)
                         .font(.system(size: 20))
+                        .onChange(of: email) {
+                            email = email.trimmingCharacters(in: .whitespacesAndNewlines)
+                        }
                     
                     Spacer().frame(height: 20)
                     
@@ -76,6 +79,9 @@ struct LoginView: View {
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
                         .padding([.horizontal], 30)
                         .font(.system(size: 20))
+                        .onChange(of: password) {
+                            password = password.trimmingCharacters(in: .whitespacesAndNewlines)
+                        }
                     
                     Spacer().frame(height: 20)
                     

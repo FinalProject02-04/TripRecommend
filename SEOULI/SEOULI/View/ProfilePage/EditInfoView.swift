@@ -14,6 +14,9 @@ struct EditInfoView: View {
     @State private var isProcessing = false
     @State private var showSuccessAlert = false
     @Environment(\.dismiss) var dismiss
+    
+    // 정규식 유효성 검사를 위한 객체
+    private let regexValidator = RegularExpression()
 
     var body: some View {
         ZStack {
@@ -21,62 +24,107 @@ struct EditInfoView: View {
             Color("Background Color")
                 .edgesIgnoringSafeArea(.all)
 
-            VStack(alignment: .leading, spacing: 40) {
+            VStack(alignment: .leading) {
                 Spacer()
 
                 // 비밀번호 섹션
-                VStack {
-                    Text("비밀번호")
-                        .font(.system(size: 18))
-                        .foregroundColor(Color("Text Color"))
+                Text("비밀번호")
+                    .font(.system(size: 18))
+                    .foregroundColor(Color("Text Color"))
+                    .bold()
+                    .padding(.leading, 30)
+                
+                SecureField("비밀번호", text: $password)
+                    .frame(height: 40)
+                    .padding(.horizontal, 20)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                    .padding(.horizontal, 30)
+                    .font(.system(size: 16))
+                    .onChange(of: password) {
+                        password = password.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                
+                if regexValidator.isValidPassword(password) == false {
+                    Text("알파벳과 숫자 포함 최소 8자 이상이어야 합니다.")
+                        .font(.system(size: 12))
                         .bold()
-                        .padding(.leading, 30)
-                    
-                    SecureField("비밀번호", text: $password)
-                        .frame(height: 40)
-                        .padding(.horizontal, 20)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
-                        .padding(.horizontal, 30)
-                        .font(.system(size: 16))
+                        .foregroundColor(.red)
+                        .padding(.leading, 35)
                 }
+                
 
                 // 비밀번호 확인 섹션
-                VStack {
-                    Text("비밀번호 확인")
-                        .font(.system(size: 18))
-                        .foregroundColor(Color("Text Color"))
+                Text("비밀번호 확인")
+                    .font(.system(size: 18))
+                    .foregroundColor(Color("Text Color"))
+                    .bold()
+                    .padding(.leading, 30)
+                
+                SecureField("비밀번호 확인", text: $passwordCheck)
+                    .frame(height: 40)
+                    .padding(.horizontal, 20)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                    .padding(.horizontal, 30)
+                    .font(.system(size: 16))
+                    .onChange(of: passwordCheck) {
+                        passwordCheck = passwordCheck.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                
+                if !password.isEmpty && !passwordCheck.isEmpty{
+                    if password == passwordCheck {
+                        Text("비밀번호가 일치합니다.")
+                            .font(.system(size: 12))
+                            .bold()
+                            .foregroundColor(.blue)
+                            .padding(.leading, 35)
+                    } else{
+                        Text("비밀번호가 일치하지 않습니다.")
+                            .font(.system(size: 12))
+                            .bold()
+                            .foregroundColor(.red)
+                            .padding(.leading, 35)
+                    }
+                } else if password.isEmpty && !passwordCheck.isEmpty{
+                    Text("비밀번호를 입력해주세요.")
+                        .font(.system(size: 12))
                         .bold()
-                        .padding(.leading, 30)
-                    
-                    SecureField("비밀번호 확인", text: $passwordCheck)
-                        .frame(height: 40)
-                        .padding(.horizontal, 20)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
-                        .padding(.horizontal, 30)
-                        .font(.system(size: 16))
+                        .foregroundColor(.red)
+                        .padding(.leading, 35)
                 }
+                
+                
 
                 // 닉네임 섹션
-                VStack {
-                    Text("닉네임")
-                        .font(.system(size: 18))
-                        .foregroundColor(Color("Text Color"))
-                        .bold()
-                        .padding(.leading, 30)
-                    
-                    TextField("닉네임", text: $nickname)
-                        .frame(height: 40)
-                        .padding(.horizontal, 20)
-                        .background(Color.white)
-                        .cornerRadius(8)
-                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
-                        .padding(.horizontal, 30)
-                        .font(.system(size: 16))
-                }
+                Text("닉네임")
+                    .font(.system(size: 18))
+                    .foregroundColor(Color("Text Color"))
+                    .bold()
+                    .padding(.leading, 30)
+                
+                TextField("닉네임", text: $nickname)
+                    .frame(height: 40)
+                    .padding(.horizontal, 20)
+                    .background(Color.white)
+                    .cornerRadius(8)
+                    .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                    .padding(.horizontal, 30)
+                    .font(.system(size: 16))
+                    .onChange(of: nickname) {
+                        nickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
+                    .onAppear {
+                        // UserDefaults에서 userNickname 값 가져오기
+                        if let userNickname = UserDefaults.standard.string(forKey: "userNickname") {
+                            nickname = userNickname
+                            print(nickname)
+                        }
+                    }
+                
+                Spacer()
 
                 HStack {
                     Spacer()
