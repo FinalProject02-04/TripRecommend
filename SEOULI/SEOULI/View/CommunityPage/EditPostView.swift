@@ -47,8 +47,15 @@ struct EditPostView: View {
                                 if let data = try? await newItem?.loadTransferable(type: Data.self) {
                                     selectedImageData = data
                                     if let data = selectedImageData, let uiImage = UIImage(data: data) {
-                                        saveImageToDocumentsDirectory(uiImage)
-                                        editedImage = "selectedImage.jpg"
+                                        // Save image to Firebase Storage and update editedImage
+                                        postVM.uploadImage(image: uiImage) { result in
+                                            switch result {
+                                            case .success(let url):
+                                                editedImage = url // Update editedImage with Firebase Storage URL
+                                            case .failure(let error):
+                                                print("Error uploading image: \(error.localizedDescription)")
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -58,14 +65,11 @@ struct EditPostView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(height: 200)
-                    } else if !editedImage.isEmpty {
-                        loadImage(named: editedImage)
-                            .map {
-                                Image(uiImage: $0)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(height: 200)
-                            }
+                    } else if !editedImage.isEmpty, let image = loadImage(named: editedImage) {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 200)
                     }
                 }
             }
@@ -79,7 +83,7 @@ struct EditPostView: View {
                 community.title = editedTitle
                 community.subtitle = editedSubtitle
                 community.content = editedContent
-                community.image = editedImage
+                community.image = editedImage // Ensure editedImage is updated with Firebase Storage URL
                 postVM.updatePost(post: community) { error in
                     if let error = error {
                         print("게시물 업데이트 오류: \(error.localizedDescription)")
@@ -111,20 +115,8 @@ struct EditPostView: View {
         }
     }
 
-    func saveImageToDocumentsDirectory(_ image: UIImage) {
-        guard let data = image.jpegData(compressionQuality: 1) else { return }
-        let filename = getDocumentsDirectory().appendingPathComponent("selectedImage.jpg")
-        try? data.write(to: filename)
-    }
-
     func loadImage(named imageName: String) -> UIImage? {
-        let documentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileURL = documentDirectory.appendingPathComponent(imageName)
+        let fileURL = URL(fileURLWithPath: imageName)
         return UIImage(contentsOfFile: fileURL.path)
     }
-
-    func getDocumentsDirectory() -> URL {
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-    }
 }
-

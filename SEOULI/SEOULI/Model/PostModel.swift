@@ -20,5 +20,10 @@ struct PostModel: Identifiable, Codable {
         self.image = image
         self.views = views
     }
+    
+    var dateValue: Date? {
+        let dateFormatter = ISO8601DateFormatter()
+        return dateFormatter.date(from: date)
+    }
 }
 

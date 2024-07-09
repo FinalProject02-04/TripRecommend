@@ -61,8 +61,8 @@ struct PostDetailView: View {
                         .foregroundColor(Color("Text Color")) // 사용자 지정 텍스트 색상 사용
                         .multilineTextAlignment(.leading)
                     
-                    if !editedImage.isEmpty {
-                        AsyncImage(url: URL(string: editedImage)) { phase in
+                    if !editedImage.isEmpty, let url = URL(string: editedImage) {
+                        AsyncImage(url: url) { phase in
                             switch phase {
                             case .empty:
                                 ProgressView()
@@ -81,6 +81,11 @@ struct PostDetailView: View {
                                 EmptyView()
                             }
                         }
+                    } else {
+                        Image(systemName: "xmark.circle")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 350, height: 300)
                     }
                     
                     Spacer()
