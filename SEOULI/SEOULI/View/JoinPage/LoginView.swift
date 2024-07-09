@@ -22,6 +22,9 @@ struct LoginView: View {
     @State private var errorMessage: String = ""
     @Binding var isLogin: Bool
     @State var result: Bool = false
+    // 로딩 상태를 추적하는 변수
+    @State private var isLoading = false
+
 
     var body: some View {
         
@@ -41,185 +44,214 @@ struct LoginView: View {
                     .edgesIgnoringSafeArea(.all)
                 } // VStack (배경색)
                 
-                VStack(content: {
+                Spacer()
+                
+                ScrollView{
                     
-                    Spacer() // 빈 공간을 추가합니다.
-                    
-                    // MARK: LOGO
-                    Image("logo")
-                        .resizable()
-                        .frame(width: 230, height: 50)
-                    
-                    Spacer().frame(height: 50)
-                    
-                    // MARK: 아이디
-                    TextField("이메일을 입력하세요.", text: $email)
-                        .frame(height: 54)
-                        .padding([.horizontal], 20)
-                        .background(Color.white)
-                        .cornerRadius(16)
-                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
-                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
-                        .padding([.horizontal], 30)
-                        .font(.system(size: 20))
-                        .onChange(of: email) {
-                            email = email.trimmingCharacters(in: .whitespacesAndNewlines)
-                        }
-                    
-                    Spacer().frame(height: 20)
-                    
-                    // MARK: 비밀번호
-                    SecureField("비밀번호를 입력하세요.", text: $password)
-                        .focused($isTextFieldFocused)
-                        .frame(height: 54)
-                        .padding([.horizontal], 20)
-                        .background(Color.white)
-                        .cornerRadius(16)
-                        .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
-                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
-                        .padding([.horizontal], 30)
-                        .font(.system(size: 20))
-                        .onChange(of: password) {
-                            password = password.trimmingCharacters(in: .whitespacesAndNewlines)
-                        }
-                    
-                    Spacer().frame(height: 20)
-                    
-                    HStack {
-                        // MARK: ID 찾기 버튼
-                        Button {
-                            path.append("FindInfoView_Id")
-                        } label: {
-                            Text("아이디 찾기")
-                                .foregroundStyle(.black)
-                                .padding(.leading, 10)
-                        }
+                    VStack(content: {
                         
-                        Divider()
-                            .frame(height: 14)
-                            .overlay(Rectangle().frame(width: 1))
+                        Spacer() // 빈 공간을 추가합니다.
                         
-                        // MARK: Password 찾기 버튼
-                        Button {
-                            path.append("FindInfoView_Pw")
-                        } label: {
-                            Text("비밀번호 찾기")
-                                .foregroundStyle(.black)
-                        }
-                    } // HStack
-                    .padding(.top, 30)
-                    
-                    Spacer().frame(height: 30)
-                    
-                    Button(action: {
-                        Task {
-                            do {
-                                let userQuery = UserInfo(result: $result)
-                                let userInfo = try await userQuery.fetchUserInfo(userid: email, userpw: password)
-                                
-                                if result {
-                                    if userInfo.documentId.isEmpty {
-                                        self.showAlert = true
-                                        self.errorMessage = "아이디와 비밀번호를 확인해주세요."
-                                    } else {
-                                        self.isLogin = true
-                                        UserDefaults.standard.set(email, forKey: "userEmail")
-                                        UserDefaults.standard.set(userInfo.usernickname, forKey: "userNickname")
-                                    }
-                                } else {
-                                    self.showAlert = true
-                                    self.errorMessage = "서버에 연결에 실패했습니다."
-                                }
-                            } catch {
-                                print("Error fetching user info: \(error)")
-                                self.showAlert = true
-                                self.errorMessage = "사용자 정보를 가져오는데 실패했습니다."
-                            }
-                        }
-                    }) {
-                        Text("로그인")
-                            .padding()
-                            .frame(width: 200)
-                            .background(.theme)
-                            .foregroundStyle(.white)
-                            .clipShape(.buttonBorder)
-                    }
-                    .alert(isPresented: $showAlert) {
-                        Alert(
-                            title: Text("알림"),
-                            message: Text(errorMessage),
-                            dismissButton: .default(Text("확인"))
-                        )
-                    }
-
-                    
-                    // MARK: 개인 회원 로그인
-                    HStack(content: {
-                        VStack {
-                            Divider()
-                                .overlay(Rectangle().frame(height: 1))
-                                .padding(.leading, 30)
-                        }
-                        
-                        Text("개인회원 SNS 로그인")
-                            .frame(width: 160)
-                            .bold()
-                        
-                        VStack {
-                            Divider()
-                                .overlay(Rectangle().frame(height: 1))
-                                .padding(.trailing, 30)
-                        }
-                    }) // HStack
-                    .padding([.top, .bottom], 30)
-                    
-                    // MARK: 소셜 로그인 버튼
-                    Button(action: {
-                        // 비동기 작업을 실행.
-                        Task {
-                            // 실행
-                            do {
-                                // VM 구글 로그인 실행(비동기)
-                                try await googleOauth()
-                            // 오류 잡기
-                            } catch {
-                                print("구글 로그인 에러 : \(error.localizedDescription)")
-                                
-                                DispatchQueue.main.async {
-                                    // 알림창을 표시.
-                                    self.showAlert = true
-                                    // 알림창 메세지
-                                    self.errorMessage = "구글 로그인 시 문제가 발생했습니다."
-                                }
-                            }
-                        }
-                    }, label: {
-                        Image("google_icon")
+                        // MARK: LOGO
+                        Image("logo")
                             .resizable()
-                            .frame(width: 50, height: 50)
-                            .scaledToFit()
-                    })
-                    
-                    // MARK: 회원 가입
-                    HStack {
+                            .frame(width: 230, height: 50)
+                            .padding(.top, 100)
                         
-                        Text("계정이 없으세요?")
+                        Spacer().frame(height: 50)
                         
-                        // MARK: 가입하기 번튼
+                        // MARK: 아이디
+                        TextField("이메일을 입력하세요.", text: $email)
+                            .focused($isTextFieldFocused)
+                            .textInputAutocapitalization(.never)
+                            .frame(height: 54)
+                            .padding([.horizontal], 20)
+                            .background(Color.white)
+                            .cornerRadius(16)
+                            .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
+                            .padding([.horizontal], 30)
+                            .font(.system(size: 20))
+                            .onChange(of: email) {
+                                email = email.trimmingCharacters(in: .whitespacesAndNewlines)
+                            }
+                        
+                        Spacer().frame(height: 20)
+                        
+                        // MARK: 비밀번호
+                        SecureField("비밀번호를 입력하세요.", text: $password)
+                            .focused($isTextFieldFocused)
+                            .textInputAutocapitalization(.never)
+                            .frame(height: 54)
+                            .padding([.horizontal], 20)
+                            .background(Color.white)
+                            .cornerRadius(16)
+                            .shadow(color: Color.gray.opacity(0.4), radius: 5, x: 0, y: 2)
+                            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
+                            .padding([.horizontal], 30)
+                            .font(.system(size: 20))
+                            .onChange(of: password) {
+                                password = password.trimmingCharacters(in: .whitespacesAndNewlines)
+                            }
+                        
+                        Spacer().frame(height: 20)
+                        
+                        HStack {
+                            // MARK: ID 찾기 버튼
+                            Button {
+                                path.append("FindInfoView_Id")
+                            } label: {
+                                Text("아이디 찾기")
+                                    .foregroundStyle(.black)
+                                    .padding(.leading, 10)
+                            }
+                            
+                            Divider()
+                                .frame(height: 14)
+                                .overlay(Rectangle().frame(width: 1))
+                            
+                            // MARK: Password 찾기 버튼
+                            Button {
+                                path.append("FindInfoView_Pw")
+                            } label: {
+                                Text("비밀번호 찾기")
+                                    .foregroundStyle(.black)
+                            }
+                        } // HStack
+                        .padding(.top, 30)
+                        
+                        Spacer().frame(height: 30)
+                        
                         Button(action: {
-                            path.append("JoinView")
-                        }, label: {
-                            Text("가입하기")
+                            Task {
+                                
+                                // 로딩 시작
+                                isLoading = true
+                                
+                                do {
+                                    let userQuery = UserInfo(result: $result)
+                                    let userInfo = try await userQuery.fetchUserInfo(userid: email, userpw: password)
+                                    
+                                    if result {
+                                        if userInfo.documentId.isEmpty {
+                                            self.showAlert = true
+                                            self.errorMessage = "아이디와 비밀번호를 확인해주세요."
+                                        } else {
+                                            self.isLogin = true
+                                            UserDefaults.standard.set(email, forKey: "userEmail")
+                                            UserDefaults.standard.set(userInfo.usernickname, forKey: "userNickname")
+                                        }
+                                    } else {
+                                        self.showAlert = true
+                                        self.errorMessage = "서버에 연결에 실패했습니다."
+                                    }
+                                } catch {
+                                    print("Error fetching user info: \(error)")
+                                    self.showAlert = true
+                                    self.errorMessage = "사용자 정보를 가져오는데 실패했습니다."
+                                }
+                                // 로딩 종료
+                                isLoading = false
+                            }
+                        }) {
+                            Text("로그인")
+                                .padding()
+                                .frame(width: 200)
+                                .background(.theme)
+                                .foregroundStyle(.white)
+                                .clipShape(.buttonBorder)
+                        }
+                        .alert(isPresented: $showAlert) {
+                            Alert(
+                                title: Text("알림"),
+                                message: Text(errorMessage),
+                                dismissButton: .default(Text("확인"))
+                            )
+                        }
+
+                        
+                        // MARK: 개인 회원 로그인
+                        HStack(content: {
+                            VStack {
+                                Divider()
+                                    .overlay(Rectangle().frame(height: 1))
+                                    .padding(.leading, 30)
+                            }
+                            
+                            Text("개인회원 SNS 로그인")
+                                .frame(width: 160)
                                 .bold()
-                                .underline()
-                                .foregroundColor(.black)
+                            
+                            VStack {
+                                Divider()
+                                    .overlay(Rectangle().frame(height: 1))
+                                    .padding(.trailing, 30)
+                            }
+                        }) // HStack
+                        .padding([.top, .bottom], 30)
+                        
+                        // MARK: 소셜 로그인 버튼
+                        Button(action: {
+                            
+                            // 로딩 시작
+                            isLoading = true
+                            
+                            // 비동기 작업을 실행.
+                            Task {
+                                // 실행
+                                do {
+                                    // VM 구글 로그인 실행(비동기)
+                                    try await googleOauth()
+                                // 오류 잡기
+                                } catch {
+                                    print("구글 로그인 에러 : \(error.localizedDescription)")
+                                    
+                                    DispatchQueue.main.async {
+                                        // 알림창을 표시.
+                                        self.showAlert = true
+                                        // 알림창 메세지
+                                        self.errorMessage = "구글 로그인 시 문제가 발생했습니다."
+                                    }
+                                }
+                                // 로딩 종료
+                                isLoading = false
+                            }
+                        }, label: {
+                            Image("google_icon")
+                                .resizable()
+                                .frame(width: 50, height: 50)
+                                .scaledToFit()
                         })
-                    } // HStack
-                    .padding(.top, 30)
+                        
+                        // MARK: 회원 가입
+                        HStack {
+                            
+                            Text("계정이 없으세요?")
+                            
+                            // MARK: 가입하기 번튼
+                            Button(action: {
+                                path.append("JoinView")
+                            }, label: {
+                                Text("가입하기")
+                                    .bold()
+                                    .underline()
+                                    .foregroundColor(.black)
+                            })
+                        } // HStack
+                        .padding(.top, 30)
+                        
+                        Spacer()
+                        
+                    }) // VStack
                     
-                    Spacer()
-                    
-                }) // VStack
+                } // ScrollView
+                
+                
+                // 로딩 상태에 따라 ProgressView 표시
+                if isLoading {
+                    LoadingView()
+                }
+                                
             } // ZStack
             // Navigation 경로 설정
             .navigationDestination(for: String.self) { value in
@@ -373,7 +405,7 @@ struct LoginView: View {
                         // 이메일을 저장.
                         UserDefaults.standard.set(email, forKey: "userEmail")
                         // 이름을 저장.
-                        UserDefaults.standard.set(name, forKey: "userNickname")
+                        UserDefaults.standard.set(name, forKey: "userName")
                     })
                     // "아니오" 버튼을 추가.
                     alert.addAction(UIAlertAction(title: "아니오", style: .cancel))
@@ -398,9 +430,25 @@ struct LoginView: View {
                 for document in snapshot.documents {
                     // 사용자 데이터를 가져옴.
                     let userData = document.data()
-                    if let email = userData["user_email"] as? String {
-                        print("사용자 이메일: \(email)")
+                    
+                    // user_email 가져오기
+                    if let userEmail = userData["user_email"] as? String {
+                        print("사용자 이메일: \(userEmail)")
+                        UserDefaults.standard.set(userEmail, forKey: "userEmail")
+                    } else {
+                        print("사용자 이메일이 존재하지 않습니다.")
                     }
+                    
+                    // user_nickname 가져오기
+                    if let userNickname = userData["user_nickname"] as? String {
+                        print("사용자 닉네임: \(userNickname)")
+                        UserDefaults.standard.set(userNickname, forKey: "userNickname")
+                    } else {
+                        print("사용자 닉네임이 존재하지 않습니다.")
+                    }
+                    
+                    // UserDefaults에 변경된 값들을 바로 저장
+                    UserDefaults.standard.synchronize()
                 }
             }
         }
