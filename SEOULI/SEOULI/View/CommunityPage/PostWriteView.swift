@@ -27,7 +27,7 @@ struct PostWriteView: View {
                             .padding(.horizontal)
                             .focused($isInputActive)
 
-                        TextField("One Liner", text: $subtitle)
+                        TextField("부제목", text: $subtitle)
                             .textFieldStyle(CustomTextFieldStyle())
                             .frame(height: 44)
                             .padding(.horizontal)
@@ -53,7 +53,7 @@ struct PostWriteView: View {
                         .padding(.horizontal)
 
                         HStack(spacing: 10) {
-                            TextField("첨부파일", text: $selectedImageURL)
+                            TextField("", text: $selectedImageURL)
                                 .disabled(true)
                                 .textFieldStyle(CustomTextFieldStyle())
                                 .frame(height: 44)
